@@ -50,12 +50,22 @@ untraced/
 │       │   │   ├── how-it-works.tsx
 │       │   │   └── footer.tsx
 │       │   ├── flow-builder/     # Flow builder components
-│       │   │   ├── flow-builder.tsx
+│       │   │   ├── kyc-flow-builder.tsx  # Main KYC flow builder (3-step)
+│       │   │   ├── flow-builder.tsx      # Legacy flow builder
+│       │   │   ├── flow-dashboard.tsx    # Dashboard layout
+│       │   │   ├── flow-canvas.tsx       # Visual flow canvas
+│       │   │   ├── flow-preview.tsx      # Live modal preview
+│       │   │   ├── flow-stats.tsx        # Flow statistics panel
+│       │   │   ├── module-selector.tsx   # Module selection sidebar
 │       │   │   ├── module-card.tsx
 │       │   │   ├── code-preview.tsx
 │       │   │   ├── code-generator.ts
 │       │   │   ├── module-data.ts
-│       │   │   └── types.ts
+│       │   │   ├── types.ts
+│       │   │   └── steps/                # KYC flow builder steps
+│       │   │       ├── project-step.tsx      # Step 1: Create project
+│       │   │       ├── api-keys-step.tsx     # Step 2: API keys
+│       │   │       └── builder-step.tsx      # Step 3: Canvas/Preview/Code
 │       │   ├── providers/        # React providers
 │       │   │   └── privy-provider.tsx
 │       │   ├── ui/               # Reusable UI components
@@ -68,6 +78,8 @@ untraced/
 │       │   │   └── index.ts          # Barrel exports
 │       │   └── verification/     # Embeddable components
 │       │       └── untraced-modal.tsx # Customer integration modal
+│       ├── public/
+│       │   └── icon.png          # UNTRACED logo
 │       └── lib/
 │           ├── cn.ts             # Classname utility
 │           └── use-wallet.ts     # Wallet hook wrapper
@@ -255,15 +267,53 @@ function App() {
 
 ---
 
-## Flow Builder UI
+## KYC Flow Builder
 
-The visual Flow Builder allows developers to:
+The KYC Flow Builder provides a streamlined 3-step workflow for creating verification flows:
 
-1. **Select modules** from the available list
-2. **Configure each module** (thresholds, providers, etc.)
-3. **Drag & drop to reorder** verification requirements
-4. **Preview generated code** (Solidity, SDK, JSON)
-5. **Deploy the flow** to Mantle
+### Step 1: Create Project
+
+- Enter project name and description
+- Minimal, focused UI
+- Automatic flow name generation
+
+### Step 2: API Keys
+
+- Auto-generated API key (public) and Secret key (private)
+- Copy-to-clipboard functionality
+- Show/hide secret key toggle
+- Security warnings and best practices
+- Quick start code snippet
+
+```typescript
+import { createClient } from "@untraced/sdk";
+
+const untraced = createClient({
+  apiKey: "uk_live_...",
+});
+```
+
+### Step 3: Flow Builder
+
+Three-tab interface:
+
+| Tab | Description |
+|-----|-------------|
+| **Canvas** | Visual flow editor with drag-and-drop modules, Start/End nodes, AND connectors |
+| **Preview** | Live phone-frame preview with simulation capability |
+| **Code** | Generated SDK, Solidity, and JSON code |
+
+**Canvas Features:**
+- Minimal sidebar with module selection
+- Drag-and-drop reordering
+- Inline configuration (thresholds, selections)
+- Visual flow with Start → Modules → End
+
+**Preview Features:**
+- Real-time modal preview
+- Phone frame for realistic view
+- Simulate button to test entire flow
+- Reset functionality
 
 ### Generated Output
 
@@ -306,14 +356,25 @@ Generated per-flow contract that:
 ## Design System
 
 **Colors:**
-- Light: `#f8f8f6`
-- Dark: `#3d0040`
-- Dark Hover: `#5a0060`
-- Light Hover: `#efefed`
+
+| Context | Color |
+|---------|-------|
+| Background (Builder) | `#fafafa` |
+| Background (Landing) | `#f8f8f6` |
+| Primary Dark | `#3d0040` |
+| Dark Hover | `#5a0060` |
+| Light Hover | `#efefed` |
+| Gray Scale | Tailwind gray-100 to gray-900 |
 
 **Fonts:**
 - Primary: Poppins (weights: 300-700)
 - Mono: System monospace
+
+**Design Principles:**
+- Minimal, focused interfaces
+- Gray-scale aesthetic for builder
+- Step-by-step progressive disclosure
+- Phone-frame previews for realistic UX
 
 **UI Components:**
 
@@ -331,7 +392,10 @@ Generated per-flow contract that:
 - `GithubIcon`, `GoogleIcon`, `EmailIcon`
 - `AmazonIcon`, `BankIcon`, `IdCardIcon`
 - `GlobeIcon`, `ShieldCheckIcon`, `UserIcon`
-- `MantleIcon`, `SparklesIcon`, `LoaderIcon`
+- `MantleIcon`, `SparklesIcon`, `LoaderIcon`, `CheckCircleIcon`
+
+**Assets:**
+- `icon.png` — UNTRACED logo used in header and builder
 
 ---
 
@@ -404,6 +468,11 @@ forge script script/Deploy.s.sol --rpc-url $MANTLE_SEPOLIA_RPC_URL --broadcast
 - [x] shadcn/magic-ui inspired components
 - [x] Embeddable UntracedModal for customers
 - [x] Polished UX with animations & gradients
+- [x] KYC Flow Builder with 3-step workflow
+- [x] Project creation & API key management
+- [x] Live phone-frame modal preview
+- [x] Flow simulation capability
+- [x] Minimal, focused UI design
 
 ### Phase 2 — zkTLS Integration
 - [ ] Integrate Reclaim Protocol / vlayer for zkTLS

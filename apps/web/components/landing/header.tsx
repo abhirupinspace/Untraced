@@ -3,6 +3,7 @@
 import { useWallet } from "@/lib/use-wallet";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { useEffect, useState } from "react";
@@ -37,9 +38,13 @@ export function Header() {
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-xl bg-untraced-dark flex items-center justify-center group-hover:scale-105 transition-transform">
-            <span className="text-untraced-light font-bold">U</span>
-          </div>
+          <Image
+            src="/icon.png"
+            alt="Untraced Logo"
+            width={40}
+            height={40}
+            className="rounded-xl group-hover:scale-105 transition-transform"
+          />
           <span className="font-semibold text-xl tracking-tight hidden sm:block">
             UNTRACED
           </span>

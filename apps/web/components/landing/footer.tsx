@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { GithubIcon } from "@/components/ui/icons";
 
 export function Footer() {
@@ -7,9 +8,13 @@ export function Footer() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-untraced-dark flex items-center justify-center">
-              <span className="text-untraced-light font-bold">U</span>
-            </div>
+            <Image
+              src="/icon.png"
+              alt="Untraced Logo"
+              width={40}
+              height={40}
+              className="rounded-xl"
+            />
             <div>
               <span className="font-semibold text-lg block">UNTRACED</span>
               <span className="text-xs text-untraced-dark/40 font-light">

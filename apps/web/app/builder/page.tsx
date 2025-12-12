@@ -1,4 +1,4 @@
-import { FlowBuilder } from "@/components/flow-builder";
+import { KYCFlowBuilder } from "@/components/flow-builder";
 
 export const metadata = {
   title: "Flow Builder | UNTRACED",
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function BuilderPage() {
-  return <FlowBuilder />;
+  return <KYCFlowBuilder />;
 }
