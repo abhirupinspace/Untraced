@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f8f8f6;
+  --foreground: #3d0040;
+  --accent: #3d0040;
+  --accent-hover: #5a0060;
+  --muted: #efefed;
+  --border: rgba(61, 0, 64, 0.1);
+  --ring: rgba(61, 0, 64, 0.2);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-light;
+    font-family: var(--font-poppins), system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Gradient backgrounds */
+.gradient-bg {
+  background: linear-gradient(135deg, #f8f8f6 0%, #fff 50%, #f8f8f6 100%);
+}
+
+.gradient-border {
+  background: linear-gradient(135deg, rgba(61, 0, 64, 0.1), rgba(61, 0, 64, 0.05));
+}
+
+/* Animated gradient border */
+.animate-border {
+  background: linear-gradient(90deg, #3d0040, #5a0060, #3d0040);
+  background-size: 200% 100%;
+  animation: border-gradient 3s ease infinite;
+}
+
+@keyframes border-gradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Shimmer effect */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(61, 0, 64, 0.05),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Glow effect */
+.glow {
+  box-shadow: 0 0 20px rgba(61, 0, 64, 0.15);
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 30px rgba(61, 0, 64, 0.2);
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-hover);
+}
+
+/* Focus styles */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-untraced-dark/20 focus:ring-offset-2 focus:ring-offset-untraced-light;
+}
