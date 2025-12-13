@@ -12,13 +12,13 @@ const Card = React.forwardRef<
     className={cn(
       "rounded-2xl transition-all duration-300",
       {
-        "bg-white": variant === "default",
-        "bg-white border border-untraced-dark/10 hover:border-untraced-dark/20":
+        "bg-[#0f0f0f]": variant === "default",
+        "bg-[#0f0f0f] border border-white/5 hover:border-white/10":
           variant === "bordered",
-        "bg-white shadow-lg shadow-untraced-dark/5 hover:shadow-xl hover:shadow-untraced-dark/10":
+        "bg-[#0f0f0f] shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30":
           variant === "elevated",
-        "glass border border-white/20": variant === "glass",
-        "bg-white shadow-glow hover:shadow-glow-lg": variant === "glow",
+        "glass border border-white/10": variant === "glass",
+        "bg-[#0f0f0f] shadow-glow hover:shadow-glow-lg": variant === "glow",
       },
       className
     )}
@@ -57,7 +57,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-untraced-dark/60 font-light", className)}
+    className={cn("text-sm text-gray-400 font-light", className)}
     {...props}
   />
 ));

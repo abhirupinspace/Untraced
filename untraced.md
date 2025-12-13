@@ -1,8 +1,8 @@
 # UNTRACED
 
-## A Modular Zero-Knowledge Verification Suite + Flow Builder
+## Zero-Knowledge Verification Protocol for Mantle
 
-UNTRACED provides developers with a toolbox of **ZK verification modules**, each representing a Web2 → ZK → On-chain attribute attestation. Built on **Mantle**.
+UNTRACED enables developers to build privacy-preserving verification flows. Users prove Web2 attributes (email, age, identity) without revealing underlying data. Built on **Mantle**.
 
 ---
 
@@ -13,22 +13,39 @@ UNTRACED provides developers with a toolbox of **ZK verification modules**, each
 bun install
 
 # Start development server
-bun run dev
+cd apps/web && bun run dev
 
 # Open http://localhost:3000
 ```
 
 ### Environment Setup
 
-Copy the example env file and configure:
-
 ```bash
 cp apps/web/.env.example apps/web/.env.local
 ```
 
 Required variables:
-- `NEXT_PUBLIC_PRIVY_APP_ID` - Your Privy App ID for wallet connection
-- `NEXT_PUBLIC_CHAIN_ID` - Chain ID (5003 for Mantle Sepolia)
+```env
+NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
+NEXT_PUBLIC_REGISTRY_ADDRESS=0x...  # After deployment
+ATTESTOR_PRIVATE_KEY=0x...          # Server-side signing key
+```
+
+---
+
+## How It Works
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   GitHub    │────▶│  Backend    │────▶│  Registry   │────▶│  Your dApp  │
+│   OAuth     │     │  Attestor   │     │  Contract   │     │   Gating    │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+      │                    │                   │                   │
+  User logs in      Signs attestation    Stores boolean      Checks access
+  via Privy         EMAIL_VERIFIED=true  on Mantle           with hasAttribute()
+```
+
+**Privacy Guarantee:** The smart contract only ever knows `EMAIL_VERIFIED == true` — nothing else.
 
 ---
 
@@ -37,293 +54,119 @@ Required variables:
 ```
 untraced/
 ├── apps/
-│   └── web/                      # Next.js 15 frontend
+│   └── web/                          # Next.js 15 frontend
 │       ├── app/
-│       │   ├── page.tsx          # Landing page
-│       │   ├── builder/          # Flow Builder UI
-│       │   └── layout.tsx        # Root layout with providers
+│       │   ├── page.tsx              # Landing → redirects to /dashboard
+│       │   ├── dashboard/            # Project management
+│       │   ├── builder/              # Flow Builder UI
+│       │   └── api/
+│       │       └── attest/route.ts   # Attestation API endpoint
 │       ├── components/
-│       │   ├── landing/          # Landing page components
-│       │   │   ├── header.tsx
-│       │   │   ├── hero.tsx
-│       │   │   ├── modules-section.tsx
-│       │   │   ├── how-it-works.tsx
-│       │   │   └── footer.tsx
-│       │   ├── flow-builder/     # Flow builder components
-│       │   │   ├── kyc-flow-builder.tsx  # Main KYC flow builder (3-step)
-│       │   │   ├── flow-builder.tsx      # Legacy flow builder
-│       │   │   ├── flow-dashboard.tsx    # Dashboard layout
-│       │   │   ├── flow-canvas.tsx       # Visual flow canvas
-│       │   │   ├── flow-preview.tsx      # Live modal preview
-│       │   │   ├── flow-stats.tsx        # Flow statistics panel
-│       │   │   ├── module-selector.tsx   # Module selection sidebar
-│       │   │   ├── module-card.tsx
-│       │   │   ├── code-preview.tsx
-│       │   │   ├── code-generator.ts
-│       │   │   ├── module-data.ts
-│       │   │   ├── types.ts
-│       │   │   └── steps/                # KYC flow builder steps
-│       │   │       ├── project-step.tsx      # Step 1: Create project
-│       │   │       ├── api-keys-step.tsx     # Step 2: API keys
-│       │   │       └── builder-step.tsx      # Step 3: Canvas/Preview/Code
-│       │   ├── providers/        # React providers
-│       │   │   └── privy-provider.tsx
-│       │   ├── ui/               # Reusable UI components
-│       │   │   ├── button.tsx        # CVA-based button with variants
-│       │   │   ├── card.tsx          # Card with glass/glow variants
-│       │   │   ├── badge.tsx         # Status badges
-│       │   │   ├── dialog.tsx        # Radix dialog wrapper
-│       │   │   ├── animated-border.tsx # Magic UI components
-│       │   │   ├── icons.tsx         # Custom SVG icons
-│       │   │   └── index.ts          # Barrel exports
-│       │   └── verification/     # Embeddable components
-│       │       └── untraced-modal.tsx # Customer integration modal
-│       ├── public/
-│       │   └── icon.png          # UNTRACED logo
+│       │   ├── dashboard/            # Dashboard components
+│       │   ├── flow-builder/         # Flow builder components
+│       │   ├── verification/
+│       │   │   └── untraced-modal.tsx # Embeddable verification modal
+│       │   ├── landing/              # Landing page components
+│       │   ├── providers/            # React providers (Privy)
+│       │   └── ui/                   # Reusable UI components
 │       └── lib/
-│           ├── cn.ts             # Classname utility
-│           └── use-wallet.ts     # Wallet hook wrapper
+│           ├── cn.ts                 # Classname utility
+│           └── use-wallet.ts         # Wallet hook wrapper
 │
 ├── packages/
-│   ├── sdk/                      # @untraced/sdk
-│   │   └── src/
-│   │       ├── index.ts          # Package exports
-│   │       ├── client.ts         # UntracedClient class
-│   │       ├── hooks.ts          # React hooks (useUntraced, useUntracedFlow)
-│   │       └── types.ts          # TypeScript types
+│   ├── sdk/                          # @untraced/sdk
+│   │   ├── src/
+│   │   │   ├── index.ts              # Package exports
+│   │   │   ├── client.ts             # UntracedClient class
+│   │   │   ├── hooks.ts              # useUntraced React hook
+│   │   │   ├── types.ts              # TypeScript types
+│   │   │   └── abi/
+│   │   │       └── registry.ts       # Registry contract ABI
+│   │   └── README.md                 # SDK documentation
 │   │
-│   ├── contracts/                # @untraced/contracts (Foundry)
-│   │   └── src/
-│   │       ├── UntracedRegistry.sol    # Central registry
-│   │       ├── FlowFactory.sol         # Flow deployment factory
-│   │       ├── interfaces/
-│   │       │   ├── IUntracedModule.sol
-│   │       │   └── IUntracedRegistry.sol
-│   │       └── modules/
-│   │           ├── MockEmailModule.sol
-│   │           └── MockAgeModule.sol
+│   ├── contracts/                    # Solidity contracts (Foundry)
+│   │   ├── src/
+│   │   │   ├── UntracedRegistry.sol  # Central registry with EIP-712 signatures
+│   │   │   ├── FlowFactory.sol       # Flow deployment factory
+│   │   │   ├── interfaces/
+│   │   │   │   ├── IUntracedModule.sol
+│   │   │   │   └── IUntracedRegistry.sol
+│   │   │   └── modules/
+│   │   │       ├── EmailModule.sol       # Production email module
+│   │   │       └── MockEmailModule.sol   # Testing mock
+│   │   └── script/
+│   │       └── Deploy.s.sol          # Foundry deployment script
 │   │
-│   └── config/                   # Shared configurations
-│       ├── tailwind.config.js
-│       └── tsconfig.base.json
+│   └── config/                       # Shared configurations
 │
-├── package.json                  # Bun workspaces root
-└── untraced.md                   # This file
+├── package.json                      # Bun workspaces root
+└── untraced.md                       # This file
 ```
 
 ---
 
-## Available Modules
+## SDK Integration
 
-| Module | Description | Status |
-|--------|-------------|--------|
-| **zk-email** | Prove Gmail/Outlook ownership without revealing email | Active |
-| **zk-age** | Prove age > threshold without revealing DOB | Active |
-| **zk-github** | Prove commits > N, verified status | Active |
-| **zk-aadhar** | Prove Aadhaar validity & age > 18 | Coming Soon |
-| **zk-bank-balance** | Prove balance > X | Coming Soon |
-| **zk-amazon** | Prove purchase history / Prime status | Coming Soon |
-| **zk-country** | Prove user belongs to allowed region | Coming Soon |
-| **zk-kyc** | Prove KYC passed with provider X | Coming Soon |
+### Installation
 
-Each module produces a standardized **attribute proof**:
-
-```json
-{
-  "attributeType": "email_verified",
-  "proof": "<zk-proof-bytes>",
-  "issuer": "gmail.com",
-  "expiry": 3600
-}
+```bash
+npm install @untraced/sdk
+# or
+bun add @untraced/sdk
 ```
 
----
-
-## Architecture
-
-### Layer A — Verification Modules (Building Blocks)
-
-Each module includes:
-
-**Off-chain components:**
-- zkTLS transcript extractor
-- ZK circuits for attribute logic
-- Proof generator
-
-**On-chain verifier:**
-
-```solidity
-interface IUntracedModule {
-    function verify(bytes calldata proof) external view returns (bool);
-    function attributeType() external pure returns (bytes32);
-    function moduleName() external pure returns (string memory);
-}
-```
-
-### Layer B — UNTRACED Registry (Hub Contract)
-
-Central contract that stores attributes, manages providers, and handles expiration.
-
-```solidity
-contract UntracedRegistry {
-    // user => moduleType => Attestation
-    mapping(address => mapping(bytes32 => Attestation)) public attestations;
-
-    function submitProof(bytes32 moduleType, bytes calldata proof) external;
-    function hasAttribute(address user, bytes32 moduleType) external view returns (bool);
-}
-```
-
-### Layer C — Flow Builder (Rules Engine)
-
-Developers combine modules into custom verification flows:
-
-```json
-{
-  "flowName": "rwa_access",
-  "requirements": [
-    { "module": "zk-email", "config": "Gmail" },
-    { "module": "zk-age", "config": 18 },
-    { "module": "zk-country", "config": "US" }
-  ]
-}
-```
-
-This compiles into a **Solidity Rule Contract**:
-
-```solidity
-contract RwaAccessFlow {
-    function verifyFlow(address user) external view returns (bool) {
-        return registry.hasAttribute(user, ZK_EMAIL)
-            && registry.hasAttribute(user, ZK_AGE)
-            && registry.hasAttribute(user, ZK_COUNTRY);
-    }
-}
-```
-
-### Layer D — JavaScript SDK
-
-```typescript
-import { createClient, useUntraced, useUntracedFlow } from "@untraced/sdk";
-
-// Client usage
-const client = createClient({ chainId: 5003 });
-const proof = await client.generateProof("zk-email");
-await client.submitProof(proof);
-
-// React hooks
-const { verified, loading, verify } = useUntraced("zk-email");
-const { allowed, verify } = useUntracedFlow("rwa_access");
-```
-
----
-
-## Embeddable UntracedModal
-
-For customers who want to integrate UNTRACED verification into their apps, we provide a ready-to-use modal component:
+### React Hook (Recommended)
 
 ```tsx
-import { UntracedModal, UntracedVerifyButton } from "@/components/verification/untraced-modal";
+import { useUntraced } from "@untraced/sdk";
 
-// Option 1: Full control with modal
-function App() {
-  const [open, setOpen] = useState(false);
+function VerifyButton() {
+  const { verified, loading, error, expiresAt, verify, revoke } = useUntraced();
+
+  if (verified) {
+    return (
+      <div>
+        <p>Email verified until {expiresAt?.toLocaleDateString()}</p>
+        <button onClick={revoke}>Revoke</button>
+      </div>
+    );
+  }
 
   return (
-    <UntracedModal
-      open={open}
-      onOpenChange={setOpen}
-      flowName="kyc_verification"
-      modules={["zk-email", "zk-age", "zk-github"]}
-      onComplete={(results) => console.log("Verified:", results)}
-      onStepComplete={(moduleId, success) => console.log(moduleId, success)}
-      title="Verify Your Identity"
-      description="Complete verification to access the platform"
-    />
-  );
-}
-
-// Option 2: Simple button that opens modal
-function App() {
-  return (
-    <UntracedVerifyButton
-      flowName="kyc_verification"
-      modules={["zk-email", "zk-age"]}
-      onComplete={(results) => console.log("Done:", results)}
-    >
-      Verify with UNTRACED
-    </UntracedVerifyButton>
+    <button onClick={verify} disabled={loading}>
+      {loading ? "Verifying..." : "Verify Email"}
+    </button>
   );
 }
 ```
 
-**Modal Features:**
-- Multi-step verification flow with progress indicator
-- Module-specific icons and descriptions
-- Loading states and error handling
-- Success/failure animations
-- Customizable title and description
-- Callback hooks for each step and completion
+### Client API (Advanced)
 
----
+```ts
+import { createClient, ZK_EMAIL } from "@untraced/sdk";
 
-## KYC Flow Builder
-
-The KYC Flow Builder provides a streamlined 3-step workflow for creating verification flows:
-
-### Step 1: Create Project
-
-- Enter project name and description
-- Minimal, focused UI
-- Automatic flow name generation
-
-### Step 2: API Keys
-
-- Auto-generated API key (public) and Secret key (private)
-- Copy-to-clipboard functionality
-- Show/hide secret key toggle
-- Security warnings and best practices
-- Quick start code snippet
-
-```typescript
-import { createClient } from "@untraced/sdk";
-
-const untraced = createClient({
-  apiKey: "uk_live_...",
+const client = createClient({
+  chainId: 5003,
+  registryAddress: "0x...",
 });
+
+// Generate proof (calls backend API)
+const proof = await client.generateProof("zk-email", accessToken, userAddress);
+
+// Submit to chain
+const result = await client.submitProof(proof, walletClient);
+await result.wait();
+
+// Check verification status
+const isVerified = await client.hasEmailVerification(userAddress);
+
+// Get attestation details
+const attestation = await client.getAttestation(userAddress, ZK_EMAIL);
+// { valid: true, timestamp: 1700000000, expiry: 1702592000, issuerHash: "0x..." }
+
+// Revoke attestation
+await client.revokeAttestation(ZK_EMAIL, walletClient);
 ```
-
-### Step 3: Flow Builder
-
-Three-tab interface:
-
-| Tab | Description |
-|-----|-------------|
-| **Canvas** | Visual flow editor with drag-and-drop modules, Start/End nodes, AND connectors |
-| **Preview** | Live phone-frame preview with simulation capability |
-| **Code** | Generated SDK, Solidity, and JSON code |
-
-**Canvas Features:**
-- Minimal sidebar with module selection
-- Drag-and-drop reordering
-- Inline configuration (thresholds, selections)
-- Visual flow with Start → Modules → End
-
-**Preview Features:**
-- Real-time modal preview
-- Phone frame for realistic view
-- Simulate button to test entire flow
-- Reset functionality
-
-### Generated Output
-
-For each flow, the builder generates:
-
-| Output | Description |
-|--------|-------------|
-| **Solidity Contract** | Deployable flow verifier contract |
-| **SDK Code** | Ready-to-use JavaScript integration |
-| **JSON Config** | Flow definition for backend systems |
 
 ---
 
@@ -331,71 +174,170 @@ For each flow, the builder generates:
 
 ### UntracedRegistry.sol
 
-The central hub that:
-- Registers verification modules
-- Stores user attestations
-- Manages expiration (default: 30 days)
-- Allows users to revoke their own attestations
+Central registry with EIP-712 signature verification:
 
-### FlowFactory.sol
+```solidity
+contract UntracedRegistry {
+    // Trusted attestor for signing proofs
+    address public attestor;
 
-Factory contract that:
-- Deploys custom FlowVerifier contracts
-- Stores flow configurations
-- Provides lookup by flow name
+    // User => ModuleType => Attestation
+    mapping(address => mapping(bytes32 => Attestation)) public attestations;
 
-### FlowVerifier.sol
+    // Submit signed attestation
+    function submitSignedProof(
+        bytes32 moduleType,
+        uint256 expiry,
+        uint8 v, bytes32 r, bytes32 s
+    ) external;
 
-Generated per-flow contract that:
-- Checks all required attributes
-- Returns boolean pass/fail
-- Lists missing modules for a user
+    // Check if user has valid attribute
+    function hasAttribute(address user, bytes32 moduleType)
+        external view returns (bool);
+
+    // User can revoke their own attestation
+    function revokeAttestation(bytes32 moduleType) external;
+}
+```
+
+### Using in Your Contracts
+
+```solidity
+import "./interfaces/IUntracedRegistry.sol";
+
+contract YourDApp {
+    IUntracedRegistry public registry;
+    bytes32 constant ZK_EMAIL = keccak256("ZK_EMAIL");
+
+    function gatedAction() external {
+        require(
+            registry.hasAttribute(msg.sender, ZK_EMAIL),
+            "Email verification required"
+        );
+        // Your logic here
+    }
+}
+```
 
 ---
 
-## Design System
+## Deployment
 
-**Colors:**
+### Prerequisites
 
-| Context | Color |
-|---------|-------|
-| Background (Builder) | `#fafafa` |
-| Background (Landing) | `#f8f8f6` |
-| Primary Dark | `#3d0040` |
-| Dark Hover | `#5a0060` |
-| Light Hover | `#efefed` |
-| Gray Scale | Tailwind gray-100 to gray-900 |
+```bash
+# Install Foundry
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
 
-**Fonts:**
-- Primary: Poppins (weights: 300-700)
-- Mono: System monospace
+# Install OpenZeppelin
+cd packages/contracts
+forge install OpenZeppelin/openzeppelin-contracts --no-commit
+```
 
-**Design Principles:**
-- Minimal, focused interfaces
-- Gray-scale aesthetic for builder
-- Step-by-step progressive disclosure
-- Phone-frame previews for realistic UX
+### Deploy to Mantle Sepolia
 
-**UI Components:**
+```bash
+cd packages/contracts
 
-| Component | Description |
-|-----------|-------------|
-| `Button` | CVA-based with variants: default, secondary, outline, ghost, link, glow |
-| `Card` | Variants: default, bordered, elevated, glass, glow |
-| `Badge` | Status indicators with default, secondary, outline, destructive variants |
-| `Dialog` | Radix-based modal with UNTRACED styling |
-| `AnimatedBorder` | Magic UI gradient border animation |
-| `GlowCard` | Card with animated glow effect |
-| `ShimmerButton` | Button with shimmer animation |
+# Set environment variables
+export DEPLOYER_PRIVATE_KEY=0x...
+export ATTESTOR_ADDRESS=0x...
+export MANTLE_SEPOLIA_RPC_URL=https://rpc.sepolia.mantle.xyz
 
-**Custom Icons:**
-- `GithubIcon`, `GoogleIcon`, `EmailIcon`
-- `AmazonIcon`, `BankIcon`, `IdCardIcon`
-- `GlobeIcon`, `ShieldCheckIcon`, `UserIcon`
-- `MantleIcon`, `SparklesIcon`, `LoaderIcon`, `CheckCircleIcon`
+# Deploy
+forge script script/Deploy.s.sol:Deploy \
+  --rpc-url $MANTLE_SEPOLIA_RPC_URL \
+  --broadcast
 
-**Assets:**
-- `icon.png` — UNTRACED logo used in header and builder
+# Output:
+# UntracedRegistry deployed at: 0x...
+# EmailModule deployed at: 0x...
+```
+
+### Update Environment
+
+After deployment, add to `apps/web/.env.local`:
+
+```env
+NEXT_PUBLIC_REGISTRY_ADDRESS=0x...
+```
+
+---
+
+## Embeddable Modal
+
+For customer-facing verification:
+
+```tsx
+import { UntracedModal } from "@/components/verification/untraced-modal";
+import { useUntraced } from "@untraced/sdk";
+
+function App() {
+  const [open, setOpen] = useState(false);
+  const { verified, expiresAt, verify, error } = useUntraced();
+
+  return (
+    <>
+      <button onClick={() => setOpen(true)}>
+        {verified ? "Verified" : "Verify Email"}
+      </button>
+
+      <UntracedModal
+        open={open}
+        onOpenChange={setOpen}
+        onVerify={verify}
+        verified={verified}
+        expiresAt={expiresAt}
+        error={error}
+      />
+    </>
+  );
+}
+```
+
+**Modal Features:**
+- Privacy messaging (what is/isn't revealed)
+- Progress states: idle → generating → submitting → success
+- "Running zero-knowledge proof locally..." UX
+- Validity duration display (30 days)
+- Error handling with retry
+
+---
+
+## Available Modules
+
+| Module | Description | Status |
+|--------|-------------|--------|
+| **zk-email** | Prove email ownership via GitHub OAuth | **Active** |
+| **zk-age** | Prove age > threshold without revealing DOB | Coming Soon |
+| **zk-github** | Prove commits > N, verified status | Coming Soon |
+| **zk-bank-balance** | Prove balance > X | Coming Soon |
+| **zk-country** | Prove user belongs to allowed region | Coming Soon |
+| **zk-aadhar** | Prove Aadhaar validity & age > 18 | Coming Soon |
+
+---
+
+## Architecture
+
+### Attestation Flow
+
+1. **User** connects wallet + GitHub via Privy
+2. **Frontend** calls `POST /api/attest` with GitHub access token
+3. **Backend** fetches GitHub emails, verifies at least one is verified
+4. **Backend** signs EIP-712 attestation: `{user, moduleType, expiry, nonce}`
+5. **Frontend** calls `registry.submitSignedProof()` on Mantle
+6. **Contract** verifies signature, stores attestation
+7. **Any dApp** can now call `registry.hasAttribute(user, ZK_EMAIL)`
+
+### Privacy Model
+
+| Layer | What it knows |
+|-------|---------------|
+| GitHub | User's email (existing relationship) |
+| Backend | Email is verified (boolean only, no storage) |
+| Contract | `EMAIL_VERIFIED == true` (no email, no identity) |
+| Other dApps | User has verified email attribute |
 
 ---
 
@@ -404,12 +346,13 @@ Generated per-flow contract that:
 | Layer | Technology |
 |-------|------------|
 | **Frontend** | Next.js 15, React 18, Tailwind CSS |
-| **Wallet** | Privy |
-| **Drag & Drop** | @dnd-kit/core, @dnd-kit/sortable |
+| **Wallet/Auth** | Privy (wallet + GitHub OAuth) |
+| **Blockchain** | Mantle Sepolia (chain ID: 5003) |
+| **Contracts** | Solidity 0.8.20, Foundry |
+| **Signing** | EIP-712 typed data signatures |
+| **Web3** | viem |
 | **Animations** | Framer Motion |
-| **UI Primitives** | Radix UI (Dialog, Slot, Tooltip) |
-| **Component Styling** | Class Variance Authority (CVA), tailwind-merge |
-| **Smart Contracts** | Solidity 0.8.20, Foundry |
+| **UI** | Radix UI, CVA |
 | **Package Manager** | Bun |
 | **Monorepo** | Bun Workspaces |
 
@@ -423,68 +366,58 @@ Generated per-flow contract that:
 # Install all dependencies
 bun install
 
-# Start web app in dev mode
-bun run dev
+# Start web app
+cd apps/web && bun run dev
 
-# Build all packages
-bun run build
-
-# Lint all packages
-bun run lint
-
-# Clean all node_modules
-bun run clean
-```
-
-### Contracts (Foundry)
-
-```bash
-cd packages/contracts
+# Type check
+bun run tsc --noEmit
 
 # Build contracts
-forge build
+cd packages/contracts && forge build
 
-# Run tests
+# Run contract tests
 forge test
+```
 
-# Deploy to Mantle Sepolia
-forge script script/Deploy.s.sol --rpc-url $MANTLE_SEPOLIA_RPC_URL --broadcast
+### API Endpoint
+
+The attestation API is at `apps/web/app/api/attest/route.ts`:
+
+```
+POST /api/attest
+Body: { userAddress, githubAccessToken, nonce }
+Response: { attestation: { moduleType, expiry, signature: { v, r, s } } }
 ```
 
 ---
 
 ## Roadmap
 
-### Phase 1 — MVP (Current)
+### Phase 1 — MVP ✅
 - [x] Monorepo setup with Bun
 - [x] Landing page with animations
-- [x] Flow Builder UI with drag-drop
-- [x] Code generation (Solidity, SDK, JSON)
-- [x] Privy wallet integration
-- [x] SDK skeleton with hooks
-- [x] Core smart contracts
-- [x] Poppins font integration
-- [x] Custom brand icons (GitHub, Email, Bank, etc.)
-- [x] shadcn/magic-ui inspired components
-- [x] Embeddable UntracedModal for customers
-- [x] Polished UX with animations & gradients
-- [x] KYC Flow Builder with 3-step workflow
-- [x] Project creation & API key management
-- [x] Live phone-frame modal preview
-- [x] Flow simulation capability
-- [x] Minimal, focused UI design
+- [x] Dashboard with project management
+- [x] Flow Builder UI
+- [x] Privy wallet + GitHub OAuth integration
+- [x] UntracedRegistry with EIP-712 signatures
+- [x] EmailModule implementation
+- [x] Backend attestation API
+- [x] SDK with `useUntraced` hook
+- [x] Embeddable verification modal
+- [x] Foundry deployment scripts
 
-### Phase 2 — zkTLS Integration
-- [ ] Integrate Reclaim Protocol / vlayer for zkTLS
-- [ ] Implement zk-email module end-to-end
-- [ ] Implement zk-age module with ID verification
-- [ ] Deploy contracts to Mantle testnet
-
-### Phase 3 — Production
-- [ ] Security audit
-- [ ] More verification modules
+### Phase 2 — Production
+- [ ] Deploy to Mantle Sepolia
+- [ ] End-to-end testing
+- [ ] Additional modules (zk-age, zk-github)
 - [ ] Analytics dashboard
+- [ ] Security audit
+
+### Phase 3 — Scale
+- [ ] Mantle mainnet deployment
 - [ ] Multi-chain support
+- [ ] Third-party module registry
+- [ ] Enterprise features
 
 ---
 
@@ -492,11 +425,11 @@ forge script script/Deploy.s.sol --rpc-url $MANTLE_SEPOLIA_RPC_URL --broadcast
 
 | Benefit | Description |
 |---------|-------------|
-| **Infinite extensibility** | Add new modules anytime |
-| **Customizable compliance** | Craft flows for specific DApp needs |
-| **Modular protocol** | Anyone can build third-party modules |
-| **Simple DX** | Abstract away zkTLS + circuit complexity |
-| **Strict privacy** | Only boolean attributes leave the client |
+| **Privacy-first** | Only boolean attributes stored on-chain |
+| **Simple DX** | 3-line SDK integration |
+| **Modular** | Add new verification modules anytime |
+| **Composable** | Combine modules into custom flows |
+| **User-controlled** | Users can revoke attestations |
 
 ---
 

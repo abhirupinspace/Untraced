@@ -1,5 +1,10 @@
-export { UntracedClient, createClient } from "./client";
-export { useUntraced, useUntracedFlow } from "./hooks";
+// Client
+export { UntracedClient, createClient, ZK_EMAIL, EMAIL_MODULE_TYPE } from "./client";
+
+// Hooks
+export { useUntraced } from "./hooks";
+
+// Types
 export type {
   UntracedConfig,
   Module,
@@ -7,4 +12,11 @@ export type {
   Proof,
   Attestation,
   TransactionResult,
+  AttestationResponse,
+  SignedAttestation,
 } from "./types";
+
+export { MANTLE_SEPOLIA } from "./types";
+
+// ABI (for advanced usage)
+export { REGISTRY_ABI } from "./abi/registry";

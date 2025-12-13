@@ -1,21 +1,5 @@
-import {
-  Header,
-  Hero,
-  ModulesSection,
-  HowItWorks,
-  Footer,
-} from "@/components/landing";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <>
-      <Header />
-      <main>
-        <Hero />
-        <ModulesSection />
-        <HowItWorks />
-      </main>
-      <Footer />
-    </>
-  );
+  redirect("/dashboard");
 }

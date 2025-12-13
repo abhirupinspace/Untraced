@@ -29,6 +29,7 @@
         "react-dom": "^18.3.1",
         "sonner": "^1.7.1",
         "tailwind-merge": "^2.6.0",
+        "viem": "^2.41.2",
       },
       "devDependencies": {
         "@types/node": "^22",
@@ -62,8 +63,12 @@
         "viem": "^2.21.54",
       },
       "devDependencies": {
+        "@types/react": "^18",
         "@untraced/config": "workspace:*",
         "typescript": "^5.7.2",
+      },
+      "peerDependencies": {
+        "react": "^18.0.0",
       },
     },
   },

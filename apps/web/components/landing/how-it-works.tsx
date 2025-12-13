@@ -44,7 +44,7 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-32 px-6">
+    <section id="how-it-works" className="py-32 px-6 bg-[#0a0a0a]">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -55,10 +55,10 @@ export function HowItWorks() {
           <Badge variant="secondary" className="mb-4">
             Simple Integration
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-light mb-4">
+          <h2 className="text-4xl md:text-5xl font-light mb-4 text-white">
             How It <span className="font-semibold">Works</span>
           </h2>
-          <p className="text-lg text-untraced-dark/60 max-w-2xl mx-auto font-light">
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto font-light">
             Four simple steps from Web2 data to privacy-preserving on-chain verification.
           </p>
         </motion.div>
@@ -76,7 +76,7 @@ export function HowItWorks() {
               {/* Connector line */}
               {index < steps.length - 1 && (
                 <div className="hidden lg:block absolute top-12 left-full w-full h-px">
-                  <div className="h-full w-full bg-gradient-to-r from-untraced-dark/20 to-transparent" />
+                  <div className="h-full w-full bg-gradient-to-r from-white/20 to-transparent" />
                 </div>
               )}
 
@@ -86,11 +86,11 @@ export function HowItWorks() {
                 >
                   <step.icon className="w-6 h-6 text-white" />
                 </div>
-                <div className="text-xs font-medium text-untraced-dark/30 mb-2">
+                <div className="text-xs font-medium text-gray-500 mb-2">
                   STEP {step.number}
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{step.title}</h3>
-                <p className="text-sm text-untraced-dark/50 font-light leading-relaxed">
+                <h3 className="text-lg font-semibold mb-2 text-white">{step.title}</h3>
+                <p className="text-sm text-gray-500 font-light leading-relaxed">
                   {step.description}
                 </p>
               </Card>
@@ -104,7 +104,7 @@ export function HowItWorks() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <Card className="relative overflow-hidden bg-gradient-to-br from-untraced-dark to-untraced-dark-hover p-8 md:p-12">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-purple-600 to-pink-600 p-8 md:p-12">
             {/* Background pattern */}
             <div className="absolute inset-0 opacity-10">
               <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -126,12 +126,12 @@ export function HowItWorks() {
                   Start creating your custom verification flow in minutes.
                 </p>
               </div>
-              <Link href="/builder">
+              <Link href="/dashboard">
                 <Button
                   size="lg"
-                  className="bg-white text-untraced-dark hover:bg-white/90 group"
+                  className="bg-white text-gray-900 hover:bg-white/90 group"
                 >
-                  Open Flow Builder
+                  Go to Dashboard
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>

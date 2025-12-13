@@ -12,11 +12,11 @@ export function Hero() {
   const { login, authenticated } = useWallet();
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-20 pb-32 px-6 overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center pt-20 pb-32 px-6 overflow-hidden bg-[#0a0a0a]">
       {/* Background decoration */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-untraced-dark/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-untraced-dark/3 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-5xl mx-auto text-center">
@@ -35,11 +35,11 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-light tracking-tight mb-6"
+          className="text-5xl md:text-7xl lg:text-8xl font-light tracking-tight mb-6 text-white"
         >
           Verify Without
           <br />
-          <span className="font-semibold bg-gradient-to-r from-untraced-dark to-untraced-dark-hover bg-clip-text text-transparent">
+          <span className="font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
             Revealing
           </span>
         </motion.h1>
@@ -48,7 +48,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-xl md:text-2xl text-untraced-dark/60 max-w-2xl mx-auto mb-12 font-light leading-relaxed"
+          className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12 font-light leading-relaxed"
         >
           Build privacy-preserving verification flows with modular ZK modules.
           Prove identity, age, and more — without revealing underlying data.
@@ -61,9 +61,9 @@ export function Hero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
         >
           {authenticated ? (
-            <Link href="/builder">
+            <Link href="/dashboard">
               <Button size="xl" variant="glow" className="group">
-                Open Flow Builder
+                Go to Dashboard
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
@@ -111,12 +111,12 @@ export function Hero() {
               transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
             >
               <AnimatedBorder containerClassName="h-full">
-                <div className="p-6 text-center h-full">
-                  <div className="w-12 h-12 rounded-xl bg-untraced-dark/5 flex items-center justify-center mx-auto mb-3">
-                    <feature.icon className="w-6 h-6 text-untraced-dark" />
+                <div className="p-6 text-center h-full bg-[#0f0f0f]">
+                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mx-auto mb-3">
+                    <feature.icon className="w-6 h-6 text-purple-400" />
                   </div>
-                  <div className="font-medium mb-1">{feature.label}</div>
-                  <div className="text-sm text-untraced-dark/50 font-light">
+                  <div className="font-medium mb-1 text-white">{feature.label}</div>
+                  <div className="text-sm text-gray-500 font-light">
                     {feature.description}
                   </div>
                 </div>

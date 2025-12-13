@@ -32,7 +32,7 @@ export function Header() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
-          ? "bg-white/80 backdrop-blur-lg border-b border-untraced-dark/5 shadow-sm"
+          ? "bg-[#0a0a0a]/80 backdrop-blur-lg border-b border-white/5"
           : "bg-transparent"
       )}
     >
@@ -45,7 +45,7 @@ export function Header() {
             height={40}
             className="rounded-xl group-hover:scale-105 transition-transform"
           />
-          <span className="font-semibold text-xl tracking-tight hidden sm:block">
+          <span className="font-semibold text-xl tracking-tight hidden sm:block text-white">
             UNTRACED
           </span>
         </Link>
@@ -53,21 +53,21 @@ export function Header() {
         <nav className="hidden md:flex items-center gap-8">
           <Link
             href="#modules"
-            className="text-sm text-untraced-dark/60 hover:text-untraced-dark transition-colors font-light"
+            className="text-sm text-gray-400 hover:text-white transition-colors font-light"
           >
             Modules
           </Link>
           <Link
             href="#how-it-works"
-            className="text-sm text-untraced-dark/60 hover:text-untraced-dark transition-colors font-light"
+            className="text-sm text-gray-400 hover:text-white transition-colors font-light"
           >
             How It Works
           </Link>
           <Link
-            href="/builder"
-            className="text-sm text-untraced-dark/60 hover:text-untraced-dark transition-colors font-light"
+            href="/dashboard"
+            className="text-sm text-gray-400 hover:text-white transition-colors font-light"
           >
-            Flow Builder
+            Dashboard
           </Link>
         </nav>
 
@@ -78,20 +78,20 @@ export function Header() {
             </Button>
           ) : authenticated ? (
             <div className="flex items-center gap-3">
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-untraced-dark/5">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5">
                 <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span className="text-sm font-mono text-untraced-dark/70">
+                <span className="text-sm font-mono text-gray-400">
                   {user?.wallet?.address
                     ? truncateAddress(user.wallet.address)
                     : user?.email?.address}
                 </span>
               </div>
-              <Button variant="outline" size="sm" onClick={logout}>
+              <Button variant="outline" size="sm" onClick={logout} className="border-white/10 text-white hover:bg-white/5">
                 Disconnect
               </Button>
             </div>
           ) : (
-            <Button onClick={login} size="sm">
+            <Button onClick={login} size="sm" className="bg-white text-black hover:bg-gray-200">
               Connect Wallet
             </Button>
           )}

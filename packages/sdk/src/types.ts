@@ -1,13 +1,16 @@
+import type { Hex } from "viem";
+
 export interface UntracedConfig {
   chainId: number;
-  registryAddress?: string;
+  registryAddress: Hex;
   rpcUrl?: string;
+  apiUrl?: string;
 }
 
 export interface Module {
   id: string;
   name: string;
-  attributeType: `0x${string}`;
+  attributeType: Hex;
 }
 
 export interface Flow {
@@ -16,21 +19,34 @@ export interface Flow {
   contractAddress?: string;
 }
 
+export interface SignedAttestation {
+  moduleType: Hex;
+  expiry: bigint;
+  v: number;
+  r: Hex;
+  s: Hex;
+}
+
 export interface Proof {
-  moduleType: `0x${string}`;
-  proof: `0x${string}`;
-  publicInputs: `0x${string}`[];
+  moduleType: Hex;
+  expiry: bigint;
+  signature: {
+    v: number;
+    r: Hex;
+    s: Hex;
+    full: Hex;
+  };
 }
 
 export interface Attestation {
   valid: boolean;
   timestamp: number;
   expiry: number;
-  issuerHash: `0x${string}`;
+  issuerHash: Hex;
 }
 
 export interface TransactionResult {
-  hash: `0x${string}`;
+  hash: Hex;
   wait: () => Promise<{ status: "success" | "reverted" }>;
 }
 
@@ -38,3 +54,30 @@ export interface ModuleProofOptions {
   provider?: string;
   threshold?: number;
 }
+
+export interface AttestationResponse {
+  success: boolean;
+  attestation: {
+    moduleType: Hex;
+    expiry: string;
+    signature: {
+      v: number;
+      r: Hex;
+      s: Hex;
+      full: Hex;
+    };
+  };
+  meta: {
+    emailVerified: boolean;
+    validityDays: number;
+    attestor: Hex;
+  };
+}
+
+// Chain configuration
+export const MANTLE_SEPOLIA = {
+  id: 5003,
+  name: "Mantle Sepolia",
+  rpcUrl: "https://rpc.sepolia.mantle.xyz",
+  blockExplorer: "https://sepolia.mantlescan.xyz",
+} as const;

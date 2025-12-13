@@ -16,14 +16,15 @@ export function PrivyProvider({ children }: { children: React.ReactNode }) {
       appId={PRIVY_APP_ID}
       config={{
         appearance: {
-          theme: "light",
-          accentColor: "#3d0040",
-          logo: "/logo.svg",
+          theme: "dark",
+          accentColor: "#a855f7",
+          logo: "/icon.png",
+          showWalletLoginFirst: true,
         },
         embeddedWallets: {
           createOnLogin: "users-without-wallets",
         },
-        loginMethods: ["email", "wallet", "google"],
+        loginMethods: ["wallet", "email", "google"],
       }}
     >
       {children}
