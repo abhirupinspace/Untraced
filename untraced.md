@@ -2,7 +2,7 @@
 
 ## Zero-Knowledge Verification Protocol for Mantle
 
-UNTRACED enables developers to build privacy-preserving verification flows. Users prove Web2 attributes (email, age, identity) without revealing underlying data. Built on **Mantle**.
+UNTRACED enables developers to build privacy-preserving verification flows. Users prove Web2 attributes (email, age, GitHub activity, Twitter account) without revealing underlying data. Built on **Mantle**.
 
 ---
 
@@ -26,9 +26,23 @@ cp apps/web/.env.example apps/web/.env.local
 
 Required variables:
 ```env
+# Privy Authentication
 NEXT_PUBLIC_PRIVY_APP_ID=your_privy_app_id
+
+# Smart Contracts
 NEXT_PUBLIC_REGISTRY_ADDRESS=0x...  # After deployment
 ATTESTOR_PRIVATE_KEY=0x...          # Server-side signing key
+
+# GitHub OAuth
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+
+# Twitter/X OAuth
+TWITTER_CLIENT_ID=your_twitter_client_id
+TWITTER_CLIENT_SECRET=your_twitter_client_secret
+
+# Optional
+NEXT_PUBLIC_URL=http://localhost:3000
 ```
 
 ---
@@ -37,15 +51,32 @@ ATTESTOR_PRIVATE_KEY=0x...          # Server-side signing key
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   GitHub    │────▶│  Backend    │────▶│  Registry   │────▶│  Your dApp  │
-│   OAuth     │     │  Attestor   │     │  Contract   │     │   Gating    │
+│   OAuth     │────▶│  Backend    │────▶│  Registry   │────▶│  Your dApp  │
+│  (GitHub/X) │     │  Attestor   │     │  Contract   │     │   Gating    │
 └─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
       │                    │                   │                   │
   User logs in      Signs attestation    Stores boolean      Checks access
-  via Privy         EMAIL_VERIFIED=true  on Mantle           with hasAttribute()
+  via OAuth         GITHUB_VERIFIED=true on Mantle           with hasAttribute()
 ```
 
-**Privacy Guarantee:** The smart contract only ever knows `EMAIL_VERIFIED == true` — nothing else.
+**Privacy Guarantee:** The smart contract only ever knows `VERIFIED == true` — nothing else.
+
+---
+
+## Features
+
+### Dashboard
+- **Projects** - Create and manage verification flows
+- **Playground** - Test ZK modules in real-time with actual OAuth
+- **Analytics** - View verification metrics and success rates (Beta)
+- **Settings** - Configure account, notifications, security, and API keys
+
+### Verification Modules
+- **Email** - Prove email ownership without revealing the address
+- **Age** - Prove age meets requirements using ZK proofs
+- **GitHub** - Verify GitHub account with real OAuth, check commit counts
+- **Twitter/X** - Verify Twitter account ownership, follower counts
+- **Balance** - Prove wallet balance threshold without revealing amount
 
 ---
 
@@ -54,54 +85,119 @@ ATTESTOR_PRIVATE_KEY=0x...          # Server-side signing key
 ```
 untraced/
 ├── apps/
-│   └── web/                          # Next.js 15 frontend
+│   └── web/                              # Next.js 15 frontend
 │       ├── app/
-│       │   ├── page.tsx              # Landing → redirects to /dashboard
-│       │   ├── dashboard/            # Project management
-│       │   ├── builder/              # Flow Builder UI
+│       │   ├── page.tsx                  # Landing → redirects to /dashboard
+│       │   ├── dashboard/
+│       │   │   ├── layout.tsx            # Dashboard layout with sidebar
+│       │   │   ├── page.tsx              # Projects list
+│       │   │   ├── playground/
+│       │   │   │   └── page.tsx          # Interactive module testing
+│       │   │   ├── analytics/
+│       │   │   │   └── page.tsx          # Verification analytics
+│       │   │   └── settings/
+│       │   │       └── page.tsx          # Account settings
+│       │   ├── builder/                  # Flow Builder UI
 │       │   └── api/
-│       │       └── attest/route.ts   # Attestation API endpoint
+│       │       ├── attest/
+│       │       │   ├── route.ts          # Email attestation
+│       │       │   ├── age/route.ts      # Age verification
+│       │       │   ├── github/route.ts   # GitHub attestation (real OAuth)
+│       │       │   └── twitter/route.ts  # Twitter attestation (real OAuth)
+│       │       └── auth/
+│       │           ├── me/route.ts       # Current user
+│       │           ├── tokens/route.ts   # OAuth token management
+│       │           ├── github/
+│       │           │   ├── route.ts      # GitHub OAuth initiation
+│       │           │   └── callback/route.ts
+│       │           └── twitter/
+│       │               ├── route.ts      # Twitter OAuth initiation (PKCE)
+│       │               └── callback/route.ts
 │       ├── components/
-│       │   ├── dashboard/            # Dashboard components
-│       │   ├── flow-builder/         # Flow builder components
+│       │   ├── app-sidebar.tsx           # Animated sidebar navigation
+│       │   ├── dashboard/                # Dashboard components
+│       │   ├── flow-builder/             # Flow builder components
 │       │   ├── verification/
-│       │   │   └── untraced-modal.tsx # Embeddable verification modal
-│       │   ├── landing/              # Landing page components
-│       │   ├── providers/            # React providers (Privy)
-│       │   └── ui/                   # Reusable UI components
+│       │   │   └── untraced-modal.tsx    # Embeddable verification modal
+│       │   ├── landing/                  # Landing page components
+│       │   ├── providers/                # React providers (Privy)
+│       │   └── ui/                       # Reusable UI components
+│       │       ├── sidebar.tsx           # Base sidebar with animations
+│       │       ├── tabs.tsx              # Tab navigation
+│       │       ├── input.tsx             # Form inputs
+│       │       ├── switch.tsx            # Toggle switch
+│       │       ├── number-ticker.tsx     # Animated number counter
+│       │       ├── progress.tsx          # Progress bar
+│       │       └── ...                   # Other UI primitives
 │       └── lib/
-│           ├── cn.ts                 # Classname utility
-│           └── use-wallet.ts         # Wallet hook wrapper
+│           ├── cn.ts                     # Classname utility
+│           ├── use-wallet.ts             # Wallet hook wrapper
+│           └── db/                       # Database utilities
 │
 ├── packages/
-│   ├── sdk/                          # @untraced/sdk
+│   ├── sdk/                              # @untraced/sdk
 │   │   ├── src/
-│   │   │   ├── index.ts              # Package exports
-│   │   │   ├── client.ts             # UntracedClient class
-│   │   │   ├── hooks.ts              # useUntraced React hook
-│   │   │   ├── types.ts              # TypeScript types
+│   │   │   ├── index.ts                  # Package exports
+│   │   │   ├── client.ts                 # UntracedClient class
+│   │   │   ├── hooks.ts                  # useUntraced React hook
+│   │   │   ├── types.ts                  # TypeScript types
 │   │   │   └── abi/
-│   │   │       └── registry.ts       # Registry contract ABI
-│   │   └── README.md                 # SDK documentation
+│   │   │       └── registry.ts           # Registry contract ABI
+│   │   └── README.md                     # SDK documentation
 │   │
-│   ├── contracts/                    # Solidity contracts (Foundry)
+│   ├── contracts/                        # Solidity contracts (Foundry)
 │   │   ├── src/
-│   │   │   ├── UntracedRegistry.sol  # Central registry with EIP-712 signatures
-│   │   │   ├── FlowFactory.sol       # Flow deployment factory
+│   │   │   ├── UntracedRegistry.sol      # Central registry with EIP-712 signatures
+│   │   │   ├── FlowFactory.sol           # Flow deployment factory
 │   │   │   ├── interfaces/
 │   │   │   │   ├── IUntracedModule.sol
 │   │   │   │   └── IUntracedRegistry.sol
 │   │   │   └── modules/
-│   │   │       ├── EmailModule.sol       # Production email module
-│   │   │       └── MockEmailModule.sol   # Testing mock
+│   │   │       ├── AgeModule.sol         # Age verification module
+│   │   │       ├── GitHubModule.sol      # GitHub verification module
+│   │   │       ├── TwitterModule.sol     # Twitter verification module
+│   │   │       ├── ZKAgeVerifier.sol     # ZK age proof verifier
+│   │   │       └── ZKBalanceVerifier.sol # ZK balance proof verifier
 │   │   └── script/
-│   │       └── Deploy.s.sol          # Foundry deployment script
+│   │       └── Deploy.s.sol              # Foundry deployment script
 │   │
-│   └── config/                       # Shared configurations
+│   ├── circuits/                         # Noir ZK circuits
+│   │
+│   └── config/                           # Shared configurations
 │
-├── package.json                      # Bun workspaces root
-└── untraced.md                       # This file
+├── package.json                          # Bun workspaces root
+└── untraced.md                           # This file
 ```
+
+---
+
+## OAuth Integration
+
+### GitHub OAuth Setup
+
+1. Go to **GitHub Settings** → **Developer Settings** → **OAuth Apps** → **New OAuth App**
+2. Set callback URL: `http://localhost:3000/api/auth/github/callback`
+3. Copy Client ID and Client Secret to `.env.local`
+
+### Twitter/X OAuth Setup
+
+1. Go to **Twitter Developer Portal** → **Create App**
+2. Enable **OAuth 2.0** with **User authentication settings**
+3. Set callback URL: `http://localhost:3000/api/auth/twitter/callback`
+4. Enable scopes: `tweet.read`, `users.read`, `offline.access`
+5. Copy Client ID and Client Secret to `.env.local`
+
+---
+
+## Playground
+
+The Playground allows testing all ZK modules in real-time:
+
+- **Email/Age/Balance** - Simulated verification with input validation
+- **GitHub** - Real OAuth connection, fetches actual commit counts
+- **Twitter** - Real OAuth connection, fetches actual follower data
+
+Access at `/dashboard/playground`
 
 ---
 
@@ -143,7 +239,7 @@ function VerifyButton() {
 ### Client API (Advanced)
 
 ```ts
-import { createClient, ZK_EMAIL } from "@untraced/sdk";
+import { createClient, ZK_EMAIL, ZK_GITHUB, ZK_TWITTER } from "@untraced/sdk";
 
 const client = createClient({
   chainId: 5003,
@@ -207,16 +303,57 @@ import "./interfaces/IUntracedRegistry.sol";
 
 contract YourDApp {
     IUntracedRegistry public registry;
-    bytes32 constant ZK_EMAIL = keccak256("ZK_EMAIL");
+    bytes32 constant ZK_GITHUB = keccak256("ZK_GITHUB");
 
     function gatedAction() external {
         require(
-            registry.hasAttribute(msg.sender, ZK_EMAIL),
-            "Email verification required"
+            registry.hasAttribute(msg.sender, ZK_GITHUB),
+            "GitHub verification required"
         );
         // Your logic here
     }
 }
+```
+
+---
+
+## API Endpoints
+
+### Attestation APIs
+
+```
+POST /api/attest/email
+Body: { userAddress, githubAccessToken, nonce }
+Response: { attestation: { moduleType, expiry, signature: { v, r, s } } }
+
+POST /api/attest/age
+Body: { userAddress, birthDate, minAge, nonce }
+Response: { attestation: { moduleType, expiry, signature, proofData }, meta: { age, verified } }
+
+POST /api/attest/github
+Body: { userAddress, githubAccessToken, minCommits, nonce }
+Response: { attestation: { ... }, meta: { githubUsername, actualCommits, totalRepos, accountAgeDays } }
+
+POST /api/attest/twitter
+Body: { userAddress, twitterAccessToken, verificationType, minFollowers?, nonce }
+Response: { attestation: { ... }, meta: { twitterUsername, followers, tweets, isVerified } }
+```
+
+### OAuth APIs
+
+```
+GET /api/auth/github?returnUrl=/dashboard/playground
+→ Redirects to GitHub OAuth
+
+GET /api/auth/twitter?returnUrl=/dashboard/playground
+→ Redirects to Twitter OAuth (PKCE)
+
+GET /api/auth/tokens
+→ { github: { connected, token }, twitter: { connected, token } }
+
+DELETE /api/auth/tokens
+Body: { provider: "github" | "twitter" | "all" }
+→ Disconnects OAuth session
 ```
 
 ---
@@ -252,7 +389,7 @@ forge script script/Deploy.s.sol:Deploy \
 
 # Output:
 # UntracedRegistry deployed at: 0x...
-# EmailModule deployed at: 0x...
+# Modules deployed at: 0x...
 ```
 
 ### Update Environment
@@ -265,54 +402,15 @@ NEXT_PUBLIC_REGISTRY_ADDRESS=0x...
 
 ---
 
-## Embeddable Modal
-
-For customer-facing verification:
-
-```tsx
-import { UntracedModal } from "@/components/verification/untraced-modal";
-import { useUntraced } from "@untraced/sdk";
-
-function App() {
-  const [open, setOpen] = useState(false);
-  const { verified, expiresAt, verify, error } = useUntraced();
-
-  return (
-    <>
-      <button onClick={() => setOpen(true)}>
-        {verified ? "Verified" : "Verify Email"}
-      </button>
-
-      <UntracedModal
-        open={open}
-        onOpenChange={setOpen}
-        onVerify={verify}
-        verified={verified}
-        expiresAt={expiresAt}
-        error={error}
-      />
-    </>
-  );
-}
-```
-
-**Modal Features:**
-- Privacy messaging (what is/isn't revealed)
-- Progress states: idle → generating → submitting → success
-- "Running zero-knowledge proof locally..." UX
-- Validity duration display (30 days)
-- Error handling with retry
-
----
-
 ## Available Modules
 
 | Module | Description | Status |
 |--------|-------------|--------|
-| **zk-email** | Prove email ownership via GitHub OAuth | **Active** |
-| **zk-age** | Prove age > threshold without revealing DOB | Coming Soon |
-| **zk-github** | Prove commits > N, verified status | Coming Soon |
-| **zk-bank-balance** | Prove balance > X | Coming Soon |
+| **zk-email** | Prove email ownership via GitHub OAuth | Active |
+| **zk-age** | Prove age > threshold without revealing DOB | Active |
+| **zk-github** | Prove commits > N, verify account with real OAuth | Active |
+| **zk-twitter** | Prove account ownership, follower count, verified status | Active |
+| **zk-balance** | Prove balance > X without revealing amount | Active |
 | **zk-country** | Prove user belongs to allowed region | Coming Soon |
 | **zk-aadhar** | Prove Aadhaar validity & age > 18 | Coming Soon |
 
@@ -322,22 +420,23 @@ function App() {
 
 ### Attestation Flow
 
-1. **User** connects wallet + GitHub via Privy
-2. **Frontend** calls `POST /api/attest` with GitHub access token
-3. **Backend** fetches GitHub emails, verifies at least one is verified
-4. **Backend** signs EIP-712 attestation: `{user, moduleType, expiry, nonce}`
-5. **Frontend** calls `registry.submitSignedProof()` on Mantle
-6. **Contract** verifies signature, stores attestation
-7. **Any dApp** can now call `registry.hasAttribute(user, ZK_EMAIL)`
+1. **User** connects wallet via Privy
+2. **User** authenticates with OAuth (GitHub/Twitter) or provides inputs
+3. **Frontend** calls attestation API with OAuth token or user data
+4. **Backend** verifies data via third-party API (GitHub API, Twitter API)
+5. **Backend** signs EIP-712 attestation: `{user, moduleType, expiry, nonce}`
+6. **Frontend** calls `registry.submitSignedProof()` on Mantle
+7. **Contract** verifies signature, stores attestation
+8. **Any dApp** can now call `registry.hasAttribute(user, MODULE_TYPE)`
 
 ### Privacy Model
 
 | Layer | What it knows |
 |-------|---------------|
-| GitHub | User's email (existing relationship) |
-| Backend | Email is verified (boolean only, no storage) |
-| Contract | `EMAIL_VERIFIED == true` (no email, no identity) |
-| Other dApps | User has verified email attribute |
+| OAuth Provider | User's account (existing relationship) |
+| Backend | Verification result (boolean, no storage) |
+| Contract | `VERIFIED == true` (no PII, no identity) |
+| Other dApps | User has verified attribute |
 
 ---
 
@@ -345,14 +444,14 @@ function App() {
 
 | Layer | Technology |
 |-------|------------|
-| **Frontend** | Next.js 15, React 18, Tailwind CSS |
-| **Wallet/Auth** | Privy (wallet + GitHub OAuth) |
+| **Frontend** | Next.js 15, React 19, Tailwind CSS |
+| **Wallet/Auth** | Privy (wallet + social OAuth) |
 | **Blockchain** | Mantle Sepolia (chain ID: 5003) |
 | **Contracts** | Solidity 0.8.20, Foundry |
 | **Signing** | EIP-712 typed data signatures |
 | **Web3** | viem |
 | **Animations** | Framer Motion |
-| **UI** | Radix UI, CVA |
+| **UI** | Radix UI, CVA, Lucide Icons |
 | **Package Manager** | Bun |
 | **Monorepo** | Bun Workspaces |
 
@@ -377,16 +476,9 @@ cd packages/contracts && forge build
 
 # Run contract tests
 forge test
-```
 
-### API Endpoint
-
-The attestation API is at `apps/web/app/api/attest/route.ts`:
-
-```
-POST /api/attest
-Body: { userAddress, githubAccessToken, nonce }
-Response: { attestation: { moduleType, expiry, signature: { v, r, s } } }
+# Compile Noir circuits
+cd packages/circuits && nargo compile
 ```
 
 ---
@@ -397,27 +489,38 @@ Response: { attestation: { moduleType, expiry, signature: { v, r, s } } }
 - [x] Monorepo setup with Bun
 - [x] Landing page with animations
 - [x] Dashboard with project management
+- [x] Animated sidebar navigation
 - [x] Flow Builder UI
-- [x] Privy wallet + GitHub OAuth integration
+- [x] Privy wallet integration
 - [x] UntracedRegistry with EIP-712 signatures
-- [x] EmailModule implementation
-- [x] Backend attestation API
+- [x] Email, Age, Balance module implementations
+- [x] Backend attestation APIs
 - [x] SDK with `useUntraced` hook
 - [x] Embeddable verification modal
 - [x] Foundry deployment scripts
 
-### Phase 2 — Production
+### Phase 2 — OAuth Integration ✅
+- [x] GitHub OAuth flow (real authentication)
+- [x] Twitter/X OAuth flow (OAuth 2.0 with PKCE)
+- [x] GitHub attestation with real commit data
+- [x] Twitter attestation with real follower data
+- [x] Interactive Playground page
+- [x] Analytics dashboard (Beta)
+- [x] Settings page with tabs
+
+### Phase 3 — Production
 - [ ] Deploy to Mantle Sepolia
 - [ ] End-to-end testing
-- [ ] Additional modules (zk-age, zk-github)
-- [ ] Analytics dashboard
+- [ ] Database integration for projects
+- [ ] API key management
 - [ ] Security audit
 
-### Phase 3 — Scale
+### Phase 4 — Scale
 - [ ] Mantle mainnet deployment
 - [ ] Multi-chain support
 - [ ] Third-party module registry
 - [ ] Enterprise features
+- [ ] Additional modules (zk-country, zk-aadhar)
 
 ---
 
@@ -426,10 +529,11 @@ Response: { attestation: { moduleType, expiry, signature: { v, r, s } } }
 | Benefit | Description |
 |---------|-------------|
 | **Privacy-first** | Only boolean attributes stored on-chain |
+| **Real OAuth** | GitHub and Twitter use actual OAuth, not simulations |
 | **Simple DX** | 3-line SDK integration |
 | **Modular** | Add new verification modules anytime |
 | **Composable** | Combine modules into custom flows |
-| **User-controlled** | Users can revoke attestations |
+| **User-controlled** | Users can revoke attestations anytime |
 
 ---
 

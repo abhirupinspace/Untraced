@@ -28,6 +28,7 @@ import {
   ShieldCheckIcon,
   CheckCircleIcon,
   LoaderIcon,
+  TwitterIcon,
 } from "@/components/ui/icons";
 import {
   ArrowLeft,
@@ -54,6 +55,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Globe: GlobeIcon,
   IdCard: IdCardIcon,
   Shield: ShieldCheckIcon,
+  Twitter: TwitterIcon,
 };
 
 type TabId = "canvas" | "preview" | "code";
@@ -68,6 +70,9 @@ interface BuilderStepProps {
   updateModuleConfig: (instanceId: string, value: string | number) => void;
   generatedCode: GeneratedCode | null;
   onBack?: () => void;
+  onSave?: () => void;
+  isSaving?: boolean;
+  saveError?: string | null;
 }
 
 export function BuilderStep({
@@ -80,6 +85,9 @@ export function BuilderStep({
   updateModuleConfig,
   generatedCode,
   onBack,
+  onSave,
+  isSaving,
+  saveError,
 }: BuilderStepProps) {
   const [activeTab, setActiveTab] = useState<TabId>("canvas");
 
@@ -187,13 +195,30 @@ export function BuilderStep({
 
           <Button
             size="sm"
-            disabled={flowModules.length === 0}
+            disabled={flowModules.length === 0 || isSaving}
+            onClick={onSave}
             className="h-8 text-xs bg-purple-500 hover:bg-purple-600 text-white"
           >
-            <Rocket className="w-3.5 h-3.5 mr-1.5" />
-            Deploy
+            {isSaving ? (
+              <>
+                <LoaderIcon className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Rocket className="w-3.5 h-3.5 mr-1.5" />
+                Save Flow
+              </>
+            )}
           </Button>
         </div>
+
+        {/* Error message */}
+        {saveError && (
+          <div className="px-6 py-2 bg-red-500/10 border-b border-red-500/20">
+            <p className="text-xs text-red-400">{saveError}</p>
+          </div>
+        )}
 
         {/* Tab Content */}
         <div className="flex-1 overflow-hidden">

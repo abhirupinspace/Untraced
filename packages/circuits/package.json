@@ -1,0 +1,27 @@
+{
+  "name": "@untraced/circuits",
+  "version": "1.0.0",
+  "description": "ZK circuits for UNTRACED verification modules",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build:circuits": "cd zk_age && nargo compile && cd ../zk_balance && nargo compile",
+    "test:circuits": "cd zk_age && nargo test && cd ../zk_balance && nargo test",
+    "build": "bun run build:circuits && tsc",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@noir-lang/backend_barretenberg": "^1.0.0-beta.16",
+    "@noir-lang/noir_js": "^1.0.0-beta.16"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist",
+    "zk_age/target",
+    "zk_balance/target"
+  ]
+}

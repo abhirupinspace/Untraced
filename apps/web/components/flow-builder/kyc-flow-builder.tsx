@@ -16,14 +16,11 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
-import Link from "next/link";
 import { cn } from "@/lib/cn";
-import { Button } from "@/components/ui/button";
 import { availableModules } from "./module-data";
 import { FlowModule, Flow } from "./types";
 import { generateCode } from "./code-generator";
+import { useFlows } from "@/lib/hooks";
 
 // Import sub-components
 import { BuilderStep } from "./steps/builder-step";
@@ -36,20 +33,54 @@ import {
 export interface ProjectContext {
   id: string;
   name: string;
-  clientId: string;
+  slug: string;
 }
 
 interface KYCFlowBuilderProps {
   onBack?: () => void;
+  onFlowCreated?: () => void;
   projectContext?: ProjectContext;
 }
 
-export function KYCFlowBuilder({ onBack, projectContext }: KYCFlowBuilderProps) {
+export function KYCFlowBuilder({ onBack, onFlowCreated, projectContext }: KYCFlowBuilderProps) {
   // Flow state
   const [flowName, setFlowName] = useState(
-    projectContext?.name?.toLowerCase().replace(/\s+/g, "_") || "kyc_verification"
+    projectContext?.slug?.toLowerCase().replace(/\s+/g, "_") || "kyc_verification"
   );
   const [flowModules, setFlowModules] = useState<FlowModule[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const { createFlow } = useFlows(projectContext?.id || null);
+
+  const handleSaveFlow = useCallback(async () => {
+    if (!projectContext || flowModules.length === 0) return;
+
+    setIsSaving(true);
+    setSaveError(null);
+
+    const { flow, error } = await createFlow({
+      name: flowName,
+      displayName: flowName.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+      modules: flowModules.map((m, index) => ({
+        moduleId: m.id,
+        instanceId: m.instanceId,
+        config: { value: m.configValue },
+        order: index,
+      })),
+    });
+
+    setIsSaving(false);
+
+    if (error) {
+      setSaveError(error);
+      return;
+    }
+
+    if (flow && onFlowCreated) {
+      onFlowCreated();
+    }
+  }, [projectContext, flowName, flowModules, createFlow, onFlowCreated]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -149,7 +180,7 @@ export function KYCFlowBuilder({ onBack, projectContext }: KYCFlowBuilderProps) 
               project={projectContext ? {
                 name: projectContext.name,
                 description: "",
-                apiKey: projectContext.clientId,
+                apiKey: projectContext.id,
                 secretKey: "",
                 createdAt: new Date(),
               } : null}
@@ -161,6 +192,9 @@ export function KYCFlowBuilder({ onBack, projectContext }: KYCFlowBuilderProps) 
               updateModuleConfig={updateModuleConfig}
               generatedCode={generatedCode}
               onBack={onBack}
+              onSave={handleSaveFlow}
+              isSaving={isSaving}
+              saveError={saveError}
             />
           </SortableContext>
         </DndContext>
