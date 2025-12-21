@@ -12,10 +12,18 @@ UNTRACED enables developers to build privacy-preserving verification flows. User
 # Install dependencies
 bun install
 
-# Start development server
-cd apps/web && bun run dev
+# Start dashboard (port 3000)
+bun run dev
 
-# Open http://localhost:3000
+# Start landing page (port 3001)
+bun run dev:landing
+
+# Start both apps
+bun run dev:all
+
+# Open:
+# - Landing: http://localhost:3001
+# - Dashboard: http://localhost:3000
 ```
 
 ### Environment Setup
@@ -85,7 +93,22 @@ NEXT_PUBLIC_URL=http://localhost:3000
 ```
 untraced/
 ├── apps/
-│   └── web/                              # Next.js 15 frontend
+│   ├── landing/                          # Marketing landing page (port 3001)
+│   │   ├── app/
+│   │   │   ├── page.tsx                  # Landing page with all sections
+│   │   │   ├── layout.tsx                # Root layout
+│   │   │   └── globals.css               # Brand colors & styles
+│   │   └── components/
+│   │       ├── PortfolioNavbar.tsx       # Navigation with CTA buttons
+│   │       ├── ProductTeaserCard.tsx     # Hero section
+│   │       ├── BankingScaleHero.tsx      # How it works section
+│   │       ├── ModulesSection.tsx        # Verification modules grid
+│   │       ├── UseCasesSection.tsx       # Use cases showcase
+│   │       ├── PricingSection.tsx        # Pricing plans
+│   │       ├── FAQSection.tsx            # FAQ accordion
+│   │       └── Footer.tsx                # Footer with links
+│   │
+│   └── web/                              # Next.js 15 dashboard (port 3000)
 │       ├── app/
 │       │   ├── page.tsx                  # Landing → redirects to /dashboard
 │       │   ├── dashboard/
@@ -465,8 +488,17 @@ NEXT_PUBLIC_REGISTRY_ADDRESS=0x...
 # Install all dependencies
 bun install
 
-# Start web app
-cd apps/web && bun run dev
+# Start dashboard (port 3000)
+bun run dev
+
+# Start landing page (port 3001)
+bun run dev:landing
+
+# Start both apps simultaneously
+bun run dev:all
+
+# Build all apps
+bun run build
 
 # Type check
 bun run tsc --noEmit

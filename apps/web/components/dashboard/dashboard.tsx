@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { KYCFlowBuilder } from "@/components/flow-builder/kyc-flow-builder";
+import { DashboardNavbar } from "@/components/dashboard/dashboard-navbar";
 import {
   Layers,
   Search,
@@ -15,7 +16,7 @@ import {
   Check,
   FolderKanban,
   ChevronRight,
-  Key,  
+  Key,
   Eye,
   EyeOff,
   AlertTriangle,
@@ -101,7 +102,7 @@ export function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-background">
         {view === "projects" && (
           <ProjectsView
             projects={filteredProjects}
@@ -172,115 +173,111 @@ function ProjectsView({
 }) {
   return (
     <>
-      <header className="h-14 border-b border-white/5 bg-[#0a0a0a] sticky top-0 z-40">
-        <div className="h-full px-6 flex items-center justify-between">
-          <h1 className="text-lg font-normal text-white">Projects</h1>
-          <button
-            onClick={onRefresh}
-            className="p-2 rounded-lg hover:bg-white/5 text-gray-500 hover:text-white transition-all"
-            title="Refresh projects"
-          >
-            <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
-          </button>
-        </div>
-      </header>
+      <DashboardNavbar title="Projects">
+        <button
+          onClick={onRefresh}
+          className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
+          title="Refresh projects"
+        >
+          <RefreshCw className={cn("w-3.5 h-3.5", loading && "animate-spin")} />
+        </button>
+      </DashboardNavbar>
 
-      <div className="p-6">
-        <div className="space-y-4">
+      <div className="p-6 flex justify-center">
+        <div className="w-full max-w-3xl space-y-4">
           {/* Header */}
-          <div className="flex items-center justify-between">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+          <div className="flex items-center justify-between gap-4">
+            <div className="relative flex-1 max-w-xs">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search projects..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-72 pl-9 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm font-light text-white placeholder:text-gray-600 focus:outline-none focus:ring-1 focus:ring-purple-500/30"
+                className="w-full pl-9 pr-3 py-2 bg-secondary border border-border rounded-lg text-sm font-light text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
               />
             </div>
             <Button
               onClick={onCreateProject}
-              className="bg-white text-black hover:bg-gray-200 gap-2 text-sm font-normal"
+              size="sm"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5 text-xs font-normal h-9"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-3.5 h-3.5" />
               New Project
             </Button>
           </div>
 
           {/* Loading state */}
           {loading && projects.length === 0 && (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-6 h-6 animate-spin text-gray-500" />
+            <div className="flex items-center justify-center py-10">
+              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             </div>
           )}
 
           {/* Error state */}
           {error && (
-            <Card className="bg-red-500/10 border border-red-500/20 p-4">
-              <div className="flex gap-3">
-                <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+              <div className="flex gap-2.5">
+                <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm text-red-400 font-light">{error}</p>
+                  <p className="text-sm text-destructive font-light">{error}</p>
                   <button
                     onClick={onRefresh}
-                    className="text-xs text-red-400/60 hover:text-red-400 mt-1"
+                    className="text-xs text-destructive/60 hover:text-destructive mt-1"
                   >
                     Try again
                   </button>
                 </div>
               </div>
-            </Card>
+            </div>
           )}
 
           {/* Project Cards */}
           {!loading && !error && (
-            <div className="grid gap-3">
+            <div className="space-y-2">
               {projects.map((project) => (
-                <Card
+                <div
                   key={project.id}
-                  variant="bordered"
-                  className="p-5 cursor-pointer group hover:border-white/20 transition-all"
+                  className="group flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover:border-primary/20 hover:bg-secondary/50 cursor-pointer transition-all"
                   onClick={() => onSelectProject(project)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                        <FolderKanban className="w-6 h-6 text-purple-400" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-normal text-white mb-1">{project.name}</h3>
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs text-gray-500 font-light">{project.flows.length} flows</span>
-                          <span className="text-xs text-gray-600">•</span>
-                          <span className="text-xs text-gray-500 font-light">
-                            {project.stats.totalVerifications.toLocaleString()} verifications
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <p className="text-xs text-gray-500 font-light mb-1">Slug</p>
-                        <code className="text-xs text-gray-400 font-mono">
-                          {project.slug}
-                        </code>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors" />
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
+                    <FolderKanban className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-normal text-foreground truncate">{project.name}</h3>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-xs text-muted-foreground font-light">{project.flows.length} flows</span>
+                      <span className="text-muted-foreground/30">·</span>
+                      <span className="text-xs text-muted-foreground font-light">
+                        {project.stats.totalVerifications.toLocaleString()} verifications
+                      </span>
                     </div>
                   </div>
-                </Card>
+                  <code className="hidden sm:block text-xs text-muted-foreground font-mono bg-secondary px-2 py-1 rounded">
+                    {project.slug}
+                  </code>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors flex-shrink-0" />
+                </div>
               ))}
             </div>
           )}
 
           {/* Empty state */}
           {!loading && !error && projects.length === 0 && (
-            <Card variant="bordered" className="text-center py-16">
-              <FolderKanban className="w-12 h-12 text-gray-700 mx-auto mb-4" />
-              <p className="text-sm text-gray-400 font-light mb-1">No projects found</p>
-              <p className="text-xs text-gray-600 font-light">Create your first project to get started</p>
-            </Card>
+            <div className="text-center py-12 border border-dashed border-border rounded-xl">
+              <FolderKanban className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground font-light mb-1">No projects yet</p>
+              <p className="text-xs text-muted-foreground/60 font-light mb-4">Create your first project to get started</p>
+              <Button
+                onClick={onCreateProject}
+                size="sm"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-normal h-8"
+              >
+                <Plus className="w-3.5 h-3.5 mr-1" />
+                Create Project
+              </Button>
+            </div>
           )}
         </div>
       </div>
@@ -312,33 +309,31 @@ function CreateProjectView({
 
   return (
     <>
-      <header className="h-14 border-b border-white/5 bg-[#0a0a0a] sticky top-0 z-40">
-        <div className="h-full px-6 flex items-center gap-4">
-          <button
-            onClick={onBack}
-            className="p-2 -ml-2 rounded-lg hover:bg-white/5 text-gray-500 hover:text-white transition-all"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-          <h1 className="text-lg font-normal text-white">Create Project</h1>
-        </div>
-      </header>
+      <DashboardNavbar>
+        <button
+          onClick={onBack}
+          className="p-1.5 -ml-1 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+        </button>
+        <h1 className="text-base font-normal text-foreground">New Project</h1>
+      </DashboardNavbar>
 
-      <div className="flex items-center justify-center min-h-[calc(100vh-3.5rem)] p-6">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-5">
-              <FolderKanban className="w-7 h-7 text-white" />
+      <div className="p-6 flex justify-center">
+        <div className="w-full max-w-sm">
+          <div className="text-center mb-6">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
+              <FolderKanban className="w-5 h-5 text-white" />
             </div>
-            <h2 className="text-2xl font-normal text-white mb-2">Create a new project</h2>
-            <p className="text-sm text-gray-500 font-light">
+            <h2 className="text-lg font-normal text-foreground mb-1">Create a new project</h2>
+            <p className="text-xs text-muted-foreground font-light">
               Projects help you organize your verification flows
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div>
-              <label className="block text-xs font-normal text-gray-400 mb-2">
+              <label className="block text-xs font-normal text-muted-foreground mb-1.5">
                 Project Name
               </label>
               <input
@@ -346,22 +341,22 @@ function CreateProjectView({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. My DeFi App"
-                className="w-full px-4 py-3 text-sm font-light bg-[#0f0f0f] border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-white/20 transition-all text-white placeholder:text-gray-600"
+                className="w-full px-3 py-2.5 text-sm font-light bg-secondary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all text-foreground placeholder:text-muted-foreground"
                 autoFocus
                 disabled={isCreating}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-normal text-gray-400 mb-2">
-                Description <span className="text-gray-600">(optional)</span>
+              <label className="block text-xs font-normal text-muted-foreground mb-1.5">
+                Description <span className="text-muted-foreground/50">(optional)</span>
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What is this project for?"
-                rows={3}
-                className="w-full px-4 py-3 text-sm font-light bg-[#0f0f0f] border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-white/20 transition-all text-white placeholder:text-gray-600 resize-none"
+                rows={2}
+                className="w-full px-3 py-2.5 text-sm font-light bg-secondary border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all text-foreground placeholder:text-muted-foreground resize-none"
                 disabled={isCreating}
               />
             </div>
@@ -369,7 +364,7 @@ function CreateProjectView({
             <Button
               type="submit"
               disabled={!isValid || isCreating}
-              className="w-full h-12 bg-white text-black hover:bg-gray-200 font-normal text-sm mt-6"
+              className="w-full h-10 bg-primary text-primary-foreground hover:bg-primary/90 font-normal text-sm mt-4"
             >
               {isCreating ? (
                 <>
@@ -424,276 +419,211 @@ function ProjectDetailView({
 
   return (
     <>
-      <header className="h-14 border-b border-white/5 bg-[#0a0a0a] sticky top-0 z-40">
-        <div className="h-full px-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onBack}
-              className="p-2 -ml-2 rounded-lg hover:bg-white/5 text-gray-500 hover:text-white transition-all"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-            <div>
-              <h1 className="text-lg font-normal text-white">{project.name}</h1>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 border-white/10 text-gray-400 hover:text-white hover:bg-white/5 font-light"
-            >
-              <Settings className="w-3.5 h-3.5 mr-1.5" />
-              Settings
-            </Button>
-          </div>
-        </div>
-      </header>
+      <DashboardNavbar>
+        <button
+          onClick={onBack}
+          className="p-1.5 -ml-1 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+        </button>
+        <h1 className="text-base font-normal text-foreground">{project.name}</h1>
+      </DashboardNavbar>
 
-      <div className="p-6 space-y-6">
-        {/* New Key Alert */}
-        {newKey?.key && (
-          <Card className="bg-green-500/10 border border-green-500/20 p-4">
-            <div className="flex gap-3">
-              <Key className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <p className="text-sm text-green-400 font-medium mb-2">
-                  New {newKey.type} key created!
-                </p>
-                <p className="text-xs text-green-400/70 mb-3">
-                  Copy this key now. You won&apos;t be able to see it again.
-                </p>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 text-sm font-mono text-green-300 bg-black/30 px-3 py-2 rounded-lg truncate">
-                    {newKey.key}
-                  </code>
-                  <button
-                    onClick={() => {
-                      copyToClipboard(newKey.key!, "new-key");
-                    }}
-                    className="p-2 rounded-lg hover:bg-white/10 text-green-400 transition-all"
-                  >
-                    {copiedId === "new-key" ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
+      <div className="p-6 flex justify-center">
+        <div className="w-full max-w-3xl space-y-5">
+          {/* New Key Alert */}
+          {newKey?.key && (
+            <div className="bg-success/10 border border-success/20 rounded-lg p-3">
+              <div className="flex gap-2.5">
+                <Key className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-success font-medium mb-1.5">
+                    New {newKey.type} key created
+                  </p>
+                  <p className="text-xs text-success/70 mb-2">
+                    Copy this key now. You won&apos;t be able to see it again.
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 text-xs font-mono text-success bg-success/10 px-2.5 py-1.5 rounded truncate">
+                      {newKey.key}
+                    </code>
+                    <button
+                      onClick={() => copyToClipboard(newKey.key!, "new-key")}
+                      className="p-1.5 rounded hover:bg-success/20 text-success transition-all"
+                    >
+                      {copiedId === "new-key" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
+                  <button onClick={() => setNewKey(null)} className="text-xs text-success/50 hover:text-success mt-2">
+                    Dismiss
                   </button>
                 </div>
-                <button
-                  onClick={() => setNewKey(null)}
-                  className="text-xs text-green-400/50 hover:text-green-400 mt-2"
-                >
-                  Dismiss
-                </button>
               </div>
             </div>
-          </Card>
-        )}
+          )}
 
-        {/* API Keys Section */}
-        <div className="grid grid-cols-2 gap-4">
-          <Card variant="bordered" className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Key className="w-4 h-4 text-gray-500" />
-                <span className="text-xs font-normal text-gray-400">Client ID (Publishable)</span>
+          {/* API Keys Section */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="border border-border rounded-lg p-3 bg-card">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5">
+                  <Key className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-xs font-normal text-muted-foreground">Client ID</span>
+                </div>
+                <Badge variant="secondary" className="text-[9px] px-1.5 py-0">Public</Badge>
               </div>
-              <Badge variant="secondary" className="text-[10px]">Public</Badge>
+              {keysLoading ? (
+                <div className="flex items-center justify-center py-1.5">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+                </div>
+              ) : publishableKey ? (
+                <div className="flex items-center gap-1.5">
+                  <code className="flex-1 text-xs font-mono text-foreground bg-secondary px-2 py-1.5 rounded truncate">
+                    {publishableKey.keyPrefix}...{publishableKey.lastFour}
+                  </code>
+                  <button
+                    onClick={() => copyToClipboard(`${publishableKey.keyPrefix}...${publishableKey.lastFour}`, `${project.id}-client`)}
+                    className={cn(
+                      "p-1.5 rounded transition-all",
+                      copiedId === `${project.id}-client` ? "bg-success/20 text-success" : "hover:bg-secondary text-muted-foreground"
+                    )}
+                  >
+                    {copiedId === `${project.id}-client` ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+              ) : (
+                <Button
+                  onClick={() => handleGenerateKey("publishable")}
+                  disabled={isGeneratingKey}
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-8 border-border text-muted-foreground text-xs"
+                >
+                  {isGeneratingKey ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Plus className="w-3.5 h-3.5 mr-1.5" />}
+                  Generate
+                </Button>
+              )}
             </div>
-            {keysLoading ? (
-              <div className="flex items-center justify-center py-2">
-                <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
-              </div>
-            ) : publishableKey ? (
-              <div className="flex items-center gap-2">
-                <code className="flex-1 text-sm font-mono text-white bg-white/5 px-3 py-2 rounded-lg truncate">
-                  {publishableKey.keyPrefix}...{publishableKey.lastFour}
-                </code>
-                <button
-                  onClick={() => copyToClipboard(`${publishableKey.keyPrefix}...${publishableKey.lastFour}`, `${project.id}-client`)}
-                  className={cn(
-                    "p-2 rounded-lg transition-all",
-                    copiedId === `${project.id}-client`
-                      ? "bg-green-500/20 text-green-400"
-                      : "hover:bg-white/10 text-gray-400"
-                  )}
-                >
-                  {copiedId === `${project.id}-client` ? (
-                    <Check className="w-4 h-4" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-            ) : (
-              <Button
-                onClick={() => handleGenerateKey("publishable")}
-                disabled={isGeneratingKey}
-                variant="outline"
-                size="sm"
-                className="w-full border-white/10 text-gray-400"
-              >
-                {isGeneratingKey ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Plus className="w-4 h-4 mr-2" />
-                )}
-                Generate Key
-              </Button>
-            )}
-          </Card>
 
-          <Card variant="bordered" className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Key className="w-4 h-4 text-gray-500" />
-                <span className="text-xs font-normal text-gray-400">Secret Key</span>
+            <div className="border border-border rounded-lg p-3 bg-card">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1.5">
+                  <Key className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-xs font-normal text-muted-foreground">Secret Key</span>
+                </div>
+                <Badge variant="destructive" className="text-[9px] px-1.5 py-0">Private</Badge>
               </div>
-              <Badge variant="destructive" className="text-[10px]">Private</Badge>
+              {keysLoading ? (
+                <div className="flex items-center justify-center py-1.5">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground" />
+                </div>
+              ) : secretKey ? (
+                <div className="flex items-center gap-1.5">
+                  <code className="flex-1 text-xs font-mono text-foreground bg-secondary px-2 py-1.5 rounded truncate">
+                    {showSecret[secretKey.id] ? `${secretKey.keyPrefix}...${secretKey.lastFour}` : "•".repeat(20)}
+                  </code>
+                  <button
+                    onClick={() => setShowSecret(prev => ({ ...prev, [secretKey.id]: !prev[secretKey.id] }))}
+                    className="p-1.5 rounded hover:bg-secondary text-muted-foreground transition-all"
+                  >
+                    {showSecret[secretKey.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  </button>
+                  <button
+                    onClick={() => copyToClipboard(`${secretKey.keyPrefix}...${secretKey.lastFour}`, `${project.id}-secret`)}
+                    className={cn(
+                      "p-1.5 rounded transition-all",
+                      copiedId === `${project.id}-secret` ? "bg-success/20 text-success" : "hover:bg-secondary text-muted-foreground"
+                    )}
+                  >
+                    {copiedId === `${project.id}-secret` ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+              ) : (
+                <Button
+                  onClick={() => handleGenerateKey("secret")}
+                  disabled={isGeneratingKey}
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-8 border-border text-muted-foreground text-xs"
+                >
+                  {isGeneratingKey ? <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" /> : <Plus className="w-3.5 h-3.5 mr-1.5" />}
+                  Generate
+                </Button>
+              )}
             </div>
-            {keysLoading ? (
-              <div className="flex items-center justify-center py-2">
-                <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
-              </div>
-            ) : secretKey ? (
-              <div className="flex items-center gap-2">
-                <code className="flex-1 text-sm font-mono text-white bg-white/5 px-3 py-2 rounded-lg truncate">
-                  {showSecret[secretKey.id]
-                    ? `${secretKey.keyPrefix}...${secretKey.lastFour}`
-                    : "•".repeat(24)
-                  }
-                </code>
-                <button
-                  onClick={() => setShowSecret(prev => ({ ...prev, [secretKey.id]: !prev[secretKey.id] }))}
-                  className="p-2 rounded-lg hover:bg-white/10 text-gray-400 transition-all"
-                >
-                  {showSecret[secretKey.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-                <button
-                  onClick={() => copyToClipboard(`${secretKey.keyPrefix}...${secretKey.lastFour}`, `${project.id}-secret`)}
-                  className={cn(
-                    "p-2 rounded-lg transition-all",
-                    copiedId === `${project.id}-secret`
-                      ? "bg-green-500/20 text-green-400"
-                      : "hover:bg-white/10 text-gray-400"
-                  )}
-                >
-                  {copiedId === `${project.id}-secret` ? (
-                    <Check className="w-4 h-4" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                </button>
-              </div>
-            ) : (
-              <Button
-                onClick={() => handleGenerateKey("secret")}
-                disabled={isGeneratingKey}
-                variant="outline"
-                size="sm"
-                className="w-full border-white/10 text-gray-400"
-              >
-                {isGeneratingKey ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Plus className="w-4 h-4 mr-2" />
-                )}
-                Generate Key
-              </Button>
-            )}
-          </Card>
-        </div>
-
-        {/* Warning */}
-        <Card className="bg-amber-500/5 border border-amber-500/20 p-4">
-          <div className="flex gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0" />
-            <p className="text-xs text-amber-400/80 font-light">
-              Never expose your secret key in client-side code. Use it only on your server.
-            </p>
-          </div>
-        </Card>
-
-        {/* Flows Section */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-normal text-white">Verification Flows</h2>
-            <Button
-              onClick={onCreateFlow}
-              size="sm"
-              className="bg-purple-500 hover:bg-purple-600 text-white gap-2 text-sm font-normal h-9"
-            >
-              <Plus className="w-4 h-4" />
-              New Flow
-            </Button>
           </div>
 
-          {project.flows.length > 0 ? (
-            <div className="space-y-2">
-              {project.flows.map((flow) => (
-                <Card
-                  key={flow.id}
-                  variant="bordered"
-                  className="p-4 cursor-pointer hover:border-white/20 transition-all group"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                        <Layers className="w-5 h-5 text-purple-400" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-sm font-normal text-white font-mono">{flow.name}</h3>
-                          <Badge
-                            variant={flow.status === "active" ? "success" : "secondary"}
-                            className="text-[10px]"
-                          >
-                            {flow.status}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500">
-                            {flow.moduleCount} module{flow.moduleCount !== 1 ? "s" : ""}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <div className="text-right">
-                        <p className="text-sm font-normal text-white">
-                          {flow.stats.totalVerifications.toLocaleString()}
-                        </p>
-                        <p className="text-xs text-gray-500 font-light">verifications</p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors" />
-                    </div>
-                  </div>
-                </Card>
-              ))}
+          {/* Warning */}
+          <div className="bg-warning/5 border border-warning/20 rounded-lg p-2.5">
+            <div className="flex gap-2">
+              <AlertTriangle className="w-3.5 h-3.5 text-warning flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-warning font-light">
+                Never expose your secret key in client-side code. Use it only on your server.
+              </p>
             </div>
-          ) : (
-            <Card variant="bordered" className="text-center py-12">
-              <Layers className="w-10 h-10 text-gray-700 mx-auto mb-3" />
-              <p className="text-sm text-gray-400 font-light mb-1">No flows yet</p>
-              <p className="text-xs text-gray-600 font-light mb-4">Create your first verification flow</p>
+          </div>
+
+          {/* Flows Section */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-medium text-foreground">Verification Flows</h2>
               <Button
                 onClick={onCreateFlow}
                 size="sm"
-                className="bg-white text-black hover:bg-gray-200 font-normal"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5 text-xs font-normal h-8"
               >
-                <Plus className="w-4 h-4 mr-1.5" />
-                Create Flow
+                <Plus className="w-3.5 h-3.5" />
+                New Flow
               </Button>
-            </Card>
-          )}
-        </div>
+            </div>
 
-        {/* Quick Start Code */}
-        {publishableKey && (
-          <Card variant="bordered" className="p-4">
-            <span className="text-xs font-normal text-gray-500 block mb-3">Quick Start</span>
-            <pre className="text-xs font-mono text-gray-300 bg-black/50 p-4 rounded-lg overflow-x-auto">
+            {project.flows.length > 0 ? (
+              <div className="space-y-2">
+                {project.flows.map((flow) => (
+                  <div
+                    key={flow.id}
+                    className="group flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:border-primary/20 hover:bg-secondary/50 cursor-pointer transition-all"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
+                      <Layers className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h3 className="text-sm font-normal text-foreground font-mono truncate">{flow.name}</h3>
+                        <Badge variant={flow.status === "active" ? "success" : "secondary"} className="text-[9px] px-1.5 py-0">
+                          {flow.status}
+                        </Badge>
+                      </div>
+                      <span className="text-xs text-muted-foreground font-light">
+                        {flow.moduleCount} module{flow.moduleCount !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+                    <div className="text-right hidden sm:block">
+                      <p className="text-sm font-normal text-foreground tabular-nums">{flow.stats.totalVerifications.toLocaleString()}</p>
+                      <p className="text-[10px] text-muted-foreground font-light">verifications</p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors flex-shrink-0" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-10 border border-dashed border-border rounded-xl">
+                <Layers className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground font-light mb-1">No flows yet</p>
+                <p className="text-xs text-muted-foreground/60 font-light mb-3">Create your first verification flow</p>
+                <Button onClick={onCreateFlow} size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-normal h-8">
+                  <Plus className="w-3.5 h-3.5 mr-1" />
+                  Create Flow
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Start Code */}
+          {publishableKey && (
+            <div className="border border-border rounded-lg p-3 bg-card">
+              <span className="text-xs font-normal text-muted-foreground block mb-2">Quick Start</span>
+              <pre className="text-[11px] font-mono text-foreground/80 bg-secondary p-3 rounded-lg overflow-x-auto">
 {`import { createClient } from "@untraced/sdk";
 
 const untraced = createClient({
@@ -705,9 +635,10 @@ untraced.verify({
   flow: "your_flow_name",
   onSuccess: (proof) => console.log("Verified!", proof),
 });`}
-            </pre>
-          </Card>
-        )}
+              </pre>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

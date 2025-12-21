@@ -84,7 +84,7 @@ const modules = [
 
 export function ModulesSection() {
   return (
-    <section id="modules" className="py-32 px-6 bg-[#0f0f0f]">
+    <section id="modules" className="py-32 px-6 bg-card">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -95,10 +95,10 @@ export function ModulesSection() {
           <Badge variant="secondary" className="mb-4">
             Modular Architecture
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-light mb-4 text-white">
+          <h2 className="text-4xl md:text-5xl font-light mb-4 text-foreground">
             Verification <span className="font-semibold">Modules</span>
           </h2>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto font-light">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-light">
             Pre-built ZK verification modules that transform Web2 credentials
             into privacy-preserving on-chain attestations.
           </p>
@@ -132,7 +132,7 @@ export function ModulesSection() {
                   <div className="flex items-start justify-between mb-4">
                     <div
                       className={cn(
-                        "w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br text-white transition-transform duration-300 group-hover:scale-110",
+                        "w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br text-foreground transition-transform duration-300 group-hover:scale-110",
                         module.gradient
                       )}
                     >
@@ -150,10 +150,10 @@ export function ModulesSection() {
                     )}
                   </div>
 
-                  <h3 className="font-semibold mb-2 text-white group-hover:text-purple-400 transition-colors">
+                  <h3 className="font-semibold mb-2 text-foreground group-hover:text-purple-400 transition-colors">
                     {module.name}
                   </h3>
-                  <p className="text-sm text-gray-500 font-light leading-relaxed">
+                  <p className="text-sm text-muted-foreground font-light leading-relaxed">
                     {module.description}
                   </p>
                 </div>

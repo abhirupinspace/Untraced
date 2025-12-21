@@ -71,9 +71,9 @@ const getIcon = (iconName: string) => {
 
 const getBadgeVariant = (label: string) => {
   const labelLower = label.toLowerCase();
-  if (labelLower === "beta") return "bg-yellow-300/20 text-yellow-300 border-transparent";
-  if (labelLower === "coming soon") return "bg-white/10 text-white/50 border-transparent";
-  return "bg-white/10 text-white/60 border-transparent";
+  if (labelLower === "beta") return "bg-warning/20 text-warning border-transparent dark:bg-yellow-300/20 dark:text-yellow-300";
+  if (labelLower === "coming soon") return "bg-muted text-muted-foreground border-transparent";
+  return "bg-muted text-muted-foreground border-transparent";
 };
 
 interface SidebarLinkItemProps {
@@ -125,7 +125,9 @@ function SidebarLinkItem({
         href={link.href}
         className={cn(
           "flex items-center justify-start gap-3 w-full group/sidebar py-2.5 px-2 rounded-lg transition-all",
-          isActive ? "bg-white/10 text-white" : "text-white/50 hover:text-white hover:bg-white/5"
+          isActive
+            ? "bg-primary/10 text-foreground dark:bg-white/10 dark:text-white"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/50 dark:hover:bg-white/5"
         )}
       >
         <span className="flex-shrink-0">{link.icon && getIcon(link.icon)}</span>
@@ -159,7 +161,9 @@ function SidebarLinkItem({
         href={link.href}
         className={cn(
           "flex items-center justify-start gap-3 w-full group/sidebar py-2.5 px-2 rounded-lg transition-all",
-          isActive ? "bg-white/10 text-white" : "text-white/50 hover:text-white hover:bg-white/5"
+          isActive
+            ? "bg-primary/10 text-foreground dark:bg-white/10 dark:text-white"
+            : "text-muted-foreground hover:text-foreground hover:bg-muted/50 dark:hover:bg-white/5"
         )}
       >
         <span className="flex-shrink-0">{link.icon && getIcon(link.icon)}</span>
@@ -211,8 +215,8 @@ function SidebarLinkItem({
                   className={cn(
                     "flex items-center gap-2 w-full py-1.5 px-2 text-sm rounded-md transition-colors duration-200",
                     pathname === sublink.href
-                      ? "text-white bg-white/5"
-                      : "text-white/40 hover:text-white/70 hover:bg-white/5"
+                      ? "text-foreground bg-muted/50 dark:bg-white/5"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/30 dark:hover:bg-white/5"
                   )}
                 >
                   {sublink.icon && getIcon(sublink.icon)}
@@ -263,7 +267,7 @@ function FooterLinkItem({
         href={link.href}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-start gap-3 w-full py-2.5 px-2 rounded-lg text-white/50 hover:text-white hover:bg-white/5 transition-all"
+        className="flex items-center justify-start gap-3 w-full py-2.5 px-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 dark:hover:bg-white/5 transition-all"
       >
         {LinkContent}
       </a>
@@ -273,12 +277,13 @@ function FooterLinkItem({
   return (
     <Link
       href={link.href}
-      className="flex items-center justify-start gap-3 w-full py-2.5 px-2 rounded-lg text-white/50 hover:text-white hover:bg-white/5 transition-all"
+      className="flex items-center justify-start gap-3 w-full py-2.5 px-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 dark:hover:bg-white/5 transition-all"
     >
       {LinkContent}
     </Link>
   );
 }
+
 
 function UserSection() {
   const { open, animate } = useSidebar();
@@ -287,7 +292,7 @@ function UserSection() {
   if (!ready) {
     return (
       <div className="flex items-center justify-center py-2">
-        <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
+        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -302,14 +307,14 @@ function UserSection() {
         {open ? (
           <Button
             onClick={login}
-            className="w-full bg-white text-black hover:bg-gray-200 text-sm font-normal h-10"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-normal h-10"
           >
             Connect Wallet
           </Button>
         ) : (
           <button
             onClick={login}
-            className="w-full flex items-center justify-center p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all"
+            className="w-full flex items-center justify-center p-2 rounded-lg bg-muted hover:bg-muted/80 dark:bg-white/10 dark:hover:bg-white/20 transition-all"
           >
             <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
               <span className="text-[10px] font-medium text-white">?</span>
@@ -333,15 +338,15 @@ function UserSection() {
         className="flex-1 min-w-0 flex items-center"
       >
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-white font-normal truncate">
+          <p className="text-xs text-foreground font-normal truncate">
             {user?.email?.address ||
               `${user?.wallet?.address?.slice(0, 6)}...${user?.wallet?.address?.slice(-4)}`}
           </p>
-          <p className="text-[10px] text-gray-500 font-light">Connected</p>
+          <p className="text-[10px] text-muted-foreground font-light">Connected</p>
         </div>
         <button
           onClick={logout}
-          className="p-1.5 rounded-lg hover:bg-white/10 text-gray-500 hover:text-white transition-all"
+          className="p-1.5 rounded-lg hover:bg-muted dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-all"
         >
           <LogOut className="w-4 h-4" />
         </button>
@@ -358,11 +363,11 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={cn(
-        "mx-auto flex w-full h-screen flex-1 flex-col overflow-hidden md:flex-row bg-[#0a0a0a]"
+        "mx-auto flex w-full h-screen flex-1 flex-col overflow-hidden md:flex-row bg-background"
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-6 border-r border-white/5">
+        <SidebarBody className="justify-between gap-6 border-r border-sidebar-border bg-sidebar">
           {/* Logo */}
           <div className="flex flex-col gap-6">
             <Link href="/" className="flex items-center gap-2.5 px-2 py-1">
@@ -378,7 +383,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                   display: open ? "inline-block" : "none",
                   opacity: open ? 1 : 0,
                 }}
-                className="font-normal text-white text-base tracking-tight whitespace-pre"
+                className="font-normal text-foreground text-base tracking-tight whitespace-pre"
               >
                 UNTRACED
               </motion.span>
@@ -402,14 +407,14 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
           {/* Footer */}
           <div className="flex flex-col gap-2">
             {/* Footer Links */}
-            <div className="border-t border-white/5 pt-3">
+            <div className="border-t border-sidebar-border pt-3">
               {footerLinks.map((link, idx) => (
                 <FooterLinkItem key={idx} link={link} />
               ))}
             </div>
 
             {/* User Section */}
-            <div className="border-t border-white/5 pt-3">
+            <div className="border-t border-sidebar-border pt-3">
               <UserSection />
             </div>
           </div>

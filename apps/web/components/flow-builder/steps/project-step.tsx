@@ -22,24 +22,24 @@ export function ProjectStep({ onSubmit }: ProjectStepProps) {
   const isValid = name.trim().length >= 3;
 
   return (
-    <div className="h-full flex items-center justify-center p-6 bg-[#0a0a0a]">
+    <div className="h-full flex items-center justify-center p-6 bg-background">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-sm"
       >
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold text-white mb-2">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">
             Create a new flow
           </h1>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             Build your ZK verification flow
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-2">
+            <label className="block text-xs font-medium text-muted-foreground mb-2">
               Flow Name
             </label>
             <input
@@ -47,7 +47,7 @@ export function ProjectStep({ onSubmit }: ProjectStepProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. kyc_verification"
-              className="w-full px-4 py-3 text-sm bg-[#0f0f0f] border border-white/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-white/20 transition-all text-white placeholder:text-gray-600 font-mono"
+              className="w-full px-4 py-3 text-sm bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/30 focus:border-white/20 transition-all text-foreground placeholder:text-muted-foreground font-mono"
               autoFocus
             />
           </div>
@@ -55,7 +55,7 @@ export function ProjectStep({ onSubmit }: ProjectStepProps) {
           <Button
             type="submit"
             disabled={!isValid}
-            className="w-full h-11 bg-white text-black hover:bg-gray-200 font-medium"
+            className="w-full h-11 bg-primary text-primary-foreground hover:bg-accent font-medium"
           >
             Create Flow
             <ArrowRight className="w-4 h-4 ml-2" />

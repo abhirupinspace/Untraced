@@ -58,7 +58,7 @@ export function FlowStats({ flowName, modules, className }: FlowStatsProps) {
   return (
     <div className={cn("space-y-4", className)}>
       {/* Flow Name Card */}
-      <div className="bg-gradient-to-br from-untraced-dark to-untraced-dark-hover rounded-2xl p-5 text-white">
+      <div className="bg-gradient-to-br from-untraced-dark to-untraced-dark-hover rounded-2xl p-5 text-foreground">
         <div className="flex items-center gap-2 mb-3">
           <Hash className="w-4 h-4 opacity-60" />
           <span className="text-xs font-medium opacity-60">Flow Name</span>
@@ -66,7 +66,7 @@ export function FlowStats({ flowName, modules, className }: FlowStatsProps) {
         <p className="font-mono text-lg font-semibold truncate">
           {flowName || "untitled_flow"}
         </p>
-        <div className="mt-3 pt-3 border-t border-white/10">
+        <div className="mt-3 pt-3 border-t border-border">
           <div className="flex items-center gap-4 text-xs">
             <span className="flex items-center gap-1 opacity-70">
               <Zap className="w-3 h-3" />
@@ -99,7 +99,7 @@ export function FlowStats({ flowName, modules, className }: FlowStatsProps) {
                   stat.color
                 )}
               >
-                <stat.icon className="w-4 h-4 text-white" />
+                <stat.icon className="w-4 h-4 text-foreground" />
               </div>
             </div>
             <p className="text-2xl font-bold text-untraced-dark">{stat.value}</p>

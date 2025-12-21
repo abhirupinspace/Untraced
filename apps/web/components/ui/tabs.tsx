@@ -42,7 +42,7 @@ function TabsList({ children, className }: TabsListProps) {
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-1 p-1 bg-white/5 rounded-lg",
+        "inline-flex items-center gap-1 p-1 bg-secondary rounded-lg",
         className
       )}
     >
@@ -67,8 +67,8 @@ function TabsTrigger({ value, children, className }: TabsTriggerProps) {
       className={cn(
         "px-4 py-2 text-sm font-light rounded-md transition-all duration-200",
         isSelected
-          ? "bg-white/10 text-white"
-          : "text-gray-500 hover:text-white hover:bg-white/5",
+          ? "bg-secondary text-foreground"
+          : "text-muted-foreground hover:text-foreground hover:bg-secondary",
         className
       )}
     >

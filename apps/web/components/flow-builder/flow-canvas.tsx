@@ -103,7 +103,7 @@ function FlowNode({
                 module.gradient
               )}
             >
-              <Icon className="w-5 h-5 text-white" />
+              <Icon className="w-5 h-5 text-foreground" />
             </div>
 
             <div className="flex-1 min-w-0">
@@ -122,7 +122,7 @@ function FlowNode({
                   className={cn(
                     "p-2 rounded-lg transition-all",
                     showConfig
-                      ? "bg-untraced-dark text-white"
+                      ? "bg-untraced-dark text-foreground"
                       : "hover:bg-untraced-dark/5 text-untraced-dark/40"
                   )}
                 >
@@ -259,7 +259,7 @@ export function FlowCanvas({
       {/* Start Node */}
       <div className="flex flex-col items-center mb-2">
         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-500 flex items-center justify-center shadow-lg shadow-green-500/20">
-          <span className="text-white text-xs font-bold">START</span>
+          <span className="text-foreground text-xs font-bold">START</span>
         </div>
         <div className="w-0.5 h-6 bg-gradient-to-b from-green-400 to-untraced-dark/20" />
       </div>
@@ -282,7 +282,7 @@ export function FlowCanvas({
       <div className="flex flex-col items-center mt-2">
         <div className="w-0.5 h-6 bg-gradient-to-b from-untraced-dark/20 to-untraced-dark" />
         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-untraced-dark to-untraced-dark-hover flex items-center justify-center shadow-lg shadow-untraced-dark/20">
-          <span className="text-white text-xs font-bold">END</span>
+          <span className="text-foreground text-xs font-bold">END</span>
         </div>
       </div>
     </div>

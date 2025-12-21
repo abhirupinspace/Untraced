@@ -12,8 +12,8 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@noir-lang/backend_barretenberg": "^1.0.0-beta.16",
-    "@noir-lang/noir_js": "^1.0.0-beta.16"
+    "@noir-lang/noir_js": "1.0.0-beta.15",
+    "@aztec/bb.js": "0.82.2"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

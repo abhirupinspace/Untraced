@@ -6,6 +6,22 @@
  * - zk-balance: Balance verification without revealing exact amount
  */
 
-export { ZKAgeProver, type AgeProofInputs, type AgePublicInputs } from "./zk-age";
-export { ZKBalanceProver, type BalanceProofInputs, type BalancePublicInputs } from "./zk-balance";
-export { computePedersenHash } from "./utils";
+export { ZKAgeProver, type AgeProofInputs, type AgePublicInputs, type AgeProof } from "./zk-age.js";
+export {
+  ZKBalanceProver,
+  type BalanceProofInputs,
+  type BalancePublicInputs,
+  type BalanceProof,
+} from "./zk-balance.js";
+export {
+  computePedersenHash,
+  computeAgeCommitment,
+  computeBalanceCommitment,
+  generateRandomSecret,
+  addressToField,
+  hexToBigInt,
+  bigIntToHex,
+  getCurrentDate,
+  getCurrentTimestamp,
+  destroyBarretenberg,
+} from "./utils.js";

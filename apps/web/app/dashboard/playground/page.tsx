@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { DashboardNavbar } from "@/components/dashboard/dashboard-navbar";
 import { cn } from "@/lib/cn";
 import {
   Play,
@@ -178,6 +179,22 @@ const modules: Module[] = [
 ];
 
 export default function PlaygroundPage() {
+  return (
+    <Suspense fallback={<PlaygroundLoading />}>
+      <PlaygroundContent />
+    </Suspense>
+  );
+}
+
+function PlaygroundLoading() {
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+    </div>
+  );
+}
+
+function PlaygroundContent() {
   const searchParams = useSearchParams();
   const { user } = useWallet();
   const [selectedModule, setSelectedModule] = useState<Module>(modules[0]);
@@ -673,37 +690,32 @@ export default function PlaygroundPage() {
     );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="h-14 border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="h-full px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-lg font-normal text-white">Playground</h1>
-            <Badge variant="secondary" className="text-[10px]">
-              Testnet
-            </Badge>
-          </div>
+      <DashboardNavbar title="Playground">
+        <Badge variant="secondary" className="text-[10px] font-medium">Testnet</Badge>
+        <div className="ml-auto mr-4">
           <Button
             variant="outline"
             size="sm"
             onClick={resetPlayground}
-            className="border-white/10 text-gray-400 hover:text-white h-8 gap-2"
+            className="border-border text-muted-foreground hover:text-foreground h-8 gap-2"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Reset
           </Button>
         </div>
-      </header>
+      </DashboardNavbar>
 
       <div className="p-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Panel - Module Selection & Inputs */}
           <div className="space-y-4">
             {/* Module List */}
-            <div className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden">
-              <div className="p-4 border-b border-white/5">
-                <h3 className="text-sm font-normal text-white">Select Module</h3>
-                <p className="text-xs text-gray-500 mt-0.5">Choose a ZK module to test</p>
+            <div className="rounded-2xl border border-border bg-card overflow-hidden">
+              <div className="p-4 border-b border-border">
+                <h3 className="text-sm font-normal text-foreground">Select Module</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Choose a ZK module to test</p>
               </div>
               <div className="p-2">
                 {modules.map((module) => {
@@ -715,7 +727,7 @@ export default function PlaygroundPage() {
                       onClick={() => handleModuleSelect(module)}
                       className={cn(
                         "w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200",
-                        isSelected ? "bg-white/10" : "hover:bg-white/5"
+                        isSelected ? "bg-primary/10 dark:bg-white/10" : "hover:bg-secondary"
                       )}
                     >
                       <div className={cn("p-2 rounded-lg", module.color)}>
@@ -724,13 +736,13 @@ export default function PlaygroundPage() {
                       <div className="flex-1 text-left min-w-0">
                         <p className={cn(
                           "text-sm font-light truncate",
-                          isSelected ? "text-white" : "text-gray-400"
+                          isSelected ? "text-foreground" : "text-muted-foreground"
                         )}>
                           {module.name}
                         </p>
                       </div>
                       {isSelected && (
-                        <ChevronRight className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                        <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                       )}
                     </button>
                   );
@@ -739,12 +751,12 @@ export default function PlaygroundPage() {
             </div>
 
             {/* Input Fields / OAuth Connection */}
-            <div className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden">
-              <div className="p-4 border-b border-white/5">
-                <h3 className="text-sm font-normal text-white">
+            <div className="rounded-2xl border border-border bg-card overflow-hidden">
+              <div className="p-4 border-b border-border">
+                <h3 className="text-sm font-normal text-foreground">
                   {selectedModule.requiresOAuth ? "Account Connection" : "Input Data"}
                 </h3>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {selectedModule.requiresOAuth
                     ? `Connect your ${selectedModule.requiresOAuth === "github" ? "GitHub" : "Twitter"} account`
                     : "Provide the required information"}
@@ -792,9 +804,9 @@ export default function PlaygroundPage() {
 
                 {/* OAuth Error */}
                 {oauthError && (
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                    <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
-                    <p className="text-xs text-red-400">{oauthError}</p>
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                    <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
+                    <p className="text-xs text-destructive">{oauthError}</p>
                   </div>
                 )}
 
@@ -814,8 +826,8 @@ export default function PlaygroundPage() {
 
                 {/* Configuration */}
                 {selectedModule.config && (
-                  <div className="pt-4 border-t border-white/5">
-                    <label className="block text-xs text-gray-400 mb-2">
+                  <div className="pt-4 border-t border-border">
+                    <label className="block text-xs text-muted-foreground mb-2">
                       {selectedModule.config.label}
                     </label>
                     {selectedModule.config.type === "threshold" ? (
@@ -826,14 +838,14 @@ export default function PlaygroundPage() {
                           max={selectedModule.config.max}
                           value={configValue as number}
                           onChange={(e) => setConfigValue(Number(e.target.value))}
-                          className="w-full accent-purple-500 h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer"
+                          className="w-full accent-primary h-1.5 bg-secondary rounded-full appearance-none cursor-pointer"
                         />
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-gray-600">{selectedModule.config.min}</span>
-                          <span className="text-white font-medium tabular-nums px-2 py-0.5 bg-white/10 rounded">
+                          <span className="text-muted-foreground">{selectedModule.config.min}</span>
+                          <span className="text-foreground font-medium tabular-nums px-2 py-0.5 bg-secondary rounded">
                             {configValue}
                           </span>
-                          <span className="text-gray-600">{selectedModule.config.max}</span>
+                          <span className="text-muted-foreground">{selectedModule.config.max}</span>
                         </div>
                       </div>
                     ) : (
@@ -845,8 +857,8 @@ export default function PlaygroundPage() {
                             className={cn(
                               "px-3 py-1.5 rounded-lg text-xs font-light transition-all",
                               configValue === option
-                                ? "bg-white/10 text-white"
-                                : "bg-white/5 text-gray-500 hover:text-gray-300"
+                                ? "bg-primary/10 text-foreground dark:bg-white/10"
+                                : "bg-secondary text-muted-foreground hover:text-foreground"
                             )}
                           >
                             {option}
@@ -859,9 +871,9 @@ export default function PlaygroundPage() {
 
                 {/* Validation Error */}
                 {validationError && (
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                    <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
-                    <p className="text-xs text-red-400">{validationError}</p>
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                    <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0" />
+                    <p className="text-xs text-destructive">{validationError}</p>
                   </div>
                 )}
               </div>
@@ -871,7 +883,7 @@ export default function PlaygroundPage() {
             <Button
               onClick={runVerification}
               disabled={status === "running" || !canRun}
-              className="w-full bg-white text-black hover:bg-gray-100 h-11 gap-2 text-sm font-normal disabled:opacity-50"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-11 gap-2 text-sm font-normal disabled:opacity-50"
             >
               {status === "running" ? (
                 <>
@@ -888,25 +900,25 @@ export default function PlaygroundPage() {
           </div>
 
           {/* Middle Panel - Terminal */}
-          <div className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b border-white/5">
+          <div className="rounded-2xl border border-border bg-card overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b border-border">
               <div className="flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-gray-500" />
-                <h3 className="text-sm font-normal text-white">Console</h3>
+                <Terminal className="w-4 h-4 text-muted-foreground" />
+                <h3 className="text-sm font-normal text-foreground">Console</h3>
               </div>
               {status === "running" && (
                 <div className="flex items-center gap-1.5">
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
                   </span>
-                  <span className="text-xs text-gray-500">Running</span>
+                  <span className="text-xs text-muted-foreground">Running</span>
                 </div>
               )}
             </div>
-            <div className="flex-1 min-h-[400px] max-h-[500px] overflow-auto p-4 font-mono text-xs bg-black/20">
+            <div className="flex-1 min-h-[400px] max-h-[500px] overflow-auto p-4 font-mono text-xs bg-muted/30 dark:bg-black/20">
               {logs.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-gray-600">
+                <div className="h-full flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
                     <Terminal className="w-8 h-8 mx-auto mb-2 opacity-50" />
                     <p>Run a verification to see logs</p>
@@ -923,12 +935,12 @@ export default function PlaygroundPage() {
                       className={cn(
                         "py-0.5 leading-relaxed",
                         log.includes("Error")
-                          ? "text-red-400"
+                          ? "text-destructive"
                           : log.includes("PASSED") || log.includes("complete") || log.includes("satisfied") || log.includes("verified") || log.includes("confirmed")
-                          ? "text-green-400"
+                          ? "text-success"
                           : log.includes("...")
-                          ? "text-yellow-400"
-                          : "text-gray-400"
+                          ? "text-warning"
+                          : "text-muted-foreground"
                       )}
                     >
                       {log}
@@ -939,7 +951,7 @@ export default function PlaygroundPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: [0, 1, 0] }}
                       transition={{ repeat: Infinity, duration: 1 }}
-                      className="text-gray-500"
+                      className="text-muted-foreground"
                     >
                       █
                     </motion.span>
@@ -952,9 +964,9 @@ export default function PlaygroundPage() {
           {/* Right Panel - Results */}
           <div className="space-y-4">
             {/* Status Card */}
-            <div className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden">
-              <div className="p-4 border-b border-white/5">
-                <h3 className="text-sm font-normal text-white">Status</h3>
+            <div className="rounded-2xl border border-border bg-card overflow-hidden">
+              <div className="p-4 border-b border-border">
+                <h3 className="text-sm font-normal text-foreground">Status</h3>
               </div>
               <div className="p-6">
                 <AnimatePresence mode="wait">
@@ -966,11 +978,11 @@ export default function PlaygroundPage() {
                       exit={{ opacity: 0 }}
                       className="text-center"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mx-auto mb-3">
-                        <Zap className="w-5 h-5 text-gray-500" />
+                      <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mx-auto mb-3">
+                        <Zap className="w-5 h-5 text-muted-foreground" />
                       </div>
-                      <p className="text-sm text-gray-400">Ready to run</p>
-                      <p className="text-xs text-gray-600 mt-1">
+                      <p className="text-sm text-muted-foreground">Ready to run</p>
+                      <p className="text-xs text-muted-foreground/70 mt-1">
                         Fill in the inputs and click run
                       </p>
                     </motion.div>
@@ -984,11 +996,11 @@ export default function PlaygroundPage() {
                       exit={{ opacity: 0 }}
                       className="text-center"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center mx-auto mb-3">
-                        <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+                      <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mx-auto mb-3">
+                        <Loader2 className="w-5 h-5 text-primary animate-spin" />
                       </div>
-                      <p className="text-sm text-white">Generating proof...</p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-sm text-foreground">Generating proof...</p>
+                      <p className="text-xs text-muted-foreground mt-1">
                         This may take a few seconds
                       </p>
                     </motion.div>
@@ -1002,11 +1014,11 @@ export default function PlaygroundPage() {
                       exit={{ opacity: 0 }}
                       className="text-center"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center mx-auto mb-3">
-                        <CheckCircle2 className="w-5 h-5 text-green-400" />
+                      <div className="w-12 h-12 rounded-xl bg-success/20 flex items-center justify-center mx-auto mb-3">
+                        <CheckCircle2 className="w-5 h-5 text-success" />
                       </div>
-                      <p className="text-sm text-white">Verification Successful</p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-sm text-foreground">Verification Successful</p>
+                      <p className="text-xs text-muted-foreground mt-1">
                         Completed in {(executionTime / 1000).toFixed(2)}s
                       </p>
                     </motion.div>
@@ -1020,11 +1032,11 @@ export default function PlaygroundPage() {
                       exit={{ opacity: 0 }}
                       className="text-center"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center mx-auto mb-3">
-                        <XCircle className="w-5 h-5 text-red-400" />
+                      <div className="w-12 h-12 rounded-xl bg-destructive/20 flex items-center justify-center mx-auto mb-3">
+                        <XCircle className="w-5 h-5 text-destructive" />
                       </div>
-                      <p className="text-sm text-white">Verification Failed</p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-sm text-foreground">Verification Failed</p>
+                      <p className="text-xs text-muted-foreground mt-1">
                         Check the console for details
                       </p>
                     </motion.div>
@@ -1038,21 +1050,21 @@ export default function PlaygroundPage() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden"
+                className="rounded-2xl border border-border bg-card overflow-hidden"
               >
-                <div className="flex items-center justify-between p-4 border-b border-white/5">
+                <div className="flex items-center justify-between p-4 border-b border-border">
                   <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-gray-500" />
-                    <h3 className="text-sm font-normal text-white">Proof Output</h3>
+                    <Shield className="w-4 h-4 text-muted-foreground" />
+                    <h3 className="text-sm font-normal text-foreground">Proof Output</h3>
                   </div>
                   <button
                     onClick={copyProof}
-                    className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-white transition-colors"
+                    className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {copied ? (
                       <>
-                        <Check className="w-3 h-3 text-green-400" />
-                        <span className="text-green-400">Copied</span>
+                        <Check className="w-3 h-3 text-success" />
+                        <span className="text-success">Copied</span>
                       </>
                     ) : (
                       <>
@@ -1067,12 +1079,12 @@ export default function PlaygroundPage() {
                   <ProofField label="Backend" value={proofData.backend} />
                   <ProofField label="Proof" value={proofData.proof} truncate />
                   <ProofField label="Nullifier" value={proofData.nullifier} truncate />
-                  <div className="pt-2 border-t border-white/5">
+                  <div className="pt-2 border-t border-border">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">Verified</span>
+                      <span className="text-xs text-muted-foreground">Verified</span>
                       <div className="flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3 h-3 text-green-400" />
-                        <span className="text-xs text-green-400">true</span>
+                        <CheckCircle2 className="w-3 h-3 text-success" />
+                        <span className="text-xs text-success">true</span>
                       </div>
                     </div>
                   </div>
@@ -1081,10 +1093,10 @@ export default function PlaygroundPage() {
             )}
 
             {/* Info Card */}
-            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4">
+            <div className="rounded-2xl border border-warning/20 bg-warning/5 p-4">
               <div className="flex gap-3">
-                <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                <div className="text-xs text-amber-400/80 space-y-1">
+                <AlertTriangle className="w-4 h-4 text-warning flex-shrink-0 mt-0.5" />
+                <div className="text-xs text-warning space-y-1">
                   <p>
                     GitHub and Twitter modules use real OAuth authentication.
                     Other modules are simulated.
@@ -1113,10 +1125,10 @@ function ProofField({
 }) {
   return (
     <div>
-      <span className="text-xs text-gray-500 block mb-1">{label}</span>
+      <span className="text-xs text-muted-foreground block mb-1">{label}</span>
       <code
         className={cn(
-          "text-xs text-gray-300 font-mono bg-black/30 px-2 py-1.5 rounded block",
+          "text-xs text-foreground/80 font-mono bg-secondary px-2 py-1.5 rounded block",
           truncate && "truncate"
         )}
       >
@@ -1145,37 +1157,37 @@ function OAuthConnectionCard({
 }) {
   if (account) {
     return (
-      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <div className="rounded-xl border border-border bg-secondary/50 p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-white/5 text-white">{icon}</div>
+            <div className="p-2 rounded-lg bg-secondary text-foreground">{icon}</div>
             <div>
-              <p className="text-sm text-white font-light">@{account.username}</p>
+              <p className="text-sm text-foreground font-light">@{account.username}</p>
               {account.name && (
-                <p className="text-xs text-gray-500">{account.name}</p>
+                <p className="text-xs text-muted-foreground">{account.name}</p>
               )}
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/10">
-              <CheckCircle2 className="w-3 h-3 text-green-400" />
-              <span className="text-xs text-green-400">Connected</span>
+            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-success/10">
+              <CheckCircle2 className="w-3 h-3 text-success" />
+              <span className="text-xs text-success">Connected</span>
             </div>
           </div>
         </div>
         {stats && stats.length > 0 && (
-          <div className="flex items-center gap-4 mb-3 pb-3 border-b border-white/5">
+          <div className="flex items-center gap-4 mb-3 pb-3 border-b border-border">
             {stats.map((stat, idx) => (
               <div key={idx} className="flex items-center gap-1.5">
-                <span className="text-xs text-gray-500">{stat.label}:</span>
-                <span className="text-xs text-white tabular-nums">{stat.value}</span>
+                <span className="text-xs text-muted-foreground">{stat.label}:</span>
+                <span className="text-xs text-foreground tabular-nums">{stat.value}</span>
               </div>
             ))}
           </div>
         )}
         <button
           onClick={onDisconnect}
-          className="flex items-center gap-2 text-xs text-gray-500 hover:text-red-400 transition-colors"
+          className="flex items-center gap-2 text-xs text-muted-foreground hover:text-destructive transition-colors"
         >
           <LogOut className="w-3 h-3" />
           Disconnect
@@ -1187,14 +1199,14 @@ function OAuthConnectionCard({
   return (
     <button
       onClick={onConnect}
-      className="w-full flex items-center justify-center gap-3 p-4 rounded-xl border border-dashed border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/20 transition-all"
+      className="w-full flex items-center justify-center gap-3 p-4 rounded-xl border border-dashed border-border bg-secondary/30 hover:bg-secondary/50 hover:border-primary/30 transition-all"
     >
-      <div className="p-2 rounded-lg bg-white/5 text-gray-400">{icon}</div>
+      <div className="p-2 rounded-lg bg-secondary text-muted-foreground">{icon}</div>
       <div className="text-left">
-        <p className="text-sm text-white font-light">Connect {label}</p>
-        <p className="text-xs text-gray-500">Authenticate to verify your account</p>
+        <p className="text-sm text-foreground font-light">Connect {label}</p>
+        <p className="text-xs text-muted-foreground">Authenticate to verify your account</p>
       </div>
-      <LinkIcon className="w-4 h-4 text-gray-500 ml-auto" />
+      <LinkIcon className="w-4 h-4 text-muted-foreground ml-auto" />
     </button>
   );
 }

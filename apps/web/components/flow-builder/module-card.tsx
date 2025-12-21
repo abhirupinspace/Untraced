@@ -63,7 +63,7 @@ export function ModuleCard({ module, onClick, disabled }: ModuleCardProps) {
           <Icon
             className={cn(
               "w-5 h-5",
-              module.gradient ? "text-white" : "text-untraced-dark"
+              module.gradient ? "text-foreground" : "text-untraced-dark"
             )}
           />
         </div>
@@ -139,7 +139,7 @@ export function FlowModuleCard({
               : "bg-untraced-dark"
           )}
         >
-          <Icon className="w-5 h-5 text-white" />
+          <Icon className="w-5 h-5 text-foreground" />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -152,7 +152,7 @@ export function FlowModuleCard({
                   className={cn(
                     "p-1.5 rounded-lg transition-all duration-200",
                     showConfig
-                      ? "bg-untraced-dark text-white"
+                      ? "bg-untraced-dark text-foreground"
                       : "hover:bg-untraced-dark/5 text-untraced-dark/50 hover:text-untraced-dark"
                   )}
                 >

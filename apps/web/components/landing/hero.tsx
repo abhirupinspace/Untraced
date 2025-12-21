@@ -12,7 +12,7 @@ export function Hero() {
   const { login, authenticated } = useWallet();
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-20 pb-32 px-6 overflow-hidden bg-[#0a0a0a]">
+    <section className="relative min-h-screen flex items-center justify-center pt-20 pb-32 px-6 overflow-hidden bg-background">
       {/* Background decoration */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
@@ -35,7 +35,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-light tracking-tight mb-6 text-white"
+          className="text-5xl md:text-7xl lg:text-8xl font-light tracking-tight mb-6 text-foreground"
         >
           Verify Without
           <br />
@@ -48,7 +48,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto mb-12 font-light leading-relaxed"
+          className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12 font-light leading-relaxed"
         >
           Build privacy-preserving verification flows with modular ZK modules.
           Prove identity, age, and more — without revealing underlying data.
@@ -111,12 +111,12 @@ export function Hero() {
               transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}
             >
               <AnimatedBorder containerClassName="h-full">
-                <div className="p-6 text-center h-full bg-[#0f0f0f]">
-                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mx-auto mb-3">
+                <div className="p-6 text-center h-full bg-card">
+                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mx-auto mb-3">
                     <feature.icon className="w-6 h-6 text-purple-400" />
                   </div>
-                  <div className="font-medium mb-1 text-white">{feature.label}</div>
-                  <div className="text-sm text-gray-500 font-light">
+                  <div className="font-medium mb-1 text-foreground">{feature.label}</div>
+                  <div className="text-sm text-muted-foreground font-light">
                     {feature.description}
                   </div>
                 </div>

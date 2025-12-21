@@ -137,7 +137,7 @@ export function ModuleSelector({
               className={cn(
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap",
                 activeCategory === category.id
-                  ? "bg-untraced-dark text-white"
+                  ? "bg-untraced-dark text-foreground"
                   : "bg-untraced-dark/5 text-untraced-dark/60 hover:bg-untraced-dark/10"
               )}
             >
@@ -165,7 +165,7 @@ export function ModuleSelector({
                 : "border-untraced-dark/20"
             )}
           >
-            {showActiveOnly && <CheckCircle2 className="w-3 h-3 text-white" />}
+            {showActiveOnly && <CheckCircle2 className="w-3 h-3 text-foreground" />}
           </div>
           Show active only
         </button>
@@ -205,7 +205,7 @@ export function ModuleSelector({
                     isDisabled && "opacity-60"
                   )}
                 >
-                  <Icon className="w-5 h-5 text-white" />
+                  <Icon className="w-5 h-5 text-foreground" />
                 </div>
 
                 {/* Content */}
@@ -244,7 +244,7 @@ export function ModuleSelector({
                       "flex items-center justify-center w-8 h-8 rounded-lg transition-all",
                       isAdded
                         ? "bg-untraced-dark/10 text-untraced-dark/40"
-                        : "bg-untraced-dark/5 text-untraced-dark/40 group-hover:bg-untraced-dark group-hover:text-white"
+                        : "bg-untraced-dark/5 text-untraced-dark/40 group-hover:bg-untraced-dark group-hover:text-foreground"
                     )}
                   >
                     <Plus className="w-4 h-4" />

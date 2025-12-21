@@ -44,7 +44,7 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-32 px-6 bg-[#0a0a0a]">
+    <section id="how-it-works" className="py-32 px-6 bg-background">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -55,10 +55,10 @@ export function HowItWorks() {
           <Badge variant="secondary" className="mb-4">
             Simple Integration
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-light mb-4 text-white">
+          <h2 className="text-4xl md:text-5xl font-light mb-4 text-foreground">
             How It <span className="font-semibold">Works</span>
           </h2>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto font-light">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-light">
             Four simple steps from Web2 data to privacy-preserving on-chain verification.
           </p>
         </motion.div>
@@ -84,13 +84,13 @@ export function HowItWorks() {
                 <div
                   className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-4`}
                 >
-                  <step.icon className="w-6 h-6 text-white" />
+                  <step.icon className="w-6 h-6 text-foreground" />
                 </div>
-                <div className="text-xs font-medium text-gray-500 mb-2">
+                <div className="text-xs font-medium text-muted-foreground mb-2">
                   STEP {step.number}
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-white">{step.title}</h3>
-                <p className="text-sm text-gray-500 font-light leading-relaxed">
+                <h3 className="text-lg font-semibold mb-2 text-foreground">{step.title}</h3>
+                <p className="text-sm text-muted-foreground font-light leading-relaxed">
                   {step.description}
                 </p>
               </Card>
@@ -119,17 +119,17 @@ export function HowItWorks() {
 
             <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="text-center md:text-left">
-                <h3 className="text-2xl md:text-3xl font-semibold text-white mb-2">
+                <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-2">
                   Ready to build?
                 </h3>
-                <p className="text-white/70 font-light">
+                <p className="text-foreground/70 font-light">
                   Start creating your custom verification flow in minutes.
                 </p>
               </div>
               <Link href="/dashboard">
                 <Button
                   size="lg"
-                  className="bg-white text-gray-900 hover:bg-white/90 group"
+                  className="bg-primary text-primary-foreground hover:bg-accent group"
                 >
                   Go to Dashboard
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />

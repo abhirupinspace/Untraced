@@ -8,9 +8,24 @@ interface SwitchProps {
   onCheckedChange: (checked: boolean) => void;
   disabled?: boolean;
   className?: string;
+  size?: "sm" | "default" | "lg";
 }
 
-function Switch({ checked, onCheckedChange, disabled, className }: SwitchProps) {
+function Switch({
+  checked,
+  onCheckedChange,
+  disabled,
+  className,
+  size = "default",
+}: SwitchProps) {
+  const sizes = {
+    sm: { track: "h-5 w-9", thumb: "h-4 w-4", translate: "translate-x-4" },
+    default: { track: "h-6 w-11", thumb: "h-5 w-5", translate: "translate-x-5" },
+    lg: { track: "h-7 w-14", thumb: "h-6 w-6", translate: "translate-x-7" },
+  };
+
+  const currentSize = sizes[size];
+
   return (
     <button
       role="switch"
@@ -18,19 +33,21 @@ function Switch({ checked, onCheckedChange, disabled, className }: SwitchProps) 
       disabled={disabled}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent",
-        "transition-colors duration-200 ease-in-out",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]",
+        "relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent",
+        "transition-all duration-300 ease-out",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        checked ? "bg-purple-500" : "bg-white/20",
+        currentSize.track,
+        checked ? "bg-primary" : "bg-secondary",
         className
       )}
     >
       <span
         className={cn(
-          "pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg",
-          "transform transition-transform duration-200 ease-in-out",
-          checked ? "translate-x-5" : "translate-x-0"
+          "pointer-events-none inline-block rounded-full bg-white shadow-sm",
+          "transform transition-transform duration-300 ease-out",
+          currentSize.thumb,
+          checked ? currentSize.translate : "translate-x-0"
         )}
       />
     </button>

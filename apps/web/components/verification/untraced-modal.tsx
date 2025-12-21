@@ -95,9 +95,9 @@ export function UntracedModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden bg-[#0a0a0a] border-white/10">
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden bg-background border-border">
         {/* Header */}
-        <div className="relative p-6 border-b border-white/5">
+        <div className="relative p-6 border-b border-border">
           <div className="flex items-center gap-2.5 mb-4">
             <Image
               src="/icon.png"
@@ -106,13 +106,13 @@ export function UntracedModal({
               height={24}
               className="rounded-md"
             />
-            <span className="text-sm font-medium text-gray-400">UNTRACED</span>
+            <span className="text-sm font-medium text-muted-foreground">UNTRACED</span>
           </div>
           <DialogHeader className="p-0">
-            <DialogTitle className="text-xl text-white font-semibold">
+            <DialogTitle className="text-xl text-foreground font-semibold">
               Email Verification
             </DialogTitle>
-            <DialogDescription className="text-gray-500 font-light">
+            <DialogDescription className="text-muted-foreground font-light">
               Prove your email is verified without revealing it
             </DialogDescription>
           </DialogHeader>
@@ -132,31 +132,31 @@ export function UntracedModal({
                 {/* Module Icon */}
                 <div className="flex justify-center">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                    <EmailIcon className="w-8 h-8 text-white" />
+                    <EmailIcon className="w-8 h-8 text-foreground" />
                   </div>
                 </div>
 
                 {/* Privacy Messaging */}
-                <div className="space-y-3 bg-white/5 rounded-xl p-4">
-                  <h4 className="text-sm font-medium text-white">
+                <div className="space-y-3 bg-secondary rounded-xl p-4">
+                  <h4 className="text-sm font-medium text-foreground">
                     Privacy Guarantee
                   </h4>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm">
                       <CheckCircleIcon className="w-4 h-4 text-green-400 flex-shrink-0" />
-                      <span className="text-gray-300">
+                      <span className="text-foreground/80">
                         Email is verified
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <XIcon className="w-4 h-4 text-red-400 flex-shrink-0" />
-                      <span className="text-gray-300">
+                      <span className="text-foreground/80">
                         Email address is never shared
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <XIcon className="w-4 h-4 text-red-400 flex-shrink-0" />
-                      <span className="text-gray-300">
+                      <span className="text-foreground/80">
                         Identity is never revealed
                       </span>
                     </div>
@@ -166,7 +166,7 @@ export function UntracedModal({
                 {/* Action Button */}
                 <Button
                   onClick={handleVerify}
-                  className="w-full bg-white text-black hover:bg-gray-200"
+                  className="w-full bg-primary text-primary-foreground hover:bg-accent"
                   size="lg"
                 >
                   Generate Proof
@@ -184,7 +184,7 @@ export function UntracedModal({
               >
                 <div className="relative">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 mx-auto flex items-center justify-center">
-                    <LoaderIcon className="w-8 h-8 text-white" />
+                    <LoaderIcon className="w-8 h-8 text-foreground" />
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-20 h-20 rounded-full border-2 border-purple-500/30 animate-ping" />
@@ -192,15 +192,15 @@ export function UntracedModal({
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg text-white mb-2">
+                  <h3 className="font-semibold text-lg text-foreground mb-2">
                     Running zero-knowledge proof locally...
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     This may take a few seconds
                   </p>
                 </div>
 
-                <div className="flex items-center justify-center gap-2 text-xs text-gray-600">
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                   <ShieldCheckIcon className="w-4 h-4" />
                   <span>Your data never leaves your device</span>
                 </div>
@@ -217,15 +217,15 @@ export function UntracedModal({
               >
                 <div className="relative">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 mx-auto flex items-center justify-center">
-                    <LoaderIcon className="w-8 h-8 text-white" />
+                    <LoaderIcon className="w-8 h-8 text-foreground" />
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg text-white mb-2">
+                  <h3 className="font-semibold text-lg text-foreground mb-2">
                     Submitting to Mantle...
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     Please confirm the transaction in your wallet
                   </p>
                 </div>
@@ -244,10 +244,10 @@ export function UntracedModal({
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg text-white mb-2">
+                  <h3 className="font-semibold text-lg text-foreground mb-2">
                     Verification Complete
                   </h3>
-                  <p className="text-sm text-gray-500 mb-4">
+                  <p className="text-sm text-muted-foreground mb-4">
                     Your email verification is now stored on-chain
                   </p>
 
@@ -261,21 +261,21 @@ export function UntracedModal({
                 </div>
 
                 {/* Privacy Summary */}
-                <div className="bg-white/5 rounded-xl p-4 text-left">
-                  <h4 className="text-sm font-medium text-white mb-2">
+                <div className="bg-secondary rounded-xl p-4 text-left">
+                  <h4 className="text-sm font-medium text-foreground mb-2">
                     What the smart contract knows:
                   </h4>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-muted-foreground">
                     Only that <code className="text-purple-400">EMAIL_VERIFIED == true</code>
                   </p>
-                  <p className="text-xs text-gray-600 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     Nothing else. No email, no identity.
                   </p>
                 </div>
 
                 <Button
                   onClick={() => onOpenChange(false)}
-                  className="w-full bg-white text-black hover:bg-gray-200"
+                  className="w-full bg-primary text-primary-foreground hover:bg-accent"
                   size="lg"
                 >
                   Continue
@@ -296,10 +296,10 @@ export function UntracedModal({
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-lg text-white mb-2">
+                  <h3 className="font-semibold text-lg text-foreground mb-2">
                     Verification Failed
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     {error?.message || "Something went wrong. Please try again."}
                   </p>
                 </div>
@@ -308,14 +308,14 @@ export function UntracedModal({
                   <Button
                     onClick={handleRetry}
                     variant="outline"
-                    className="flex-1 border-white/10 text-white hover:bg-white/5"
+                    className="flex-1 border-border text-foreground hover:bg-secondary"
                   >
                     Try Again
                   </Button>
                   <Button
                     onClick={() => onOpenChange(false)}
                     variant="ghost"
-                    className="flex-1 text-gray-400 hover:text-white hover:bg-white/5"
+                    className="flex-1 text-muted-foreground hover:text-foreground hover:bg-secondary"
                   >
                     Cancel
                   </Button>
@@ -326,8 +326,8 @@ export function UntracedModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-white/5">
-          <div className="flex items-center justify-between text-xs text-gray-600">
+        <div className="px-6 py-4 border-t border-border">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>Module: zk-email</span>
             <span>Powered by UNTRACED</span>
           </div>

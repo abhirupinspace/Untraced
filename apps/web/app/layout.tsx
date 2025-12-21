@@ -17,15 +17,29 @@ export const metadata: Metadata = {
   keywords: ["zkTLS", "zero-knowledge", "verification", "privacy", "Web3", "KYC"],
 };
 
+const themeScript = `
+  (function() {
+    const theme = localStorage.getItem('theme');
+    if (theme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+  })();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body
-        className={`${poppins.variable} font-sans antialiased bg-[#0a0a0a] text-white`}
+        className={`${poppins.variable} font-sans antialiased bg-background text-foreground`}
       >
         <Providers>{children}</Providers>
         <Toaster position="bottom-right" richColors />

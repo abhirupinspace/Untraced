@@ -8,6 +8,8 @@
   ],
   "scripts": {
     "dev": "bun run --filter @untraced/web dev",
+    "dev:landing": "bun run --filter @untraced/landing dev",
+    "dev:all": "bun run --filter '@untraced/*' dev",
     "build": "bun run --filter '*' build",
     "lint": "bun run --filter '*' lint",
     "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"

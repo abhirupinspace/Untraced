@@ -137,15 +137,15 @@ export function KYCFlowBuilder({ onBack, onFlowCreated, projectContext }: KYCFlo
   const generatedCode = flowModules.length > 0 ? generateCode(flow) : null;
 
   return (
-    <div className="h-screen bg-[#0a0a0a] flex flex-col">
+    <div className="h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="h-14 border-b border-white/5 bg-[#0a0a0a] sticky top-0 z-50 flex-shrink-0">
+      <header className="h-14 border-b border-border bg-background sticky top-0 z-50 flex-shrink-0">
         <div className="h-full px-6 flex items-center justify-between">
           <div className="flex items-center gap-4">
             {onBack && (
               <button
                 onClick={onBack}
-                className="p-2 -ml-2 rounded-lg hover:bg-white/5 text-gray-500 hover:text-white transition-all"
+                className="p-2 -ml-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
@@ -155,9 +155,9 @@ export function KYCFlowBuilder({ onBack, onFlowCreated, projectContext }: KYCFlo
                 <Layers className="w-4 h-4 text-purple-400" />
               </div>
               <div>
-                <h1 className="text-base font-normal text-white">Flow Builder</h1>
+                <h1 className="text-base font-normal text-foreground">Flow Builder</h1>
                 {projectContext && (
-                  <p className="text-xs text-gray-500 font-light">{projectContext.name}</p>
+                  <p className="text-xs text-muted-foreground font-light">{projectContext.name}</p>
                 )}
               </div>
             </div>

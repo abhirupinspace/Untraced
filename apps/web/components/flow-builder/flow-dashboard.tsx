@@ -262,7 +262,7 @@ export function FlowDashboard() {
         {/* Center - Flow Canvas */}
         <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Flow Name Input */}
-          <div className="flex-shrink-0 p-4 border-b border-untraced-dark/5 bg-white/50">
+          <div className="flex-shrink-0 p-4 border-b border-untraced-dark/5 bg-secondary0">
             <div className="flex items-center gap-4">
               <div className="flex-1">
                 <label className="text-xs font-medium text-untraced-dark/50 block mb-1.5">

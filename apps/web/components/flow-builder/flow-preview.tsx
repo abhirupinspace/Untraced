@@ -175,7 +175,7 @@ export function FlowPreview({ flowName, modules, className }: FlowPreviewProps) 
             onClick={() => setShowPreview(!showPreview)}
             className={cn(
               "p-1.5 rounded-lg transition-colors",
-              showPreview ? "bg-untraced-dark text-white" : "hover:bg-untraced-dark/5"
+              showPreview ? "bg-untraced-dark text-foreground" : "hover:bg-untraced-dark/5"
             )}
           >
             {showPreview ? (
@@ -263,7 +263,7 @@ export function FlowPreview({ flowName, modules, className }: FlowPreviewProps) 
                   {/* Modal Content */}
                   <div className="relative">
                     {/* Header */}
-                    <div className="relative bg-gradient-to-br from-untraced-dark to-untraced-dark-hover p-5 text-white">
+                    <div className="relative bg-gradient-to-br from-untraced-dark to-untraced-dark-hover p-5 text-foreground">
                       <div className="absolute inset-0 opacity-10">
                         <svg
                           className="w-full h-full"
@@ -291,12 +291,12 @@ export function FlowPreview({ flowName, modules, className }: FlowPreviewProps) 
                       <div className="relative">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-6 h-6 rounded-md bg-white/20 flex items-center justify-center">
-                            <span className="text-white font-bold text-xs">U</span>
+                            <span className="text-foreground font-bold text-xs">U</span>
                           </div>
                           <span className="text-xs font-medium opacity-80">UNTRACED</span>
                         </div>
                         <h3 className="text-base font-semibold">Identity Verification</h3>
-                        <p className="text-xs text-white/70 font-light mt-1">
+                        <p className="text-xs text-foreground/70 font-light mt-1">
                           Complete the verification steps
                         </p>
                       </div>
@@ -316,8 +316,8 @@ export function FlowPreview({ flowName, modules, className }: FlowPreviewProps) 
                                 className={cn(
                                   "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300",
                                   step.status === "completed" && "bg-green-100 text-green-600",
-                                  step.status === "in_progress" && "bg-untraced-dark text-white",
-                                  step.status === "pending" && "bg-gray-100 text-gray-400",
+                                  step.status === "in_progress" && "bg-untraced-dark text-foreground",
+                                  step.status === "pending" && "bg-gray-100 text-muted-foreground",
                                   step.status === "failed" && "bg-red-100 text-red-600"
                                 )}
                                 animate={{
@@ -369,7 +369,7 @@ export function FlowPreview({ flowName, modules, className }: FlowPreviewProps) 
                                 currentModule?.gradient || "from-gray-400 to-gray-500"
                               )}
                             >
-                              <Icon className="w-7 h-7 text-white" />
+                              <Icon className="w-7 h-7 text-foreground" />
                             </div>
                             <h4 className="font-semibold text-sm mb-1">
                               {currentModule?.name || "Module"}
@@ -382,7 +382,7 @@ export function FlowPreview({ flowName, modules, className }: FlowPreviewProps) 
                               disabled={isVerifying || isSimulating}
                               className={cn(
                                 "w-full py-2.5 px-4 rounded-xl text-sm font-medium transition-all",
-                                "bg-untraced-dark text-white hover:bg-untraced-dark-hover",
+                                "bg-untraced-dark text-foreground hover:bg-untraced-dark-hover",
                                 "disabled:opacity-50 disabled:cursor-not-allowed"
                               )}
                             >
@@ -413,7 +413,7 @@ export function FlowPreview({ flowName, modules, className }: FlowPreviewProps) 
                             </p>
                             <button
                               onClick={handleReset}
-                              className="w-full py-2.5 px-4 rounded-xl text-sm font-medium bg-untraced-dark text-white hover:bg-untraced-dark-hover transition-all"
+                              className="w-full py-2.5 px-4 rounded-xl text-sm font-medium bg-untraced-dark text-foreground hover:bg-untraced-dark-hover transition-all"
                             >
                               Continue
                             </button>

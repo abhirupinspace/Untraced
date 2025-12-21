@@ -35,7 +35,7 @@ export function ApiKeysStep({ project, onContinue, onBack }: ApiKeysStepProps) {
   };
 
   return (
-    <div className="h-full flex items-center justify-center p-6 bg-[#0a0a0a]">
+    <div className="h-full flex items-center justify-center p-6 bg-background">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -43,12 +43,12 @@ export function ApiKeysStep({ project, onContinue, onBack }: ApiKeysStepProps) {
       >
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-2xl bg-purple-500 flex items-center justify-center mx-auto mb-4">
-            <Key className="w-6 h-6 text-white" />
+            <Key className="w-6 h-6 text-foreground" />
           </div>
-          <h1 className="text-2xl font-semibold text-white mb-2">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">
             Your API Keys
           </h1>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-muted-foreground">
             Use these keys to integrate UNTRACED into your application
           </p>
         </div>
@@ -57,13 +57,13 @@ export function ApiKeysStep({ project, onContinue, onBack }: ApiKeysStepProps) {
           {/* API Key */}
           <Card variant="bordered" className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-medium text-gray-400">
+              <label className="text-xs font-medium text-muted-foreground">
                 API Key
               </label>
               <Badge variant="secondary" className="text-[10px]">Public</Badge>
             </div>
             <div className="flex items-center gap-2">
-              <code className="flex-1 text-sm font-mono text-white bg-white/5 px-3 py-2 rounded-lg truncate">
+              <code className="flex-1 text-sm font-mono text-foreground bg-secondary px-3 py-2 rounded-lg truncate">
                 {project.apiKey}
               </code>
               <button
@@ -72,7 +72,7 @@ export function ApiKeysStep({ project, onContinue, onBack }: ApiKeysStepProps) {
                   "p-2 rounded-lg transition-all",
                   copiedKey === "api"
                     ? "bg-green-500/20 text-green-400"
-                    : "hover:bg-white/10 text-gray-400"
+                    : "hover:bg-secondary text-muted-foreground"
                 )}
               >
                 {copiedKey === "api" ? (
@@ -87,18 +87,18 @@ export function ApiKeysStep({ project, onContinue, onBack }: ApiKeysStepProps) {
           {/* Secret Key */}
           <Card variant="bordered" className="p-4">
             <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-medium text-gray-400">
+              <label className="text-xs font-medium text-muted-foreground">
                 Secret Key
               </label>
               <Badge variant="destructive" className="text-[10px]">Private</Badge>
             </div>
             <div className="flex items-center gap-2">
-              <code className="flex-1 text-sm font-mono text-white bg-white/5 px-3 py-2 rounded-lg truncate">
+              <code className="flex-1 text-sm font-mono text-foreground bg-secondary px-3 py-2 rounded-lg truncate">
                 {showSecret ? project.secretKey : "•".repeat(40)}
               </code>
               <button
                 onClick={() => setShowSecret(!showSecret)}
-                className="p-2 rounded-lg hover:bg-white/10 text-gray-400 transition-all"
+                className="p-2 rounded-lg hover:bg-secondary text-muted-foreground transition-all"
               >
                 {showSecret ? (
                   <EyeOff className="w-4 h-4" />
@@ -112,7 +112,7 @@ export function ApiKeysStep({ project, onContinue, onBack }: ApiKeysStepProps) {
                   "p-2 rounded-lg transition-all",
                   copiedKey === "secret"
                     ? "bg-green-500/20 text-green-400"
-                    : "hover:bg-white/10 text-gray-400"
+                    : "hover:bg-secondary text-muted-foreground"
                 )}
               >
                 {copiedKey === "secret" ? (
@@ -136,8 +136,8 @@ export function ApiKeysStep({ project, onContinue, onBack }: ApiKeysStepProps) {
 
           {/* Quick Start */}
           <Card variant="bordered" className="p-4">
-            <span className="text-xs font-medium text-gray-500 block mb-3">Quick Start</span>
-            <pre className="text-xs font-mono text-gray-300 bg-black/50 p-3 rounded-lg overflow-x-auto">
+            <span className="text-xs font-medium text-muted-foreground block mb-3">Quick Start</span>
+            <pre className="text-xs font-mono text-foreground/80 bg-black/50 p-3 rounded-lg overflow-x-auto">
 {`import { createClient } from "@untraced/sdk";
 
 const untraced = createClient({
@@ -152,14 +152,14 @@ const untraced = createClient({
           <Button
             variant="outline"
             onClick={onBack}
-            className="h-11 border-white/10 text-white hover:bg-white/5"
+            className="h-11 border-border text-foreground hover:bg-secondary"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
           <Button
             onClick={onContinue}
-            className="flex-1 h-11 bg-purple-500 hover:bg-purple-600 text-white"
+            className="flex-1 h-11 bg-purple-500 hover:bg-purple-600 text-foreground"
           >
             Continue to Builder
             <ArrowRight className="w-4 h-4 ml-2" />

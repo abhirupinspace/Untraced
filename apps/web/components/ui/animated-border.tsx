@@ -31,7 +31,7 @@ export function AnimatedBorder({
           ease: "linear",
         }}
       />
-      <div className={cn("relative bg-white rounded-[14px]", className)}>
+      <div className={cn("relative bg-card rounded-[14px]", className)}>
         {children}
       </div>
     </div>
@@ -48,7 +48,7 @@ export function GlowCard({
   return (
     <motion.div
       className={cn(
-        "relative rounded-2xl bg-white p-6 overflow-hidden",
+        "relative rounded-2xl bg-card p-6 overflow-hidden",
         className
       )}
       whileHover={{ scale: 1.02 }}
@@ -79,7 +79,7 @@ export function ShimmerButton({
       )}
       {...props}
     >
-      <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-white rounded-full group-hover:w-56 group-hover:h-56 opacity-10" />
+      <span className="absolute w-0 h-0 transition-all duration-500 ease-out bg-foreground rounded-full group-hover:w-56 group-hover:h-56 opacity-10" />
       <span className="relative">{children}</span>
     </button>
   );

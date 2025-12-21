@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { DashboardNavbar } from "@/components/dashboard/dashboard-navbar";
 import {
   User,
   Bell,
@@ -43,19 +44,15 @@ export default function SettingsPage() {
   const { user, authenticated } = useWallet();
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="h-14 border-b border-white/5 bg-[#0a0a0a]/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="h-full px-6 flex items-center justify-center">
-          <h1 className="text-lg font-normal text-white">Settings</h1>
-        </div>
-      </header>
+      <DashboardNavbar title="Settings" />
 
       <div className="flex justify-center px-6 py-8">
         <div className="w-full max-w-2xl space-y-8">
           {/* Tab Navigation */}
           <div className="flex justify-center">
-            <div className="inline-flex items-center p-1 bg-white/[0.03] rounded-xl border border-white/5">
+            <div className="inline-flex items-center p-1 bg-secondary rounded-xl border border-border">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -66,8 +63,8 @@ export default function SettingsPage() {
                     className={cn(
                       "flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-light transition-all duration-200",
                       isActive
-                        ? "bg-white/10 text-white"
-                        : "text-gray-500 hover:text-gray-300"
+                        ? "bg-primary/10 text-foreground dark:bg-white/10"
+                        : "text-muted-foreground hover:text-foreground"
                     )}
                   >
                     <Icon className="w-4 h-4" />
@@ -109,26 +106,26 @@ function GeneralSettings({ user, authenticated }: { user: any; authenticated: bo
   return (
     <>
       {/* Profile Card */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02]">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-500/5 via-transparent to-transparent" />
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
         <div className="relative p-6">
           <div className="flex flex-col items-center text-center">
-            <div className="w-20 h-20 rounded-2xl bg-purple-500 flex items-center justify-center text-2xl font-medium text-white mb-4">
+            <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center text-2xl font-medium text-primary-foreground mb-4">
               {authenticated ? user?.wallet?.address?.slice(2, 4).toUpperCase() || "U" : "?"}
             </div>
-            <h3 className="text-lg font-normal text-white mb-1">
+            <h3 className="text-lg font-medium text-foreground mb-1">
               {displayName || "Unnamed User"}
             </h3>
             {authenticated && (
               <button
                 onClick={copyAddress}
-                className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-300 transition-colors"
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-light"
               >
                 <code className="font-mono">
                   {user?.wallet?.address?.slice(0, 6)}...{user?.wallet?.address?.slice(-4)}
                 </code>
                 {copied ? (
-                  <Check className="w-3.5 h-3.5 text-green-400" />
+                  <Check className="w-3.5 h-3.5 text-success" />
                 ) : (
                   <Copy className="w-3.5 h-3.5" />
                 )}
@@ -156,7 +153,7 @@ function GeneralSettings({ user, authenticated }: { user: any; authenticated: bo
           />
         </div>
         <div className="flex justify-end mt-6">
-          <Button className="bg-white text-black hover:bg-gray-100 text-sm font-normal h-10 px-6">
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium h-10 px-6">
             Save Changes
           </Button>
         </div>
@@ -166,8 +163,8 @@ function GeneralSettings({ user, authenticated }: { user: any; authenticated: bo
       <SettingsSection title="Preferences" description="Customize your experience">
         <div className="space-y-1">
           <SettingToggle
-            title="Dark Mode"
-            description="Always enabled for optimal viewing"
+            title="Theme"
+            description="Toggle between light and dark mode"
             checked={true}
             disabled
           />
@@ -180,19 +177,19 @@ function GeneralSettings({ user, authenticated }: { user: any; authenticated: bo
       </SettingsSection>
 
       {/* Danger Zone */}
-      <div className="rounded-2xl border border-red-500/20 bg-red-500/[0.02] p-6">
+      <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-6">
         <div className="flex items-start gap-4">
-          <div className="p-2.5 rounded-xl bg-red-500/10">
-            <AlertTriangle className="w-5 h-5 text-red-400" />
+          <div className="p-2.5 rounded-xl bg-destructive/10">
+            <AlertTriangle className="w-5 h-5 text-destructive" />
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-normal text-white mb-1">Delete Account</h3>
-            <p className="text-xs text-gray-500 mb-4">
+            <h3 className="text-sm font-medium text-foreground mb-1">Delete Account</h3>
+            <p className="text-xs text-muted-foreground mb-4 font-light">
               Permanently remove your account and all associated data. This action cannot be undone.
             </p>
             <Button
               variant="outline"
-              className="border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 text-sm font-normal h-9"
+              className="border-destructive/30 text-destructive hover:bg-destructive/10 hover:border-destructive/50 text-sm font-medium h-9"
             >
               Delete Account
             </Button>
@@ -258,19 +255,19 @@ function SecuritySettings() {
   return (
     <>
       <SettingsSection title="Two-Factor Authentication" description="Add an extra layer of security">
-        <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5">
+        <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 border border-border">
           <div className="flex items-center gap-4">
-            <div className="p-2.5 rounded-xl bg-purple-500/10">
-              <Shield className="w-5 h-5 text-purple-400" />
+            <div className="p-2.5 rounded-xl bg-primary/10">
+              <Shield className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-white font-light">Enable 2FA</p>
-              <p className="text-xs text-gray-500">Secure your account with TOTP</p>
+              <p className="text-sm text-foreground font-light">Enable 2FA</p>
+              <p className="text-xs text-muted-foreground font-light">Secure your account with TOTP</p>
             </div>
           </div>
           <Button
             variant="outline"
-            className="border-white/10 text-gray-300 hover:text-white hover:bg-white/5 text-sm font-normal h-9"
+            className="border-border text-foreground hover:bg-secondary text-sm font-medium h-9"
           >
             Setup
           </Button>
@@ -284,7 +281,7 @@ function SecuritySettings() {
           <Button
             variant="ghost"
             size="sm"
-            className="text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs h-8"
+            className="text-destructive hover:text-destructive hover:bg-destructive/10 text-xs h-8 font-medium"
           >
             Revoke All
           </Button>
@@ -294,32 +291,32 @@ function SecuritySettings() {
           {sessions.map((session, index) => (
             <div
               key={index}
-              className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5"
+              className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 border border-border"
             >
               <div className="flex items-center gap-4">
-                <div className="p-2.5 rounded-xl bg-white/5">
+                <div className="p-2.5 rounded-xl bg-secondary">
                   {session.type === "desktop" ? (
-                    <Monitor className="w-4 h-4 text-gray-400" />
+                    <Monitor className="w-4 h-4 text-muted-foreground" />
                   ) : (
-                    <Smartphone className="w-4 h-4 text-gray-400" />
+                    <Smartphone className="w-4 h-4 text-muted-foreground" />
                   )}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm text-white font-light">{session.device}</p>
+                    <p className="text-sm text-foreground font-light">{session.device}</p>
                     {session.current && (
-                      <span className="px-2 py-0.5 text-[10px] rounded-full bg-green-500/10 text-green-400">
+                      <span className="px-2 py-0.5 text-[10px] rounded-full bg-success/10 text-success font-medium">
                         Current
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground font-light">
                     {session.location} · {session.lastActive}
                   </p>
                 </div>
               </div>
               {!session.current && (
-                <button className="text-xs text-gray-500 hover:text-red-400 transition-colors">
+                <button className="text-xs text-muted-foreground hover:text-destructive transition-colors font-medium">
                   Revoke
                 </button>
               )}
@@ -352,7 +349,7 @@ function ApiSettings() {
         title="API Keys"
         description="Manage your API credentials"
         action={
-          <Button className="bg-white text-black hover:bg-gray-100 text-sm font-normal h-9 gap-2">
+          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium h-9 gap-2">
             <Plus className="w-4 h-4" />
             New Key
           </Button>
@@ -362,34 +359,34 @@ function ApiSettings() {
           {apiKeys.map((key) => (
             <div
               key={key.id}
-              className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/5"
+              className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 border border-border"
             >
               <div className="flex items-center gap-4">
-                <div className="p-2.5 rounded-xl bg-white/5">
-                  <Key className="w-4 h-4 text-gray-400" />
+                <div className="p-2.5 rounded-xl bg-secondary">
+                  <Key className="w-4 h-4 text-muted-foreground" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-sm text-white font-light">{key.name}</p>
+                    <p className="text-sm text-foreground font-light">{key.name}</p>
                     <span
                       className={cn(
-                        "px-2 py-0.5 text-[10px] rounded-full",
+                        "px-2 py-0.5 text-[10px] rounded-full font-medium",
                         key.type === "public"
-                          ? "bg-white/10 text-gray-300"
-                          : "bg-red-500/10 text-red-400"
+                          ? "bg-secondary text-muted-foreground"
+                          : "bg-destructive/10 text-destructive"
                       )}
                     >
                       {key.type}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 mt-1">
-                    <code className="text-xs text-gray-500 font-mono">
+                    <code className="text-xs text-muted-foreground font-mono">
                       {key.type === "secret" && !showSecret ? "••••••••••••" : key.id}
                     </code>
                     {key.type === "secret" && (
                       <button
                         onClick={() => setShowSecret(!showSecret)}
-                        className="text-gray-500 hover:text-white transition-colors"
+                        className="text-muted-foreground hover:text-foreground transition-colors"
                       >
                         {showSecret ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                       </button>
@@ -398,18 +395,18 @@ function ApiSettings() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-600 mr-2">{key.lastUsed}</span>
+                <span className="text-xs text-muted-foreground/70 mr-2 font-light">{key.lastUsed}</span>
                 <button
                   onClick={() => copyToClipboard(key.id, key.id)}
-                  className="p-2 rounded-lg hover:bg-white/5 text-gray-500 hover:text-white transition-all"
+                  className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
                 >
                   {copiedId === key.id ? (
-                    <Check className="w-4 h-4 text-green-400" />
+                    <Check className="w-4 h-4 text-success" />
                   ) : (
                     <Copy className="w-4 h-4" />
                   )}
                 </button>
-                <button className="p-2 rounded-lg hover:bg-red-500/10 text-gray-500 hover:text-red-400 transition-all">
+                <button className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -420,14 +417,14 @@ function ApiSettings() {
 
       <SettingsSection title="Webhooks" description="Receive real-time event notifications">
         <div className="flex flex-col items-center justify-center py-10 text-center">
-          <div className="p-3 rounded-xl bg-white/5 mb-4">
-            <Globe className="w-6 h-6 text-gray-500" />
+          <div className="p-3 rounded-xl bg-secondary mb-4">
+            <Globe className="w-6 h-6 text-muted-foreground" />
           </div>
-          <p className="text-sm text-gray-400 mb-1">No webhooks configured</p>
-          <p className="text-xs text-gray-600 mb-4">Add an endpoint to receive events</p>
+          <p className="text-sm text-muted-foreground mb-1 font-light">No webhooks configured</p>
+          <p className="text-xs text-muted-foreground/70 mb-4 font-light">Add an endpoint to receive events</p>
           <Button
             variant="outline"
-            className="border-white/10 text-gray-300 hover:text-white hover:bg-white/5 text-sm font-normal h-9 gap-2"
+            className="border-border text-foreground hover:bg-secondary text-sm font-medium h-9 gap-2"
           >
             <Plus className="w-4 h-4" />
             Add Webhook
@@ -435,19 +432,19 @@ function ApiSettings() {
         </div>
       </SettingsSection>
 
-      <div className="flex items-center justify-between p-5 rounded-2xl bg-white/[0.02] border border-white/5">
+      <div className="flex items-center justify-between p-5 rounded-2xl bg-card border border-border">
         <div className="flex items-center gap-4">
-          <div className="p-2.5 rounded-xl bg-white/5">
-            <ExternalLink className="w-4 h-4 text-gray-400" />
+          <div className="p-2.5 rounded-xl bg-secondary">
+            <ExternalLink className="w-4 h-4 text-muted-foreground" />
           </div>
           <div>
-            <p className="text-sm text-white font-light">API Documentation</p>
-            <p className="text-xs text-gray-500">Learn how to integrate UNTRACED</p>
+            <p className="text-sm text-foreground font-medium">API Documentation</p>
+            <p className="text-xs text-muted-foreground font-light">Learn how to integrate UNTRACED</p>
           </div>
         </div>
         <Button
           variant="ghost"
-          className="text-gray-400 hover:text-white text-sm font-normal gap-2"
+          className="text-muted-foreground hover:text-foreground text-sm font-medium gap-2"
           asChild
         >
           <a href="https://docs.untraced.io" target="_blank" rel="noopener noreferrer">
@@ -472,11 +469,11 @@ function SettingsSection({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-white/5 bg-white/[0.02] overflow-hidden">
-      <div className="flex items-center justify-between p-5 border-b border-white/5">
+    <div className="rounded-2xl border border-border bg-card overflow-hidden">
+      <div className="flex items-center justify-between p-5 border-b border-border">
         <div>
-          <h3 className="text-sm font-normal text-white">{title}</h3>
-          <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+          <h3 className="text-sm font-medium text-foreground">{title}</h3>
+          <p className="text-xs text-muted-foreground mt-0.5 font-light">{description}</p>
         </div>
         {action}
       </div>
@@ -501,8 +498,8 @@ function SettingToggle({
   return (
     <div className="flex items-center justify-between py-3">
       <div>
-        <p className="text-sm text-white font-light">{title}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+        <p className="text-sm text-foreground font-light">{title}</p>
+        <p className="text-xs text-muted-foreground mt-0.5 font-light">{description}</p>
       </div>
       <Switch checked={checked} onCheckedChange={setChecked} disabled={disabled} />
     </div>

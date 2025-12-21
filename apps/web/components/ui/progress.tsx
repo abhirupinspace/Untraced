@@ -20,7 +20,7 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
         <div
           ref={ref}
           className={cn(
-            "relative h-2 w-full overflow-hidden rounded-full bg-white/10",
+            "relative h-2 w-full overflow-hidden rounded-full bg-secondary",
             className
           )}
         >
@@ -33,7 +33,7 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
           />
         </div>
         {showLabel && (
-          <div className="mt-1 flex justify-between text-xs text-gray-500">
+          <div className="mt-1 flex justify-between text-xs text-muted-foreground">
             <span>{value.toLocaleString()}</span>
             <span>{max.toLocaleString()}</span>
           </div>
