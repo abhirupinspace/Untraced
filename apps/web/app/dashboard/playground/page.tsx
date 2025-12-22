@@ -30,8 +30,14 @@ import {
   Loader2,
   LogOut,
   Link as LinkIcon,
+  ExternalLink,
+  Send,
 } from "lucide-react";
 import { useWallet } from "@/lib/use-wallet";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
+import { createWalletClient, custom, type Hex } from "viem";
+import { mantleSepoliaTestnet } from "viem/chains";
+import { createClient, MANTLE_SEPOLIA } from "@untraced/sdk";
 
 type ModuleStatus = "idle" | "running" | "success" | "error";
 
@@ -197,6 +203,7 @@ function PlaygroundLoading() {
 function PlaygroundContent() {
   const searchParams = useSearchParams();
   const { user } = useWallet();
+  const { wallets } = useWallets();
   const [selectedModule, setSelectedModule] = useState<Module>(modules[0]);
   const [configValue, setConfigValue] = useState<string | number>(
     modules[0].config?.default || ""
@@ -208,6 +215,11 @@ function PlaygroundContent() {
   const [executionTime, setExecutionTime] = useState<number>(0);
   const [copied, setCopied] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  // On-chain submission state
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [txStatus, setTxStatus] = useState<"pending" | "success" | "failed" | null>(null);
 
   // OAuth connected accounts
   const [githubAccount, setGithubAccount] = useState<ConnectedAccount | null>(null);
@@ -564,6 +576,7 @@ function PlaygroundContent() {
       timestamp: new Date().toISOString(),
       attestation: data.attestation,
       meta: data.meta,
+      verificationId: data.verificationId,
     });
 
     setStatus("success");
@@ -653,10 +666,103 @@ function PlaygroundContent() {
       timestamp: new Date().toISOString(),
       attestation: data.attestation,
       meta: data.meta,
+      verificationId: data.verificationId,
     });
 
     setStatus("success");
     addLog("Verification complete!");
+  };
+
+  // Submit attestation to blockchain
+  const submitToChain = async () => {
+    if (!proofData?.attestation || !user?.wallet?.address) {
+      addLog("Error: No attestation or wallet available");
+      return;
+    }
+
+    const registryAddress = process.env.NEXT_PUBLIC_REGISTRY_ADDRESS;
+    if (!registryAddress) {
+      addLog("Error: Registry contract not configured");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setTxStatus("pending");
+    addLog("Preparing on-chain submission...");
+
+    try {
+      // Get wallet from Privy
+      const wallet = wallets.find((w) => w.walletClientType === "privy") || wallets[0];
+      if (!wallet) {
+        throw new Error("No wallet connected");
+      }
+
+      addLog("Connecting to wallet...");
+      const provider = await wallet.getEthereumProvider();
+
+      const walletClient = createWalletClient({
+        chain: mantleSepoliaTestnet,
+        transport: custom(provider),
+        account: user.wallet.address as Hex,
+      });
+
+      // Create SDK client
+      const client = createClient({
+        registryAddress: registryAddress as Hex,
+        chainId: MANTLE_SEPOLIA.id,
+      });
+
+      addLog("Submitting proof to registry contract...");
+
+      // Build proof object
+      const proof = {
+        moduleType: proofData.attestation.moduleType as Hex,
+        expiry: BigInt(proofData.attestation.expiry),
+        signature: {
+          v: proofData.attestation.signature.v,
+          r: proofData.attestation.signature.r as Hex,
+          s: proofData.attestation.signature.s as Hex,
+          full: proofData.attestation.signature.full as Hex,
+        },
+      };
+
+      // Submit to chain
+      const result = await client.submitProof(proof, walletClient);
+
+      setTxHash(result.hash);
+      addLog(`Transaction submitted: ${result.hash.slice(0, 10)}...`);
+      addLog("Waiting for confirmation...");
+
+      // Wait for transaction
+      const receipt = await result.wait();
+
+      if (receipt.status === "success") {
+        setTxStatus("success");
+        addLog("Transaction confirmed! Attestation recorded on-chain.");
+
+        // Update verification record with transaction hash
+        if (proofData.verificationId) {
+          try {
+            await fetch(`/api/verify/${proofData.verificationId}/transaction`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ transactionHash: result.hash }),
+            });
+          } catch {
+            // Non-critical, continue
+          }
+        }
+      } else {
+        setTxStatus("failed");
+        addLog("Transaction reverted");
+      }
+    } catch (error: any) {
+      console.error("Chain submission error:", error);
+      setTxStatus("failed");
+      addLog(`Error: ${error.message || "Failed to submit to chain"}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetPlayground = () => {
@@ -666,6 +772,8 @@ function PlaygroundContent() {
     setExecutionTime(0);
     setInputValues({});
     setValidationError(null);
+    setTxHash(null);
+    setTxStatus(null);
   };
 
   const copyProof = () => {
@@ -1088,6 +1196,67 @@ function PlaygroundContent() {
                       </div>
                     </div>
                   </div>
+
+                  {/* On-chain submission section */}
+                  {proofData.attestation && (
+                    <div className="pt-3 border-t border-border space-y-3">
+                      {txHash ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">Transaction</span>
+                            <div className="flex items-center gap-1.5">
+                              {txStatus === "pending" && (
+                                <>
+                                  <Loader2 className="w-3 h-3 text-warning animate-spin" />
+                                  <span className="text-xs text-warning">Pending</span>
+                                </>
+                              )}
+                              {txStatus === "success" && (
+                                <>
+                                  <CheckCircle2 className="w-3 h-3 text-success" />
+                                  <span className="text-xs text-success">Confirmed</span>
+                                </>
+                              )}
+                              {txStatus === "failed" && (
+                                <>
+                                  <XCircle className="w-3 h-3 text-destructive" />
+                                  <span className="text-xs text-destructive">Failed</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <a
+                            href={`${MANTLE_SEPOLIA.blockExplorer}/tx/${txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 text-xs text-primary hover:underline"
+                          >
+                            View on Explorer
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+                      ) : (
+                        <Button
+                          onClick={submitToChain}
+                          disabled={isSubmitting || !process.env.NEXT_PUBLIC_REGISTRY_ADDRESS}
+                          size="sm"
+                          className="w-full gap-2"
+                        >
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              Submitting...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-3.5 h-3.5" />
+                              Submit to Chain
+                            </>
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -1102,7 +1271,9 @@ function PlaygroundContent() {
                     Other modules are simulated.
                   </p>
                   <p>
-                    Attestations are signed but not submitted to the blockchain.
+                    {process.env.NEXT_PUBLIC_REGISTRY_ADDRESS
+                      ? "Click 'Submit to Chain' to record attestations on-chain."
+                      : "Configure REGISTRY_ADDRESS to enable on-chain submission."}
                   </p>
                 </div>
               </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/cn";
-import { useProjects, useApiKeys, type Project, type ApiKey } from "@/lib/hooks";
+import { useProjects, useApiKeys, type Project, type ApiKey, type Flow } from "@/lib/hooks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,9 +24,24 @@ import {
   Loader2,
   RefreshCw,
   Settings,
+  Activity,
+  CheckCircle2,
+  XCircle,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  Calendar,
+  Mail,
+  Github,
+  Wallet,
+  User,
+  Twitter,
+  Shield,
+  Globe,
+  Zap,
 } from "lucide-react";
 
-type View = "projects" | "project-detail" | "create-project" | "flow-builder";
+type View = "projects" | "project-detail" | "create-project" | "flow-builder" | "flow-detail";
 
 export function Dashboard() {
   const { projects, loading, error, createProject, refreshProjects } = useProjects();
@@ -34,6 +49,7 @@ export function Dashboard() {
   const [view, setView] = useState<View>("projects");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedFlow, setSelectedFlow] = useState<Flow | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -48,6 +64,11 @@ export function Dashboard() {
     setView("project-detail");
   };
 
+  const handleSelectFlow = (flow: Flow) => {
+    setSelectedFlow(flow);
+    setView("flow-detail");
+  };
+
   const handleBack = () => {
     if (view === "project-detail") {
       setSelectedProject(null);
@@ -55,6 +76,9 @@ export function Dashboard() {
     } else if (view === "create-project") {
       setView("projects");
     } else if (view === "flow-builder") {
+      setView("project-detail");
+    } else if (view === "flow-detail") {
+      setSelectedFlow(null);
       setView("project-detail");
     }
   };
@@ -131,8 +155,17 @@ export function Dashboard() {
             project={selectedProject}
             onBack={handleBack}
             onCreateFlow={() => setView("flow-builder")}
+            onSelectFlow={handleSelectFlow}
             copyToClipboard={copyToClipboard}
             copiedId={copiedId}
+          />
+        )}
+
+        {view === "flow-detail" && selectedProject && selectedFlow && (
+          <FlowDetailView
+            flow={selectedFlow}
+            project={selectedProject}
+            onBack={handleBack}
           />
         )}
 
@@ -321,10 +354,7 @@ function CreateProjectView({
 
       <div className="p-6 flex justify-center">
         <div className="w-full max-w-sm">
-          <div className="text-center mb-6">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
-              <FolderKanban className="w-5 h-5 text-white" />
-            </div>
+          <div className="text-center mb-6 p-y-4">
             <h2 className="text-lg font-normal text-foreground mb-1">Create a new project</h2>
             <p className="text-xs text-muted-foreground font-light">
               Projects help you organize your verification flows
@@ -387,12 +417,14 @@ function ProjectDetailView({
   project,
   onBack,
   onCreateFlow,
+  onSelectFlow,
   copyToClipboard,
   copiedId,
 }: {
   project: Project;
   onBack: () => void;
   onCreateFlow: () => void;
+  onSelectFlow: (flow: Flow) => void;
   copyToClipboard: (text: string, id: string) => void;
   copiedId: string | null;
 }) {
@@ -582,6 +614,7 @@ function ProjectDetailView({
                 {project.flows.map((flow) => (
                   <div
                     key={flow.id}
+                    onClick={() => onSelectFlow(flow)}
                     className="group flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:border-primary/20 hover:bg-secondary/50 cursor-pointer transition-all"
                   >
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
@@ -641,6 +674,375 @@ untraced.verify({
         </div>
       </div>
     </>
+  );
+}
+
+// Module icon mapping
+const moduleIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  "zk-email": Mail,
+  "zk-age": User,
+  "zk-github": Github,
+  "zk-twitter": Twitter,
+  "zk-balance": Wallet,
+  "zk-country": Globe,
+  "zk-kyc": Shield,
+};
+
+const moduleGradients: Record<string, string> = {
+  "zk-email": "from-blue-500 to-cyan-500",
+  "zk-age": "from-purple-500 to-pink-500",
+  "zk-github": "from-gray-600 to-gray-800",
+  "zk-twitter": "from-sky-400 to-blue-600",
+  "zk-balance": "from-green-500 to-emerald-500",
+  "zk-country": "from-teal-500 to-cyan-500",
+  "zk-kyc": "from-rose-500 to-red-500",
+};
+
+// Flow Detail View with Analytics
+function FlowDetailView({
+  flow,
+  project,
+  onBack,
+}: {
+  flow: Flow;
+  project: Project;
+  onBack: () => void;
+}) {
+  const stats = flow.stats || { totalVerifications: 0, successfulVerifications: 0, failedVerifications: 0 };
+  const modules = flow.modules || [];
+
+  const successRate = stats.totalVerifications > 0
+    ? ((stats.successfulVerifications / stats.totalVerifications) * 100).toFixed(1)
+    : "0.0";
+
+  const failedCount = stats.totalVerifications - stats.successfulVerifications;
+
+  // Generate mock weekly data based on flow stats
+  const avgDaily = Math.floor(stats.totalVerifications / 7) || 0;
+  const weeklyData = [
+    { day: "M", total: Math.floor(avgDaily * 0.9), success: Math.floor(avgDaily * 0.85) },
+    { day: "T", total: Math.floor(avgDaily * 1.1), success: Math.floor(avgDaily * 1.05) },
+    { day: "W", total: Math.floor(avgDaily * 1.0), success: Math.floor(avgDaily * 0.95) },
+    { day: "T", total: Math.floor(avgDaily * 1.2), success: Math.floor(avgDaily * 1.15) },
+    { day: "F", total: Math.floor(avgDaily * 1.3), success: Math.floor(avgDaily * 1.25) },
+    { day: "S", total: Math.floor(avgDaily * 0.6), success: Math.floor(avgDaily * 0.55) },
+    { day: "S", total: Math.floor(avgDaily * 0.4), success: Math.floor(avgDaily * 0.35) },
+  ];
+
+  return (
+    <>
+      <DashboardNavbar>
+        <button
+          onClick={onBack}
+          className="p-1.5 -ml-1 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+        </button>
+        <h1 className="text-base font-normal text-foreground">{flow.displayName || flow.name}</h1>
+        <Badge
+          variant={flow.status === "active" ? "success" : "secondary"}
+          className="ml-2 text-[9px] px-1.5 py-0"
+        >
+          {flow.status}
+        </Badge>
+      </DashboardNavbar>
+
+      <div className="p-6 flex justify-center">
+        <div className="w-full max-w-4xl space-y-4">
+          {/* Stats Overview */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <Card variant="bordered" padding="none" className="p-3">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <p className="text-[10px] text-muted-foreground mb-0.5">Total Verifications</p>
+                  <p className="text-lg font-medium text-foreground tabular-nums">
+                    {stats.totalVerifications.toLocaleString()}
+                  </p>
+                </div>
+                <div className="p-1.5 rounded-md bg-primary/10 text-primary">
+                  <Activity className="w-3.5 h-3.5" />
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                <Layers className="w-2.5 h-2.5" />
+                <span>{modules.length} module{modules.length !== 1 ? "s" : ""}</span>
+              </div>
+            </Card>
+
+            <Card variant="bordered" padding="none" className="p-3">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <p className="text-[10px] text-muted-foreground mb-0.5">Success Rate</p>
+                  <p className="text-lg font-medium text-foreground tabular-nums">{successRate}%</p>
+                </div>
+                <RingProgress value={parseFloat(successRate)} size={36} />
+              </div>
+              <div className={cn(
+                "flex items-center gap-1 text-[10px] font-medium",
+                parseFloat(successRate) >= 90 ? "text-success" : parseFloat(successRate) >= 70 ? "text-warning" : "text-destructive"
+              )}>
+                {parseFloat(successRate) >= 90 ? (
+                  <TrendingUp className="w-2.5 h-2.5" />
+                ) : (
+                  <TrendingDown className="w-2.5 h-2.5" />
+                )}
+                <span>{parseFloat(successRate) >= 90 ? "Healthy" : parseFloat(successRate) >= 70 ? "Needs attention" : "Critical"}</span>
+              </div>
+            </Card>
+
+            <Card variant="bordered" padding="none" className="p-3">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <p className="text-[10px] text-muted-foreground mb-0.5">Successful</p>
+                  <p className="text-lg font-medium text-foreground tabular-nums">
+                    {stats.successfulVerifications.toLocaleString()}
+                  </p>
+                </div>
+                <div className="p-1.5 rounded-md bg-success/10 text-success">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-[10px] text-success">
+                <TrendingUp className="w-2.5 h-2.5" />
+                <span>Completed</span>
+              </div>
+            </Card>
+
+            <Card variant="bordered" padding="none" className="p-3">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <p className="text-[10px] text-muted-foreground mb-0.5">Failed</p>
+                  <p className="text-lg font-medium text-foreground tabular-nums">
+                    {failedCount.toLocaleString()}
+                  </p>
+                </div>
+                <div className="p-1.5 rounded-md bg-destructive/10 text-destructive">
+                  <XCircle className="w-3.5 h-3.5" />
+                </div>
+              </div>
+              <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                <Clock className="w-2.5 h-2.5" />
+                <span>Requires review</span>
+              </div>
+            </Card>
+          </div>
+
+          {/* Main Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
+            {/* Weekly Chart */}
+            <Card variant="bordered" padding="none" className="lg:col-span-3 overflow-hidden">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <span className="text-xs font-medium text-foreground">Weekly Activity</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30" />
+                    <span className="text-[10px] text-muted-foreground">Total</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <span className="text-[10px] text-muted-foreground">Success</span>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4">
+                <FlowBarChart data={weeklyData} />
+              </div>
+            </Card>
+
+            {/* Flow Info */}
+            <Card variant="bordered" padding="none" className="lg:col-span-2 overflow-hidden">
+              <div className="px-4 py-3 border-b border-border">
+                <span className="text-xs font-medium text-foreground">Flow Details</span>
+              </div>
+              <div className="p-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Flow ID</span>
+                  <code className="text-[10px] font-mono text-foreground bg-secondary px-1.5 py-0.5 rounded">
+                    {flow.name}
+                  </code>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Project</span>
+                  <span className="text-xs text-foreground">{project.name}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Created</span>
+                  <span className="text-xs text-foreground">
+                    {new Date(flow.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+                {flow.updatedAt && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Updated</span>
+                    <span className="text-xs text-foreground">
+                      {new Date(flow.updatedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Modules</span>
+                  <span className="text-xs text-foreground">{modules.length}</span>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Module Performance */}
+          <Card variant="bordered" padding="none" className="overflow-hidden">
+            <div className="px-4 py-3 border-b border-border">
+              <span className="text-xs font-medium text-foreground">Module Configuration</span>
+            </div>
+            <div className="p-3">
+              {modules.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {modules.map((module, index) => {
+                    const Icon = moduleIcons[module.moduleId] || Shield;
+                    const gradient = moduleGradients[module.moduleId] || "from-gray-500 to-gray-600";
+                    const configValue = module.config && Object.entries(module.config)[0];
+
+                    return (
+                      <div
+                        key={module.instanceId}
+                        className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
+                      >
+                        <div className={cn(
+                          "w-8 h-8 rounded-lg bg-gradient-to-br flex items-center justify-center flex-shrink-0",
+                          gradient
+                        )}>
+                          <Icon className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-foreground truncate">
+                              {module.moduleId.replace("zk-", "").charAt(0).toUpperCase() +
+                               module.moduleId.replace("zk-", "").slice(1)}
+                            </span>
+                            <Badge variant="outline" className="text-[9px] px-1 py-0">
+                              Step {index + 1}
+                            </Badge>
+                          </div>
+                          {configValue && (
+                            <p className="text-[10px] text-muted-foreground mt-0.5">
+                              {String(configValue[0])}: {String(configValue[1])}
+                            </p>
+                          )}
+                        </div>
+                        {module.required && (
+                          <Badge variant="secondary" className="text-[9px] px-1.5 py-0">
+                            Required
+                          </Badge>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <Layers className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+                  <p className="text-xs text-muted-foreground">No modules configured</p>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Quick Integration */}
+          <Card variant="bordered" padding="none" className="overflow-hidden">
+            <div className="px-4 py-3 border-b border-border">
+              <span className="text-xs font-medium text-foreground">Quick Integration</span>
+            </div>
+            <div className="p-3">
+              <pre className="text-[11px] font-mono text-foreground/80 bg-secondary p-3 rounded-lg overflow-x-auto">
+{`import { createClient } from "@untraced/sdk";
+
+const untraced = createClient({ clientId: "your_client_id" });
+
+// Trigger this flow
+untraced.verify({
+  flow: "${flow.name}",
+  onSuccess: (proof) => {
+    console.log("Verified!", proof);
+  },
+  onError: (error) => {
+    console.error("Verification failed:", error);
+  }
+});`}
+              </pre>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// Ring Progress Component
+function RingProgress({ value, size = 40 }: { value: number; size?: number }) {
+  const strokeWidth = 3;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (value / 100) * circumference;
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          className="text-secondary"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          className="text-success transition-all duration-500"
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-[8px] font-medium text-foreground tabular-nums">{Math.round(value)}</span>
+      </div>
+    </div>
+  );
+}
+
+// Flow Bar Chart Component
+function FlowBarChart({ data }: { data: Array<{ day: string; total: number; success: number }> }) {
+  const maxValue = Math.max(...data.map((d) => d.total), 1);
+
+  return (
+    <div className="flex items-end justify-between gap-2 h-28">
+      {data.map((item, index) => {
+        const totalHeight = (item.total / maxValue) * 100;
+        const successHeight = (item.success / maxValue) * 100;
+
+        return (
+          <div key={index} className="flex-1 flex flex-col items-center gap-2 group cursor-default" title={item.total > 0 ? `${Math.round((item.success / item.total) * 100)}% success` : undefined}>
+            <div className="relative w-full h-20 flex items-end">
+              <div
+                className="absolute bottom-0 w-full bg-secondary rounded transition-all"
+                style={{ height: `${totalHeight}%` }}
+              />
+              <div
+                className="absolute bottom-0 w-full bg-primary/60 group-hover:bg-primary rounded transition-all"
+                style={{ height: `${successHeight}%` }}
+              />
+            </div>
+            <span className="text-[10px] text-muted-foreground group-hover:text-foreground transition-colors">
+              {item.day}
+            </span>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 

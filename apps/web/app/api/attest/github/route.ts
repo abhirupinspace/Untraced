@@ -10,6 +10,7 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { mantleSepoliaTestnet } from "viem/chains";
+import { recordVerification, recordFailedVerification } from "@/lib/verification";
 
 // Module type for GitHub verification
 const ZK_GITHUB = keccak256(toHex("ZK_GITHUB"));
@@ -59,6 +60,8 @@ interface GitHubAttestRequest {
   githubAccessToken: string;
   minCommits: number;
   nonce: number;
+  flowId?: string;
+  projectId?: string;
 }
 
 /**
@@ -190,7 +193,7 @@ async function fetchCommitCount(accessToken: string): Promise<{
 export async function POST(request: NextRequest) {
   try {
     const body: GitHubAttestRequest = await request.json();
-    const { userAddress, githubAccessToken, minCommits, nonce } = body;
+    const { userAddress, githubAccessToken, minCommits, nonce, flowId, projectId } = body;
 
     // Validate inputs
     if (!userAddress || !githubAccessToken) {
@@ -222,6 +225,15 @@ export async function POST(request: NextRequest) {
 
     // Check if user meets minimum commits requirement
     if (githubStats.totalCommits < minCommits) {
+      // Record failed verification
+      await recordFailedVerification({
+        userWallet: userAddress,
+        moduleId: "zk-github",
+        flowId,
+        projectId,
+        errorMessage: `Commit requirement not met: ${githubStats.totalCommits} < ${minCommits}`,
+      });
+
       return NextResponse.json(
         {
           error: "Commit requirement not met",
@@ -284,8 +296,22 @@ export async function POST(request: NextRequest) {
       ]
     );
 
+    // Record successful verification
+    const verification = await recordVerification({
+      userWallet: userAddress,
+      moduleId: "zk-github",
+      flowId,
+      projectId,
+      attestation: {
+        moduleType: ZK_GITHUB,
+        expiry: new Date(Number(expiry) * 1000),
+        signature: { v, r, s },
+      },
+    });
+
     return NextResponse.json({
       success: true,
+      verificationId: verification._id.toString(),
       attestation: {
         moduleType: ZK_GITHUB,
         expiry: expiry.toString(),

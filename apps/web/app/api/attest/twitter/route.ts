@@ -10,6 +10,7 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { mantleSepoliaTestnet } from "viem/chains";
+import { recordVerification, recordFailedVerification } from "@/lib/verification";
 
 // Module type for Twitter verification
 const ZK_TWITTER = keccak256(toHex("ZK_TWITTER"));
@@ -56,6 +57,8 @@ interface TwitterAttestRequest {
   verificationType: "account" | "followers" | "verified";
   minFollowers?: number;
   nonce: number;
+  flowId?: string;
+  projectId?: string;
 }
 
 /**
@@ -100,6 +103,8 @@ export async function POST(request: NextRequest) {
       verificationType,
       minFollowers = 0,
       nonce,
+      flowId,
+      projectId,
     } = body;
 
     // Validate inputs
@@ -166,6 +171,15 @@ export async function POST(request: NextRequest) {
     }
 
     if (!verificationPassed) {
+      // Record failed verification
+      await recordFailedVerification({
+        userWallet: userAddress,
+        moduleId: "zk-twitter",
+        flowId,
+        projectId,
+        errorMessage: `Twitter ${verificationType} verification failed: ${JSON.stringify(verificationDetails)}`,
+      });
+
       return NextResponse.json(
         {
           error: "Twitter verification requirement not met",
@@ -238,8 +252,22 @@ export async function POST(request: NextRequest) {
       ]
     );
 
+    // Record successful verification
+    const verification = await recordVerification({
+      userWallet: userAddress,
+      moduleId: "zk-twitter",
+      flowId,
+      projectId,
+      attestation: {
+        moduleType: ZK_TWITTER,
+        expiry: new Date(Number(expiry) * 1000),
+        signature: { v, r, s },
+      },
+    });
+
     return NextResponse.json({
       success: true,
+      verificationId: verification._id.toString(),
       attestation: {
         moduleType: ZK_TWITTER,
         expiry: expiry.toString(),

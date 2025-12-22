@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -524,6 +525,8 @@ function PreviewView({
 
   const currentModule = modules[currentStep];
   const allCompleted = steps.length > 0 && steps.every((s) => s.status === "completed");
+  const completedCount = steps.filter((s) => s.status === "completed").length;
+  const progress = modules.length > 0 ? (completedCount / modules.length) * 100 : 0;
   const Icon = currentModule ? (iconMap[currentModule.icon] || ShieldCheckIcon) : ShieldCheckIcon;
 
   if (modules.length === 0) {
@@ -540,11 +543,11 @@ function PreviewView({
   const isDark = previewTheme === "dark";
 
   return (
-    <div className="h-full bg-gradient-to-br from-[#0f0f0f] to-[#1a1a1a] flex p-6 gap-6">
+    <div className="h-full bg-gradient-to-br from-secondary/50 to-muted/50 dark:from-secondary/20 dark:to-background flex p-6 gap-6">
       {/* Customization Panel */}
       <div className="w-64 flex-shrink-0 space-y-4">
         <div>
-          <h3 className="text-xs font-normal text-muted-foreground mb-3 uppercase tracking-wider">Customize Modal</h3>
+          <h3 className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wider">Customize Modal</h3>
 
           {/* Theme Toggle */}
           <div className="space-y-2">
@@ -554,7 +557,7 @@ function PreviewView({
                 onClick={() => setPreviewTheme("dark")}
                 className={cn(
                   "flex-1 py-2 px-3 rounded-lg text-xs font-light transition-all",
-                  isDark ? "bg-secondary text-foreground" : "bg-secondary text-muted-foreground hover:bg-secondary"
+                  isDark ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:bg-secondary/80"
                 )}
               >
                 Dark
@@ -563,7 +566,7 @@ function PreviewView({
                 onClick={() => setPreviewTheme("light")}
                 className={cn(
                   "flex-1 py-2 px-3 rounded-lg text-xs font-light transition-all",
-                  !isDark ? "bg-secondary text-foreground" : "bg-secondary text-muted-foreground hover:bg-secondary"
+                  !isDark ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground hover:bg-secondary/80"
                 )}
               >
                 Light
@@ -578,7 +581,7 @@ function PreviewView({
             size="sm"
             onClick={handleSimulate}
             disabled={isSimulating || allCompleted}
-            className="w-full h-9 text-xs bg-purple-500 hover:bg-purple-600 text-foreground font-normal"
+            className="w-full h-9 text-xs bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
           >
             <Play className="w-3 h-3 mr-1.5" />
             {isSimulating ? "Simulating..." : "Run Simulation"}
@@ -607,8 +610,8 @@ function PreviewView({
                   key={module.instanceId}
                   className={cn(
                     "flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs transition-all",
-                    stepStatus === "completed" && "bg-green-500/10 text-green-400",
-                    stepStatus === "in_progress" && "bg-purple-500/20 text-purple-400",
+                    stepStatus === "completed" && "bg-success/10 text-success",
+                    stepStatus === "in_progress" && "bg-primary/20 text-primary",
                     stepStatus === "pending" && "text-muted-foreground"
                   )}
                 >
@@ -626,67 +629,119 @@ function PreviewView({
       {/* Modal Preview */}
       <div className="flex-1 flex items-center justify-center">
         <div className={cn(
-          "rounded-2xl shadow-2xl overflow-hidden w-[400px]",
-          isDark ? "bg-background border border-border" : "bg-white"
+          "rounded-2xl shadow-2xl overflow-hidden w-[420px]",
+          isDark ? "bg-[#09090b] border border-[#27272a]" : "bg-white border border-gray-200"
         )}>
           {/* Modal Header */}
           <div className={cn(
-            "px-6 py-5 border-b",
-            isDark ? "border-border" : "border-gray-100"
+            "px-6 pt-6 pb-5 border-b",
+            isDark ? "border-[#27272a]" : "border-gray-100"
           )}>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-6 h-6 rounded-md bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <span className="text-[10px] font-bold text-foreground">U</span>
+            {/* Brand */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <Image
+                  src="/icon.png"
+                  alt="Untraced"
+                  width={28}
+                  height={28}
+                  className="rounded-lg"
+                />
+                <span className={cn(
+                  "text-xs font-medium tracking-wide uppercase",
+                  isDark ? "text-[#a1a1aa]" : "text-gray-500"
+                )}>Untraced</span>
               </div>
-              <span className={cn(
-                "text-xs font-normal",
-                isDark ? "text-muted-foreground" : "text-muted-foreground"
-              )}>UNTRACED</span>
+              <button className={cn(
+                "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
+                isDark ? "text-[#a1a1aa] hover:text-white hover:bg-[#27272a]" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+              )}>
+                <X className="w-4 h-4" />
+              </button>
             </div>
+
+            {/* Title */}
             <h3 className={cn(
-              "text-lg font-normal",
-              isDark ? "text-foreground" : "text-gray-900"
+              "text-lg font-medium tracking-tight",
+              isDark ? "text-white" : "text-gray-900"
             )}>Identity Verification</h3>
             <p className={cn(
-              "text-sm font-light",
-              isDark ? "text-muted-foreground" : "text-muted-foreground"
-            )}>Complete the following verification steps</p>
+              "text-sm font-light mt-1",
+              isDark ? "text-[#a1a1aa]" : "text-gray-500"
+            )}>Complete the verification steps below</p>
+
+            {/* Progress bar */}
+            <div className="mt-5">
+              <div className={cn(
+                "flex items-center justify-between text-xs mb-2",
+                isDark ? "text-[#a1a1aa]" : "text-gray-500"
+              )}>
+                <span>Progress</span>
+                <span>{completedCount} of {modules.length} completed</span>
+              </div>
+              <div className={cn(
+                "h-1 rounded-full overflow-hidden",
+                isDark ? "bg-[#27272a]" : "bg-gray-200"
+              )}>
+                <motion.div
+                  className={cn(
+                    "h-full rounded-full",
+                    isDark ? "bg-[#a78bfa]" : "bg-[#7c3aed]"
+                  )}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Progress Steps */}
+          {/* Steps indicator */}
           <div className={cn(
-            "px-6 py-4",
-            isDark ? "bg-card" : "bg-gray-50"
+            "px-6 py-4 border-b",
+            isDark ? "border-[#27272a] bg-[#18181b]/50" : "border-gray-100 bg-gray-50"
           )}>
             <div className="flex items-center justify-center gap-2">
               {steps.map((step, idx) => {
                 const stepModule = modules[idx];
                 const StepIcon = stepModule ? iconMap[stepModule.icon] || ShieldCheckIcon : ShieldCheckIcon;
+                const isActive = idx === currentStep;
+                const isCompleted = step.status === "completed";
+
                 return (
                   <div key={idx} className="flex items-center">
-                    <div
+                    <motion.div
                       className={cn(
-                        "w-9 h-9 rounded-full flex items-center justify-center transition-all",
-                        step.status === "completed" && (isDark ? "bg-green-500/20 text-green-400" : "bg-green-100 text-green-600"),
-                        step.status === "in_progress" && "bg-purple-500 text-foreground",
-                        step.status === "pending" && (isDark ? "bg-secondary text-muted-foreground" : "bg-gray-200 text-muted-foreground")
+                        "w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200",
+                        isCompleted && (isDark ? "bg-[#34d399]/15 text-[#34d399]" : "bg-green-100 text-green-600"),
+                        isActive && !isCompleted && (isDark ? "bg-[#a78bfa] text-white" : "bg-[#7c3aed] text-white"),
+                        !isActive && !isCompleted && (isDark ? "bg-[#27272a] text-[#71717a]" : "bg-gray-200 text-gray-400")
                       )}
+                      animate={
+                        step.status === "in_progress"
+                          ? { scale: [1, 1.05, 1] }
+                          : { scale: 1 }
+                      }
+                      transition={{
+                        repeat: step.status === "in_progress" ? Infinity : 0,
+                        duration: 1.5,
+                      }}
                     >
-                      {step.status === "completed" ? (
+                      {isCompleted ? (
                         <CheckCircleIcon className="w-4 h-4" />
                       ) : step.status === "in_progress" ? (
                         <LoaderIcon className="w-4 h-4" />
                       ) : (
                         <StepIcon className="w-4 h-4" />
                       )}
-                    </div>
+                    </motion.div>
                     {idx < steps.length - 1 && (
                       <div
                         className={cn(
-                          "w-10 h-0.5 mx-2 transition-all",
-                          step.status === "completed"
-                            ? "bg-green-500"
-                            : isDark ? "bg-secondary" : "bg-gray-200"
+                          "w-8 h-0.5 mx-1.5 transition-colors duration-300",
+                          isCompleted
+                            ? (isDark ? "bg-[#34d399]" : "bg-green-500")
+                            : (isDark ? "bg-[#27272a]" : "bg-gray-200")
                         )}
                       />
                     )}
@@ -696,76 +751,133 @@ function PreviewView({
             </div>
           </div>
 
-          {/* Content */}
-          <div className="px-6 py-6">
+          {/* Content - Fixed height */}
+          <div className="px-6 py-6 min-h-[280px] flex flex-col">
             <AnimatePresence mode="wait">
               {!allCompleted ? (
                 <motion.div
                   key={currentStep}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="text-center"
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex-1 flex flex-col"
                 >
-                  <div
-                    className={cn(
-                      "w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-gradient-to-br",
-                      currentModule?.gradient || "from-gray-400 to-gray-500"
-                    )}
-                  >
-                    <Icon className="w-8 h-8 text-foreground" />
+                  {/* Module header */}
+                  <div className="text-center">
+                    <div
+                      className={cn(
+                        "w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-gradient-to-br",
+                        currentModule?.gradient || "from-primary/80 to-primary"
+                      )}
+                    >
+                      <Icon className="w-7 h-7 text-white" />
+                    </div>
+                    <h4 className={cn(
+                      "text-base font-medium",
+                      isDark ? "text-white" : "text-gray-900"
+                    )}>
+                      {currentModule?.name || "Module"}
+                    </h4>
+                    <p className={cn(
+                      "text-sm font-light mt-1",
+                      isDark ? "text-[#a1a1aa]" : "text-gray-500"
+                    )}>
+                      {currentModule?.description}
+                    </p>
                   </div>
-                  <h4 className={cn(
-                    "text-base font-normal mb-1",
-                    isDark ? "text-foreground" : "text-gray-900"
+
+                  {/* Wallet placeholder */}
+                  <div className={cn(
+                    "flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl mt-5",
+                    isDark ? "bg-[#27272a]/50" : "bg-gray-100"
                   )}>
-                    {currentModule?.name || "Module"}
-                  </h4>
-                  <p className={cn(
-                    "text-sm font-light mb-6",
-                    isDark ? "text-muted-foreground" : "text-muted-foreground"
-                  )}>
-                    {currentModule?.description}
-                  </p>
+                    <div className="w-2 h-2 rounded-full bg-[#34d399]" />
+                    <span className={cn(
+                      "text-sm font-mono",
+                      isDark ? "text-[#a1a1aa]" : "text-gray-500"
+                    )}>
+                      0x1234...5678
+                    </span>
+                  </div>
+
+                  {/* Spacer */}
+                  <div className="flex-1" />
+
+                  {/* Verify button */}
                   <button className={cn(
-                    "w-full py-3 rounded-xl text-sm font-normal transition-all",
+                    "w-full py-3.5 rounded-xl text-sm font-medium transition-all mt-5",
                     isDark
-                      ? "bg-white text-black hover:bg-gray-200"
-                      : "bg-gray-900 text-foreground hover:bg-gray-800"
+                      ? "bg-[#a78bfa] text-white hover:bg-[#a78bfa]/90"
+                      : "bg-[#7c3aed] text-white hover:bg-[#7c3aed]/90"
                   )}>
-                    {steps[currentStep]?.status === "in_progress" ? "Verifying..." : "Verify Now"}
+                    {steps[currentStep]?.status === "in_progress" ? "Verifying..." : "Verify"}
                   </button>
                 </motion.div>
               ) : (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-4"
+                  className="flex-1 flex flex-col items-center justify-center text-center"
                 >
                   <div className={cn(
-                    "w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center",
-                    isDark ? "bg-green-500/20" : "bg-green-100"
+                    "w-16 h-16 rounded-full mx-auto mb-5 flex items-center justify-center",
+                    isDark ? "bg-[#34d399]/10" : "bg-green-100"
                   )}>
                     <CheckCircleIcon className={cn(
                       "w-8 h-8",
-                      isDark ? "text-green-400" : "text-green-600"
+                      isDark ? "text-[#34d399]" : "text-green-600"
                     )} />
                   </div>
                   <h4 className={cn(
-                    "text-base font-normal mb-1",
-                    isDark ? "text-foreground" : "text-gray-900"
+                    "text-base font-medium mb-2",
+                    isDark ? "text-white" : "text-gray-900"
                   )}>Verification Complete</h4>
                   <p className={cn(
-                    "text-sm font-light mb-6",
-                    isDark ? "text-muted-foreground" : "text-muted-foreground"
+                    "text-sm font-light mb-5",
+                    isDark ? "text-[#a1a1aa]" : "text-gray-500"
                   )}>All verification steps have been completed</p>
+
+                  {/* Completed modules summary */}
+                  <div className="w-full space-y-2 mb-5">
+                    {modules.map((module) => {
+                      const ModuleIcon = iconMap[module.icon] || ShieldCheckIcon;
+                      return (
+                        <div
+                          key={module.instanceId}
+                          className={cn(
+                            "flex items-center justify-between px-4 py-2.5 rounded-xl",
+                            isDark ? "bg-[#27272a]/50" : "bg-gray-100"
+                          )}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={cn(
+                              "w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br",
+                              module.gradient || "from-primary/80 to-primary"
+                            )}>
+                              <ModuleIcon className="w-4 h-4 text-white" />
+                            </div>
+                            <span className={cn(
+                              "text-sm",
+                              isDark ? "text-white" : "text-gray-900"
+                            )}>{module.name}</span>
+                          </div>
+                          <CheckCircleIcon className={cn(
+                            "w-4 h-4",
+                            isDark ? "text-[#34d399]" : "text-green-600"
+                          )} />
+                        </div>
+                      );
+                    })}
+                  </div>
+
                   <button className={cn(
-                    "w-full py-3 rounded-xl text-sm font-normal transition-all",
+                    "w-full py-3.5 rounded-xl text-sm font-medium transition-all",
                     isDark
-                      ? "bg-white text-black hover:bg-gray-200"
-                      : "bg-gray-900 text-foreground hover:bg-gray-800"
+                      ? "bg-[#a78bfa] text-white hover:bg-[#a78bfa]/90"
+                      : "bg-[#7c3aed] text-white hover:bg-[#7c3aed]/90"
                   )}>
-                    Continue
+                    Done
                   </button>
                 </motion.div>
               )}
@@ -774,15 +886,15 @@ function PreviewView({
 
           {/* Footer */}
           <div className={cn(
-            "px-6 py-3 border-t",
-            isDark ? "border-border bg-card" : "border-gray-100 bg-gray-50"
+            "px-6 py-4 border-t",
+            isDark ? "border-[#27272a] bg-[#18181b]/30" : "border-gray-100 bg-gray-50"
           )}>
             <div className={cn(
-              "flex items-center justify-between text-[10px]",
-              isDark ? "text-muted-foreground" : "text-muted-foreground"
+              "flex items-center justify-between text-xs",
+              isDark ? "text-[#71717a]" : "text-gray-400"
             )}>
-              <span className="font-mono">{flowName}</span>
-              <span>Powered by UNTRACED</span>
+              <span className="truncate max-w-[140px]">Flow: {flowName}</span>
+              <span>Powered by Untraced</span>
             </div>
           </div>
         </div>

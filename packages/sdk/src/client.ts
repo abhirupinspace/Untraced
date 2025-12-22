@@ -27,9 +27,9 @@ export class UntracedClient {
 
   constructor(config: UntracedConfig) {
     this.config = {
-      chainId: MANTLE_SEPOLIA.id,
       apiUrl: "/api/attest",
       ...config,
+      chainId: config.chainId || MANTLE_SEPOLIA.id,
     };
 
     this.publicClient = createPublicClient({

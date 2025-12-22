@@ -1,15 +1,49 @@
 import { cookies } from "next/headers";
+import { PrivyClient } from "@privy-io/server-auth";
 import dbConnect from "./db/mongodb";
 import { User, Organization, type IUser, type IOrganization } from "./db/models";
+
+// Initialize Privy client
+const privyClient = new PrivyClient(
+  process.env.NEXT_PUBLIC_PRIVY_APP_ID || "",
+  process.env.PRIVY_APP_SECRET || ""
+);
 
 export interface AuthUser {
   user: IUser;
   organization: IOrganization | null;
 }
 
+export interface VerifiedAuth {
+  privyId: string;
+  walletAddress?: string;
+  email?: string;
+}
+
+/**
+ * Verify Privy authorization token from request headers
+ */
+export async function verifyAuthToken(authHeader: string | null): Promise<VerifiedAuth | null> {
+  if (!authHeader?.startsWith("Bearer ")) {
+    return null;
+  }
+
+  const token = authHeader.slice(7);
+
+  try {
+    const verifiedClaims = await privyClient.verifyAuthToken(token);
+    return {
+      privyId: verifiedClaims.userId,
+    };
+  } catch (error) {
+    console.error("Privy token verification failed:", error);
+    return null;
+  }
+}
+
 /**
  * Get the current authenticated user from Privy token
- * This is a simplified version - in production, you'd verify the Privy JWT
+ * Uses proper JWT verification with Privy server SDK
  */
 export async function getCurrentUser(): Promise<AuthUser | null> {
   try {
@@ -20,15 +54,13 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       return null;
     }
 
-    // In production, you'd verify the JWT and extract the user ID
-    // For now, we'll decode the basic payload (NOT SECURE - use proper JWT verification)
-    // This is a placeholder - integrate with Privy's server-side auth
-    const payload = JSON.parse(
-      Buffer.from(privyToken.split(".")[1], "base64").toString()
-    );
-
-    const privyId = payload.sub;
-    if (!privyId) {
+    // Verify the token with Privy
+    let privyId: string;
+    try {
+      const verifiedClaims = await privyClient.verifyAuthToken(privyToken);
+      privyId = verifiedClaims.userId;
+    } catch (error) {
+      console.error("Privy token verification failed:", error);
       return null;
     }
 
@@ -125,4 +157,37 @@ export function hasPermission(
   );
   if (!member) return false;
   return requiredRoles.includes(member.role);
+}
+
+/**
+ * Get authenticated user from API request headers
+ * This function extracts auth headers and optionally verifies the Bearer token
+ */
+export async function getAuthFromRequest(
+  headers: Headers
+): Promise<{ user: IUser; organization: IOrganization } | null> {
+  const privyId = headers.get("x-privy-id");
+  const walletAddress = headers.get("x-wallet-address");
+  const email = headers.get("x-user-email") || undefined;
+  const authHeader = headers.get("authorization");
+
+  if (!privyId || !walletAddress) {
+    return null;
+  }
+
+  // If we have a Bearer token and Privy secret is configured, verify it
+  if (authHeader && process.env.PRIVY_APP_SECRET) {
+    const verified = await verifyAuthToken(authHeader);
+    if (!verified) {
+      return null;
+    }
+    // Ensure the verified user matches the header
+    if (verified.privyId !== privyId) {
+      console.error("Token user ID doesn't match header");
+      return null;
+    }
+  }
+
+  // Ensure user exists and return
+  return ensureUser(privyId, walletAddress, email);
 }

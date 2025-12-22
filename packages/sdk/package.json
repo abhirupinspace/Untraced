@@ -13,11 +13,13 @@
     "@privy-io/react-auth": "^2.0.5"
   },
   "peerDependencies": {
-    "react": "^18.0.0"
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "devDependencies": {
     "@untraced/config": "workspace:*",
     "@types/react": "^18",
+    "@types/react-dom": "^18",
     "typescript": "^5.7.2"
   }
 }
