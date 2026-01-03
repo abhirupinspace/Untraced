@@ -112,7 +112,7 @@ export function UntracedButton({
   const variantStyles: Record<string, CSSProperties> = {
     primary: {
       backgroundColor: colors.accent,
-      color: "#ffffff",
+      color: "#fffefeff",
     },
     secondary: {
       backgroundColor: colors.bgSecondary,

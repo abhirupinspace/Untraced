@@ -30,6 +30,7 @@ import {
   CheckCircleIcon,
   LoaderIcon,
   TwitterIcon,
+  ChainsIcon,
 } from "@/components/ui/icons";
 import {
   ArrowLeft,
@@ -57,6 +58,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   IdCard: IdCardIcon,
   Shield: ShieldCheckIcon,
   Twitter: TwitterIcon,
+  Chains: ChainsIcon,
 };
 
 type TabId = "canvas" | "preview" | "code";

@@ -14,6 +14,7 @@ import {
   IdCardIcon,
   ShieldCheckIcon,
   AmazonIcon,
+  ChainsIcon,
 } from "@/components/ui/icons";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -36,6 +37,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   IdCard: IdCardIcon,
   Shield: ShieldCheckIcon,
   Amazon: AmazonIcon,
+  Chains: ChainsIcon,
 };
 
 const categories = [
@@ -53,6 +55,8 @@ const moduleCategories: Record<string, string> = {
   "zk-github": "social",
   "zk-amazon": "social",
   "zk-bank-balance": "financial",
+  "zk-balance": "financial",
+  "zk-chain-balance": "financial",
   "zk-country": "identity",
 };
 

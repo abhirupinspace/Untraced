@@ -15,6 +15,7 @@ import {
   AmazonIcon,
   GlobeIcon,
   ShieldCheckIcon,
+  ChainsIcon,
 } from "@/components/ui/icons";
 import { Badge } from "@/components/ui/badge";
 
@@ -27,6 +28,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Amazon: AmazonIcon,
   Globe: GlobeIcon,
   Shield: ShieldCheckIcon,
+  Chains: ChainsIcon,
 };
 
 interface ModuleCardProps {

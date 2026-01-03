@@ -4,6 +4,11 @@ import { useState, useRef } from "react"
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { Shield, Vote, Users, Coins, Gamepad2, Building2, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { GridPattern } from "@/components/magicui/grid-pattern"
+import { BorderBeam } from "@/components/magicui/border-beam"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 
 type CaseStudy = {
   id: string
@@ -75,7 +80,8 @@ export const CaseStudiesCarousel = () => {
     offset: ["start end", "end start"]
   })
 
-  // Parallax floating elements
+  // Parallax transforms
+  const gridY = useTransform(scrollYProgress, [0, 1], [-15, 15])
   const floatY1 = useTransform(scrollYProgress, [0, 1], [40, -60])
   const floatY2 = useTransform(scrollYProgress, [0, 1], [-20, 40])
 
@@ -93,33 +99,49 @@ export const CaseStudiesCarousel = () => {
   const Icon = currentStudy.icon
 
   return (
-    <section ref={sectionRef} className="relative w-full py-28 overflow-hidden bg-card/30" id="use-cases">
+    <section ref={sectionRef} className="relative w-full py-24 md:py-32 overflow-hidden bg-secondary/30" id="use-cases">
+      {/* Background Grid Pattern with Parallax */}
+      <motion.div
+        style={{ y: gridY }}
+        className="absolute inset-0 pointer-events-none opacity-20"
+      >
+        <GridPattern
+          width={45}
+          height={45}
+          x={-1}
+          y={-1}
+          className={cn(
+            "[mask-image:radial-gradient(550px_circle_at_center,white,transparent)]"
+          )}
+        />
+      </motion.div>
+
       {/* Parallax floating orbs */}
       <motion.div
         style={{ y: floatY1 }}
-        className="absolute top-10 right-10 w-[200px] h-[200px] bg-purple-800/8 rounded-full blur-[100px] pointer-events-none"
+        className="absolute top-10 right-10 w-[250px] h-[250px] bg-primary/5 rounded-full blur-[100px] pointer-events-none"
       />
       <motion.div
         style={{ y: floatY2 }}
-        className="absolute bottom-10 left-10 w-[250px] h-[250px] bg-purple-900/8 rounded-full blur-[100px] pointer-events-none"
+        className="absolute bottom-10 left-10 w-[300px] h-[300px] bg-accent/5 rounded-full blur-[100px] pointer-events-none"
       />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-6">
+      <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-14"
         >
-          <p className="text-sm font-mono text-muted-foreground/60 mb-4 tracking-wide">
-            USE CASES
-          </p>
-          <h2 className="text-3xl md:text-4xl font-medium tracking-tight text-foreground mb-4">
-            Built for Real Applications
+          <Badge variant="outline" className="mb-4 px-4 py-1.5 text-xs font-medium border-primary/20 text-primary/90">
+            Use Cases
+          </Badge>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium tracking-tight text-foreground mb-5">
+            Built for <span className="text-primary">Real Applications</span>
           </h2>
-          <p className="text-base text-muted-foreground/80 max-w-xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
             See how teams use UNTRACED to build privacy-preserving verification.
           </p>
         </motion.div>
@@ -133,41 +155,54 @@ export const CaseStudiesCarousel = () => {
               initial={{ opacity: 0, x: direction > 0 ? 40 : -40 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: direction > 0 ? -40 : 40 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="relative rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm overflow-hidden"
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="p-8 md:p-10">
-                {/* Category & Icon */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-lg bg-primary/8 border border-primary/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-primary/70" />
+              <Card className="relative border-border/40 bg-card/50 backdrop-blur-sm py-0 overflow-hidden">
+                <BorderBeam
+                  size={200}
+                  duration={12}
+                  colorFrom="#7c3aed"
+                  colorTo="#a855f7"
+                  borderWidth={1}
+                />
+                <CardContent className="p-8 md:p-10">
+                  {/* Category & Icon */}
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className={cn(
+                      "w-11 h-11 rounded-xl flex items-center justify-center",
+                      "bg-gradient-to-br from-primary/10 to-accent/10",
+                      "border border-primary/15"
+                    )}>
+                      <Icon className="w-5 h-5 text-primary/80" />
+                    </div>
+                    <Badge variant="secondary" className="text-[10px] font-medium tracking-wider uppercase">
+                      {currentStudy.category}
+                    </Badge>
                   </div>
-                  <span className="text-xs font-mono text-muted-foreground/60 uppercase tracking-wider">
-                    {currentStudy.category}
-                  </span>
-                </div>
 
-                {/* Content */}
-                <h3 className="text-xl md:text-2xl font-medium text-foreground mb-3 leading-tight">
-                  {currentStudy.title}
-                </h3>
+                  {/* Content */}
+                  <h3 className="text-xl md:text-2xl font-medium text-foreground mb-3 leading-tight">
+                    {currentStudy.title}
+                  </h3>
 
-                <p className="text-muted-foreground/80 leading-relaxed mb-6 max-w-2xl">
-                  {currentStudy.description}
-                </p>
+                  <p className="text-muted-foreground leading-relaxed mb-6 max-w-2xl">
+                    {currentStudy.description}
+                  </p>
 
-                {/* Modules */}
-                <div className="flex flex-wrap gap-2">
-                  {currentStudy.modules.map((module) => (
-                    <span
-                      key={module}
-                      className="px-2.5 py-1 rounded-md text-xs font-mono bg-primary/8 text-primary/70 border border-primary/10"
-                    >
-                      {module}
-                    </span>
-                  ))}
-                </div>
-              </div>
+                  {/* Modules */}
+                  <div className="flex flex-wrap gap-2">
+                    {currentStudy.modules.map((module) => (
+                      <Badge
+                        key={module}
+                        variant="outline"
+                        className="font-mono text-xs border-primary/20 text-primary/80"
+                      >
+                        {module}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </motion.div>
           </AnimatePresence>
 
@@ -185,7 +220,7 @@ export const CaseStudiesCarousel = () => {
                   className={cn(
                     "h-1.5 rounded-full transition-all duration-300",
                     idx === currentIndex
-                      ? "w-6 bg-primary/60"
+                      ? "w-6 bg-primary"
                       : "w-1.5 bg-muted-foreground/20 hover:bg-muted-foreground/30"
                   )}
                   aria-label={`Go to slide ${idx + 1}`}
@@ -195,20 +230,24 @@ export const CaseStudiesCarousel = () => {
 
             {/* Arrows */}
             <div className="flex gap-2">
-              <button
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={prev}
-                className="p-2 rounded-lg border border-border/40 text-muted-foreground hover:text-foreground hover:border-border/60 transition-all"
+                className="h-9 w-9 border-border/40 hover:border-primary/30 hover:bg-primary/5"
                 aria-label="Previous"
               >
                 <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={next}
-                className="p-2 rounded-lg border border-border/40 text-muted-foreground hover:text-foreground hover:border-border/60 transition-all"
+                className="h-9 w-9 border-border/40 hover:border-primary/30 hover:bg-primary/5"
                 aria-label="Next"
               >
                 <ChevronRight className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
           </div>
         </div>

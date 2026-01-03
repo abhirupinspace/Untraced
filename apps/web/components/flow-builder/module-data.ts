@@ -75,6 +75,20 @@ export const availableModules: Module[] = [
     },
   },
   {
+    id: "zk-chain-balance",
+    name: "zk-chain-balance",
+    description: "Cross-chain balance via Flare",
+    icon: "Chains",
+    status: "coming",
+    gradient: "from-orange-500 to-red-500",
+    config: {
+      type: "selection",
+      label: "Source Chain",
+      options: ["Ethereum", "BNB Chain", "XRP", "Dogecoin", "Litecoin", "Flare", "Mantle"],
+      default: "Ethereum",
+    },
+  },
+  {
     id: "zk-aadhar",
     name: "zk-aadhar",
     description: "Verify Aadhaar identity",

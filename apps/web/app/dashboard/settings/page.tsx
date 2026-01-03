@@ -1,51 +1,83 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { DashboardNavbar } from "@/components/dashboard/dashboard-navbar";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { toast } from "sonner";
 import {
   User,
   Bell,
   Shield,
-  Key,
-  Globe,
-  Trash2,
+  CreditCard,
   AlertTriangle,
   Check,
   Copy,
-  Eye,
-  EyeOff,
-  Plus,
-  ExternalLink,
+  Loader2,
+  Zap,
+  TrendingUp,
+  Crown,
+  Building2,
   ChevronRight,
-  Mail,
-  Smartphone,
-  Monitor,
+  ExternalLink,
 } from "lucide-react";
-import { useWallet } from "@/lib/use-wallet";
+import {
+  useSettings,
+  PLAN_FEATURES,
+  type UserSettings,
+  type OrganizationInfo,
+  type UsageInfo,
+} from "@/lib/hooks";
 import { cn } from "@/lib/cn";
 
-type SettingsTab = "general" | "notifications" | "security" | "api";
+type SettingsTab = "general" | "notifications" | "billing" | "security";
 
 const tabs: { id: SettingsTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: "general", label: "General", icon: User },
+  { id: "billing", label: "Plan & Billing", icon: CreditCard },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "security", label: "Security", icon: Shield },
-  { id: "api", label: "API", icon: Key },
 ];
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<SettingsTab>("general");
-  const { user, authenticated } = useWallet();
+  const { data, loading, error, updateUser, isSaving, refetch } = useSettings();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <DashboardNavbar title="Settings" />
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="min-h-screen bg-background">
+        <DashboardNavbar title="Settings" />
+        <div className="flex flex-col items-center justify-center py-20">
+          <AlertTriangle className="w-8 h-8 text-destructive mb-3" />
+          <p className="text-sm text-muted-foreground mb-4">
+            {error || "Failed to load settings"}
+          </p>
+          <Button onClick={refetch} variant="outline" size="sm">
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <DashboardNavbar title="Settings" />
 
       <div className="flex justify-center px-6 py-8">
@@ -76,30 +108,77 @@ export default function SettingsPage() {
           </div>
 
           {/* Content */}
-          <div className="space-y-6">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-6"
+          >
             {activeTab === "general" && (
-              <GeneralSettings user={user} authenticated={authenticated} />
+              <GeneralSettings
+                userData={data.user}
+                onUpdate={updateUser}
+                isSaving={isSaving}
+              />
             )}
-            {activeTab === "notifications" && <NotificationSettings />}
+            {activeTab === "billing" && (
+              <BillingSettings
+                userData={data.user}
+                organization={data.organization}
+                usage={data.usage}
+              />
+            )}
+            {activeTab === "notifications" && (
+              <NotificationSettings
+                settings={data.user.settings}
+                onUpdate={updateUser}
+                isSaving={isSaving}
+              />
+            )}
             {activeTab === "security" && <SecuritySettings />}
-            {activeTab === "api" && <ApiSettings />}
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>
   );
 }
 
-function GeneralSettings({ user, authenticated }: { user: any; authenticated: boolean }) {
-  const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
+function GeneralSettings({
+  userData,
+  onUpdate,
+  isSaving,
+}: {
+  userData: UserSettings;
+  onUpdate: ReturnType<typeof useSettings>["updateUser"];
+  isSaving: boolean;
+}) {
+  const [name, setName] = useState(userData.name || "");
+  const [email, setEmail] = useState(userData.email || "");
   const [copied, setCopied] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    setHasChanges(
+      name !== (userData.name || "") || email !== (userData.email || "")
+    );
+  }, [name, email, userData]);
 
   const copyAddress = () => {
-    if (user?.wallet?.address) {
-      navigator.clipboard.writeText(user.wallet.address);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+    navigator.clipboard.writeText(userData.walletAddress);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleSave = async () => {
+    const { success, error } = await onUpdate({ name, email });
+    if (success) {
+      toast.success("Settings saved", {
+        description: "Your profile has been updated.",
+      });
+      setHasChanges(false);
+    } else {
+      toast.error("Failed to save", { description: error });
     }
   };
 
@@ -107,42 +186,54 @@ function GeneralSettings({ user, authenticated }: { user: any; authenticated: bo
     <>
       {/* Profile Card */}
       <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
         <div className="relative p-6">
           <div className="flex flex-col items-center text-center">
-            <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center text-2xl font-medium text-primary-foreground mb-4">
-              {authenticated ? user?.wallet?.address?.slice(2, 4).toUpperCase() || "U" : "?"}
+            <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl font-medium text-primary mb-4">
+              {userData.walletAddress?.slice(2, 4).toUpperCase() || "U"}
             </div>
             <h3 className="text-lg font-medium text-foreground mb-1">
-              {displayName || "Unnamed User"}
+              {name || "Unnamed User"}
             </h3>
-            {authenticated && (
-              <button
-                onClick={copyAddress}
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-light"
+            <button
+              onClick={copyAddress}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-light"
+            >
+              <code className="font-mono">
+                {userData.walletAddress?.slice(0, 6)}...
+                {userData.walletAddress?.slice(-4)}
+              </code>
+              {copied ? (
+                <Check className="w-3.5 h-3.5 text-success" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
+            </button>
+            <div className="flex items-center gap-2 mt-3">
+              <Badge
+                variant={userData.plan === "free" ? "secondary" : "default"}
+                className="text-xs"
               >
-                <code className="font-mono">
-                  {user?.wallet?.address?.slice(0, 6)}...{user?.wallet?.address?.slice(-4)}
-                </code>
-                {copied ? (
-                  <Check className="w-3.5 h-3.5 text-success" />
-                ) : (
-                  <Copy className="w-3.5 h-3.5" />
-                )}
-              </button>
-            )}
+                {userData.plan.charAt(0).toUpperCase() + userData.plan.slice(1)} Plan
+              </Badge>
+              <span className="text-xs text-muted-foreground">
+                Member since {new Date(userData.createdAt).toLocaleDateString()}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Account Details */}
-      <SettingsSection title="Account Details" description="Update your personal information">
+      <SettingsSection
+        title="Account Details"
+        description="Update your personal information"
+      >
         <div className="space-y-4">
           <Input
             label="Display Name"
             placeholder="Enter your name"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
           />
           <Input
             label="Email Address"
@@ -153,26 +244,20 @@ function GeneralSettings({ user, authenticated }: { user: any; authenticated: bo
           />
         </div>
         <div className="flex justify-end mt-6">
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium h-10 px-6">
-            Save Changes
+          <Button
+            onClick={handleSave}
+            disabled={!hasChanges || isSaving}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium h-10 px-6"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
           </Button>
-        </div>
-      </SettingsSection>
-
-      {/* Preferences */}
-      <SettingsSection title="Preferences" description="Customize your experience">
-        <div className="space-y-1">
-          <SettingToggle
-            title="Theme"
-            description="Toggle between light and dark mode"
-            checked={true}
-            disabled
-          />
-          <SettingToggle
-            title="Compact View"
-            description="Display more content with reduced spacing"
-            checked={false}
-          />
         </div>
       </SettingsSection>
 
@@ -183,9 +268,12 @@ function GeneralSettings({ user, authenticated }: { user: any; authenticated: bo
             <AlertTriangle className="w-5 h-5 text-destructive" />
           </div>
           <div className="flex-1">
-            <h3 className="text-sm font-medium text-foreground mb-1">Delete Account</h3>
+            <h3 className="text-sm font-medium text-foreground mb-1">
+              Delete Account
+            </h3>
             <p className="text-xs text-muted-foreground mb-4 font-light">
-              Permanently remove your account and all associated data. This action cannot be undone.
+              Permanently remove your account and all associated data. This
+              action cannot be undone.
             </p>
             <Button
               variant="outline"
@@ -200,45 +288,335 @@ function GeneralSettings({ user, authenticated }: { user: any; authenticated: bo
   );
 }
 
-function NotificationSettings() {
+function BillingSettings({
+  userData,
+  organization,
+  usage,
+}: {
+  userData: UserSettings;
+  organization: OrganizationInfo;
+  usage: UsageInfo;
+}) {
+  const currentPlan = PLAN_FEATURES[organization.plan];
+  const isUnlimited = (value: number) => value === -1;
+
+  const getUsagePercentage = (used: number, limit: number) => {
+    if (limit === -1) return 0;
+    return Math.min((used / limit) * 100, 100);
+  };
+
   return (
     <>
-      <SettingsSection title="Email Notifications" description="Manage your email preferences">
+      {/* Current Plan */}
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+        <div className="p-6">
+          <div className="flex items-start justify-between mb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-lg font-medium text-foreground">
+                  {currentPlan.name} Plan
+                </h3>
+                {organization.plan !== "free" && (
+                  <Badge variant="default" className="text-xs">
+                    Active
+                  </Badge>
+                )}
+              </div>
+              <p className="text-sm text-muted-foreground font-light">
+                {currentPlan.description}
+              </p>
+            </div>
+            {currentPlan.price > 0 && (
+              <div className="text-right">
+                <p className="text-2xl font-medium text-foreground">
+                  ${currentPlan.price}
+                </p>
+                <p className="text-xs text-muted-foreground">/month</p>
+              </div>
+            )}
+          </div>
+
+          {/* Usage Stats */}
+          <div className="space-y-4">
+            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              Current Usage
+            </h4>
+
+            <UsageBar
+              label="Projects"
+              used={usage.projects}
+              limit={usage.limits.maxProjects}
+              icon={Building2}
+            />
+
+            <UsageBar
+              label="Verifications this month"
+              used={usage.verificationsThisMonth}
+              limit={usage.limits.maxVerificationsPerMonth}
+              icon={Zap}
+            />
+
+            <UsageBar
+              label="Flows"
+              used={usage.flows}
+              limit={usage.limits.maxFlows * usage.projects || usage.limits.maxFlows}
+              icon={TrendingUp}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Upgrade Options */}
+      {organization.plan !== "enterprise" && (
+        <SettingsSection
+          title="Upgrade Your Plan"
+          description="Get more out of UNTRACED with a premium plan"
+        >
+          <div className="grid gap-4">
+            {(["pro", "enterprise"] as const)
+              .filter((plan) => plan !== organization.plan)
+              .map((planKey) => {
+                const plan = PLAN_FEATURES[planKey];
+                return (
+                  <div
+                    key={planKey}
+                    className={cn(
+                      "relative p-5 rounded-xl border transition-all",
+                      planKey === "pro"
+                        ? "border-primary/30 bg-primary/5"
+                        : "border-border bg-secondary/30"
+                    )}
+                  >
+                    {planKey === "pro" && (
+                      <div className="absolute -top-2.5 left-4">
+                        <Badge className="bg-primary text-primary-foreground text-[10px]">
+                          Recommended
+                        </Badge>
+                      </div>
+                    )}
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          {planKey === "enterprise" ? (
+                            <Crown className="w-4 h-4 text-amber-500" />
+                          ) : (
+                            <Zap className="w-4 h-4 text-primary" />
+                          )}
+                          <h4 className="text-sm font-medium text-foreground">
+                            {plan.name}
+                          </h4>
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-3">
+                          {plan.description}
+                        </p>
+                        <ul className="space-y-1.5">
+                          {plan.features.slice(0, 4).map((feature, i) => (
+                            <li
+                              key={i}
+                              className="flex items-center gap-2 text-xs text-muted-foreground"
+                            >
+                              <Check className="w-3 h-3 text-success" />
+                              {feature}
+                            </li>
+                          ))}
+                          {plan.features.length > 4 && (
+                            <li className="text-xs text-muted-foreground/70">
+                              +{plan.features.length - 4} more features
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                      <div className="text-right">
+                        {plan.price > 0 ? (
+                          <>
+                            <p className="text-xl font-medium text-foreground">
+                              ${plan.price}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground mb-3">
+                              /month
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-sm font-medium text-foreground mb-3">
+                            Custom
+                          </p>
+                        )}
+                        <Button
+                          size="sm"
+                          variant={planKey === "pro" ? "default" : "outline"}
+                          className="text-xs h-8"
+                        >
+                          {planKey === "enterprise" ? "Contact Sales" : "Upgrade"}
+                          <ChevronRight className="w-3 h-3 ml-1" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        </SettingsSection>
+      )}
+
+      {/* Billing History */}
+      <SettingsSection
+        title="Billing History"
+        description="View your past invoices and payments"
+      >
+        <div className="text-center py-8">
+          <CreditCard className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground font-light">
+            No billing history yet
+          </p>
+          <p className="text-xs text-muted-foreground/70">
+            Invoices will appear here after your first payment
+          </p>
+        </div>
+      </SettingsSection>
+    </>
+  );
+}
+
+function UsageBar({
+  label,
+  used,
+  limit,
+  icon: Icon,
+}: {
+  label: string;
+  used: number;
+  limit: number;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  const isUnlimited = limit === -1;
+  const percentage = isUnlimited ? 0 : Math.min((used / limit) * 100, 100);
+  const isNearLimit = percentage >= 80;
+  const isAtLimit = percentage >= 100;
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+          <span className="text-xs text-muted-foreground">{label}</span>
+        </div>
+        <span className="text-xs font-medium text-foreground">
+          {used.toLocaleString()}
+          {!isUnlimited && (
+            <span className="text-muted-foreground">
+              {" "}
+              / {limit.toLocaleString()}
+            </span>
+          )}
+          {isUnlimited && (
+            <span className="text-muted-foreground"> (Unlimited)</span>
+          )}
+        </span>
+      </div>
+      {!isUnlimited && (
+        <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+          <div
+            className={cn(
+              "h-full rounded-full transition-all",
+              isAtLimit
+                ? "bg-destructive"
+                : isNearLimit
+                ? "bg-warning"
+                : "bg-primary"
+            )}
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function NotificationSettings({
+  settings,
+  onUpdate,
+  isSaving,
+}: {
+  settings: { notifications: boolean; timezone: string };
+  onUpdate: ReturnType<typeof useSettings>["updateUser"];
+  isSaving: boolean;
+}) {
+  const [notifications, setNotifications] = useState(settings.notifications);
+  const [securityAlerts, setSecurityAlerts] = useState(true);
+  const [weeklyDigest, setWeeklyDigest] = useState(false);
+  const [failedVerifications, setFailedVerifications] = useState(true);
+  const [rateLimitWarnings, setRateLimitWarnings] = useState(true);
+  const [newFeatures, setNewFeatures] = useState(false);
+
+  const handleNotificationsChange = async (value: boolean) => {
+    setNotifications(value);
+    const { success, error } = await onUpdate({
+      settings: { notifications: value },
+    });
+    if (success) {
+      toast.success("Notifications updated");
+    } else {
+      toast.error("Failed to update", { description: error });
+      setNotifications(!value);
+    }
+  };
+
+  return (
+    <>
+      <SettingsSection
+        title="Email Notifications"
+        description="Manage your email preferences"
+      >
         <div className="space-y-1">
           <SettingToggle
             title="All Notifications"
             description="Receive notifications via email"
-            checked={true}
+            checked={notifications}
+            onCheckedChange={handleNotificationsChange}
+            disabled={isSaving}
           />
           <SettingToggle
             title="Security Alerts"
             description="Important security-related notifications"
-            checked={true}
+            checked={securityAlerts}
+            onCheckedChange={setSecurityAlerts}
+            disabled={!notifications}
           />
           <SettingToggle
             title="Weekly Digest"
             description="Summary of your weekly activity"
-            checked={false}
+            checked={weeklyDigest}
+            onCheckedChange={setWeeklyDigest}
+            disabled={!notifications}
           />
         </div>
       </SettingsSection>
 
-      <SettingsSection title="Product Alerts" description="Stay updated on your projects">
+      <SettingsSection
+        title="Product Alerts"
+        description="Stay updated on your projects"
+      >
         <div className="space-y-1">
           <SettingToggle
             title="Failed Verifications"
             description="Get notified when verifications fail"
-            checked={true}
+            checked={failedVerifications}
+            onCheckedChange={setFailedVerifications}
+            disabled={!notifications}
           />
           <SettingToggle
             title="Rate Limit Warnings"
             description="Alert when approaching API limits"
-            checked={true}
+            checked={rateLimitWarnings}
+            onCheckedChange={setRateLimitWarnings}
+            disabled={!notifications}
           />
           <SettingToggle
             title="New Features"
             description="Updates about new features and improvements"
-            checked={false}
+            checked={newFeatures}
+            onCheckedChange={setNewFeatures}
+            disabled={!notifications}
           />
         </div>
       </SettingsSection>
@@ -247,14 +625,12 @@ function NotificationSettings() {
 }
 
 function SecuritySettings() {
-  const sessions = [
-    { device: "MacBook Pro", type: "desktop", location: "San Francisco, US", current: true, lastActive: "Now" },
-    { device: "iPhone 15", type: "mobile", location: "San Francisco, US", current: false, lastActive: "2h ago" },
-  ];
-
   return (
     <>
-      <SettingsSection title="Two-Factor Authentication" description="Add an extra layer of security">
+      <SettingsSection
+        title="Two-Factor Authentication"
+        description="Add an extra layer of security"
+      >
         <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 border border-border">
           <div className="flex items-center gap-4">
             <div className="p-2.5 rounded-xl bg-primary/10">
@@ -262,7 +638,9 @@ function SecuritySettings() {
             </div>
             <div>
               <p className="text-sm text-foreground font-light">Enable 2FA</p>
-              <p className="text-xs text-muted-foreground font-light">Secure your account with TOTP</p>
+              <p className="text-xs text-muted-foreground font-light">
+                Secure your account with TOTP
+              </p>
             </div>
           </div>
           <Button
@@ -275,160 +653,26 @@ function SecuritySettings() {
       </SettingsSection>
 
       <SettingsSection
-        title="Active Sessions"
-        description="Devices currently logged into your account"
-        action={
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-destructive hover:text-destructive hover:bg-destructive/10 text-xs h-8 font-medium"
-          >
-            Revoke All
-          </Button>
-        }
+        title="Connected Wallet"
+        description="Your primary authentication method"
       >
-        <div className="space-y-2">
-          {sessions.map((session, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 border border-border"
-            >
-              <div className="flex items-center gap-4">
-                <div className="p-2.5 rounded-xl bg-secondary">
-                  {session.type === "desktop" ? (
-                    <Monitor className="w-4 h-4 text-muted-foreground" />
-                  ) : (
-                    <Smartphone className="w-4 h-4 text-muted-foreground" />
-                  )}
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-foreground font-light">{session.device}</p>
-                    {session.current && (
-                      <span className="px-2 py-0.5 text-[10px] rounded-full bg-success/10 text-success font-medium">
-                        Current
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground font-light">
-                    {session.location} · {session.lastActive}
-                  </p>
-                </div>
-              </div>
-              {!session.current && (
-                <button className="text-xs text-muted-foreground hover:text-destructive transition-colors font-medium">
-                  Revoke
-                </button>
-              )}
+        <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 border border-border">
+          <div className="flex items-center gap-4">
+            <div className="p-2.5 rounded-xl bg-secondary">
+              <Shield className="w-4 h-4 text-muted-foreground" />
             </div>
-          ))}
-        </div>
-      </SettingsSection>
-    </>
-  );
-}
-
-function ApiSettings() {
-  const [showSecret, setShowSecret] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
-  const apiKeys = [
-    { id: "pk_live_xxx", name: "Publishable Key", type: "public", lastUsed: "2h ago" },
-    { id: "sk_live_xxx", name: "Secret Key", type: "secret", lastUsed: "1h ago" },
-  ];
-
-  return (
-    <>
-      <SettingsSection
-        title="API Keys"
-        description="Manage your API credentials"
-        action={
-          <Button className="bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium h-9 gap-2">
-            <Plus className="w-4 h-4" />
-            New Key
-          </Button>
-        }
-      >
-        <div className="space-y-2">
-          {apiKeys.map((key) => (
-            <div
-              key={key.id}
-              className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 border border-border"
-            >
-              <div className="flex items-center gap-4">
-                <div className="p-2.5 rounded-xl bg-secondary">
-                  <Key className="w-4 h-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-foreground font-light">{key.name}</p>
-                    <span
-                      className={cn(
-                        "px-2 py-0.5 text-[10px] rounded-full font-medium",
-                        key.type === "public"
-                          ? "bg-secondary text-muted-foreground"
-                          : "bg-destructive/10 text-destructive"
-                      )}
-                    >
-                      {key.type}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <code className="text-xs text-muted-foreground font-mono">
-                      {key.type === "secret" && !showSecret ? "••••••••••••" : key.id}
-                    </code>
-                    {key.type === "secret" && (
-                      <button
-                        onClick={() => setShowSecret(!showSecret)}
-                        className="text-muted-foreground hover:text-foreground transition-colors"
-                      >
-                        {showSecret ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground/70 mr-2 font-light">{key.lastUsed}</span>
-                <button
-                  onClick={() => copyToClipboard(key.id, key.id)}
-                  className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
-                >
-                  {copiedId === key.id ? (
-                    <Check className="w-4 h-4 text-success" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                </button>
-                <button className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
+            <div>
+              <p className="text-sm text-foreground font-light">
+                Ethereum Wallet
+              </p>
+              <p className="text-xs text-muted-foreground font-light">
+                Primary authentication via Privy
+              </p>
             </div>
-          ))}
-        </div>
-      </SettingsSection>
-
-      <SettingsSection title="Webhooks" description="Receive real-time event notifications">
-        <div className="flex flex-col items-center justify-center py-10 text-center">
-          <div className="p-3 rounded-xl bg-secondary mb-4">
-            <Globe className="w-6 h-6 text-muted-foreground" />
           </div>
-          <p className="text-sm text-muted-foreground mb-1 font-light">No webhooks configured</p>
-          <p className="text-xs text-muted-foreground/70 mb-4 font-light">Add an endpoint to receive events</p>
-          <Button
-            variant="outline"
-            className="border-border text-foreground hover:bg-secondary text-sm font-medium h-9 gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Add Webhook
-          </Button>
+          <Badge variant="secondary" className="text-xs">
+            Connected
+          </Badge>
         </div>
       </SettingsSection>
 
@@ -438,8 +682,12 @@ function ApiSettings() {
             <ExternalLink className="w-4 h-4 text-muted-foreground" />
           </div>
           <div>
-            <p className="text-sm text-foreground font-medium">API Documentation</p>
-            <p className="text-xs text-muted-foreground font-light">Learn how to integrate UNTRACED</p>
+            <p className="text-sm text-foreground font-medium">
+              Security Best Practices
+            </p>
+            <p className="text-xs text-muted-foreground font-light">
+              Learn how to keep your account secure
+            </p>
           </div>
         </div>
         <Button
@@ -447,8 +695,12 @@ function ApiSettings() {
           className="text-muted-foreground hover:text-foreground text-sm font-medium gap-2"
           asChild
         >
-          <a href="https://docs.untraced.io" target="_blank" rel="noopener noreferrer">
-            View Docs
+          <a
+            href="https://docs.untraced.io/security"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Learn More
             <ChevronRight className="w-4 h-4" />
           </a>
         </Button>
@@ -473,7 +725,9 @@ function SettingsSection({
       <div className="flex items-center justify-between p-5 border-b border-border">
         <div>
           <h3 className="text-sm font-medium text-foreground">{title}</h3>
-          <p className="text-xs text-muted-foreground mt-0.5 font-light">{description}</p>
+          <p className="text-xs text-muted-foreground mt-0.5 font-light">
+            {description}
+          </p>
         </div>
         {action}
       </div>
@@ -485,23 +739,34 @@ function SettingsSection({
 function SettingToggle({
   title,
   description,
-  checked: initialChecked,
+  checked,
+  onCheckedChange,
   disabled,
 }: {
   title: string;
   description: string;
   checked: boolean;
+  onCheckedChange?: (checked: boolean) => void;
   disabled?: boolean;
 }) {
-  const [checked, setChecked] = useState(initialChecked);
-
   return (
-    <div className="flex items-center justify-between py-3">
+    <div
+      className={cn(
+        "flex items-center justify-between py-3",
+        disabled && "opacity-50"
+      )}
+    >
       <div>
         <p className="text-sm text-foreground font-light">{title}</p>
-        <p className="text-xs text-muted-foreground mt-0.5 font-light">{description}</p>
+        <p className="text-xs text-muted-foreground mt-0.5 font-light">
+          {description}
+        </p>
       </div>
-      <Switch checked={checked} onCheckedChange={setChecked} disabled={disabled} />
+      <Switch
+        checked={checked}
+        onCheckedChange={onCheckedChange ?? (() => {})}
+        disabled={disabled}
+      />
     </div>
   );
 }

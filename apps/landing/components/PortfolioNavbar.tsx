@@ -84,14 +84,6 @@ export const PortfolioNavbar = () => {
           <div className="hidden lg:flex items-center gap-3">
             <AnimatedThemeToggler />
             <a
-              href="https://github.com/untraced"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-300"
-            >
-              GitHub
-            </a>
-            <a
               href={`${WEB_APP_URL}/dashboard`}
               className="group inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-full text-sm font-medium hover:bg-primary-hover transition-all duration-300 hover:shadow-[0_0_20px_rgba(107,33,168,0.35)]"
             >

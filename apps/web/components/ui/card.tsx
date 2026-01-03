@@ -11,15 +11,15 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        "rounded-2xl transition-all duration-300",
+        "rounded-2xl transition-all duration-300 ease-out",
         // Variants
         {
           "bg-card": variant === "default",
-          "bg-card border border-border": variant === "bordered",
-          "bg-card elevated": variant === "elevated",
+          "bg-card border border-border hover:border-border/80": variant === "bordered",
+          "bg-card elevated hover:shadow-xl": variant === "elevated",
           "glass": variant === "glass",
-          "bg-card border border-border hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 cursor-pointer": variant === "interactive",
-          "bg-gradient-to-br from-card to-secondary/50 border border-border": variant === "gradient",
+          "bg-card border border-border hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-0.5 cursor-pointer active:scale-[0.99]": variant === "interactive",
+          "bg-gradient-to-br from-card to-secondary/50 border border-border hover:border-border/80": variant === "gradient",
         },
         // Padding
         {

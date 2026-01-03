@@ -1,13 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/cn";
 import { useProjects, useApiKeys, type Project, type ApiKey, type Flow } from "@/lib/hooks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { EditDialog } from "@/components/ui/edit-dialog";
 import { KYCFlowBuilder } from "@/components/flow-builder/kyc-flow-builder";
 import { DashboardNavbar } from "@/components/dashboard/dashboard-navbar";
+import { toast } from "sonner";
 import {
   Layers,
   Search,
@@ -39,12 +43,15 @@ import {
   Shield,
   Globe,
   Zap,
+  Trash2,
+  Pencil,
+  MoreVertical,
 } from "lucide-react";
 
 type View = "projects" | "project-detail" | "create-project" | "flow-builder" | "flow-detail";
 
 export function Dashboard() {
-  const { projects, loading, error, createProject, refreshProjects } = useProjects();
+  const { projects, loading, error, createProject, deleteProject, updateProject, refreshProjects } = useProjects();
 
   const [view, setView] = useState<View>("projects");
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,6 +59,14 @@ export function Dashboard() {
   const [selectedFlow, setSelectedFlow] = useState<Flow | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+
+  // Delete/Edit states
+  const [deleteProjectDialogOpen, setDeleteProjectDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
+  const [deleteFlowDialogOpen, setDeleteFlowDialogOpen] = useState(false);
+  const [flowToDelete, setFlowToDelete] = useState<Flow | null>(null);
+  const [editProjectDialogOpen, setEditProjectDialogOpen] = useState(false);
+  const [editFlowDialogOpen, setEditFlowDialogOpen] = useState(false);
 
   const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -109,6 +124,111 @@ export function Dashboard() {
     setView("project-detail");
   };
 
+  const handleDeleteProject = async () => {
+    if (!projectToDelete) return;
+
+    const { success, error } = await deleteProject(projectToDelete.id);
+    if (success) {
+      toast.success("Project deleted", {
+        description: `"${projectToDelete.name}" has been permanently deleted.`,
+      });
+      setSelectedProject(null);
+      setView("projects");
+    } else {
+      toast.error("Failed to delete project", {
+        description: error || "An unexpected error occurred.",
+      });
+    }
+    setProjectToDelete(null);
+  };
+
+  const handleConfirmDeleteProject = (project: Project) => {
+    setProjectToDelete(project);
+    setDeleteProjectDialogOpen(true);
+  };
+
+  const handleDeleteFlow = async () => {
+    if (!flowToDelete || !selectedProject) return;
+
+    try {
+      const response = await fetch(`/api/projects/${selectedProject.id}/flows/${flowToDelete.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast.success("Flow archived", {
+          description: `"${flowToDelete.displayName || flowToDelete.name}" has been archived.`,
+        });
+        // Refresh projects to update flow list
+        await refreshProjects();
+        setSelectedFlow(null);
+        setView("project-detail");
+      } else {
+        const data = await response.json();
+        toast.error("Failed to delete flow", {
+          description: data.error || "An unexpected error occurred.",
+        });
+      }
+    } catch {
+      toast.error("Failed to delete flow", {
+        description: "An unexpected error occurred.",
+      });
+    }
+    setFlowToDelete(null);
+  };
+
+  const handleConfirmDeleteFlow = (flow: Flow) => {
+    setFlowToDelete(flow);
+    setDeleteFlowDialogOpen(true);
+  };
+
+  const handleEditProject = async (name: string, description: string) => {
+    if (!selectedProject) return;
+
+    const { project, error } = await updateProject(selectedProject.id, { name, description });
+    if (project) {
+      toast.success("Project updated", {
+        description: `"${name}" has been updated successfully.`,
+      });
+      setSelectedProject({ ...selectedProject, name, description });
+      setEditProjectDialogOpen(false);
+    } else {
+      toast.error("Failed to update project", {
+        description: error || "An unexpected error occurred.",
+      });
+    }
+  };
+
+  const handleEditFlow = async (displayName: string) => {
+    if (!selectedFlow || !selectedProject) return;
+
+    try {
+      const response = await fetch(`/api/projects/${selectedProject.id}/flows/${selectedFlow.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ displayName }),
+      });
+
+      if (response.ok) {
+        toast.success("Flow updated", {
+          description: `Flow has been renamed to "${displayName}".`,
+        });
+        await refreshProjects();
+        setSelectedFlow({ ...selectedFlow, displayName });
+        setEditFlowDialogOpen(false);
+      } else {
+        const data = await response.json();
+        toast.error("Failed to update flow", {
+          description: data.error || "An unexpected error occurred.",
+        });
+      }
+    } catch {
+      toast.error("Failed to update flow", {
+        description: "An unexpected error occurred.",
+      });
+    }
+  };
+
   // Update selected project when projects change
   useEffect(() => {
     if (selectedProject) {
@@ -156,18 +276,87 @@ export function Dashboard() {
             onBack={handleBack}
             onCreateFlow={() => setView("flow-builder")}
             onSelectFlow={handleSelectFlow}
+            onDeleteProject={handleConfirmDeleteProject}
+            onEditProject={() => setEditProjectDialogOpen(true)}
             copyToClipboard={copyToClipboard}
             copiedId={copiedId}
           />
         )}
+
+        {/* Delete Project Confirmation */}
+        <ConfirmDialog
+          open={deleteProjectDialogOpen}
+          onOpenChange={setDeleteProjectDialogOpen}
+          title="Delete Project?"
+          description={`This will permanently delete "${projectToDelete?.name}" and all its flows. This action cannot be undone.`}
+          confirmLabel="Delete Project"
+          variant="destructive"
+          onConfirm={handleDeleteProject}
+        />
 
         {view === "flow-detail" && selectedProject && selectedFlow && (
           <FlowDetailView
             flow={selectedFlow}
             project={selectedProject}
             onBack={handleBack}
+            onDeleteFlow={handleConfirmDeleteFlow}
+            onEditFlow={() => setEditFlowDialogOpen(true)}
           />
         )}
+
+        {/* Delete Flow Confirmation */}
+        <ConfirmDialog
+          open={deleteFlowDialogOpen}
+          onOpenChange={setDeleteFlowDialogOpen}
+          title="Delete Flow?"
+          description={`This will permanently delete "${flowToDelete?.displayName || flowToDelete?.name}" and all its configuration. This action cannot be undone.`}
+          confirmLabel="Delete Flow"
+          variant="destructive"
+          onConfirm={handleDeleteFlow}
+        />
+
+        {/* Edit Project Dialog */}
+        <EditDialog
+          open={editProjectDialogOpen}
+          onOpenChange={setEditProjectDialogOpen}
+          title="Edit Project"
+          fields={[
+            {
+              name: "name",
+              label: "Project Name",
+              placeholder: "e.g. My DeFi App",
+              defaultValue: selectedProject?.name || "",
+              required: true,
+            },
+            {
+              name: "description",
+              label: "Description",
+              placeholder: "What is this project for?",
+              defaultValue: selectedProject?.description || "",
+              type: "textarea",
+            },
+          ]}
+          onSubmit={(values) => handleEditProject(values.name, values.description)}
+          submitLabel="Save Changes"
+        />
+
+        {/* Edit Flow Dialog */}
+        <EditDialog
+          open={editFlowDialogOpen}
+          onOpenChange={setEditFlowDialogOpen}
+          title="Edit Flow"
+          fields={[
+            {
+              name: "displayName",
+              label: "Display Name",
+              placeholder: "e.g. Age Verification Flow",
+              defaultValue: selectedFlow?.displayName || selectedFlow?.name || "",
+              required: true,
+            },
+          ]}
+          onSubmit={(values) => handleEditFlow(values.displayName)}
+          submitLabel="Save Changes"
+        />
 
         {view === "flow-builder" && selectedProject && (
           <FlowBuilderView
@@ -268,13 +457,16 @@ function ProjectsView({
           {/* Project Cards */}
           {!loading && !error && (
             <div className="space-y-2">
-              {projects.map((project) => (
-                <div
+              {projects.map((project, index) => (
+                <motion.div
                   key={project.id}
-                  className="group flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover:border-primary/20 hover:bg-secondary/50 cursor-pointer transition-all"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: index * 0.05 }}
+                  className="group flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover:border-primary/20 hover:bg-secondary/50 hover:-translate-y-0.5 cursor-pointer transition-all duration-200"
                   onClick={() => onSelectProject(project)}
                 >
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
+                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <FolderKanban className="w-4 h-4 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -290,8 +482,8 @@ function ProjectsView({
                   <code className="hidden sm:block text-xs text-muted-foreground font-mono bg-secondary px-2 py-1 rounded">
                     {project.slug}
                   </code>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors flex-shrink-0" />
-                </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                </motion.div>
               ))}
             </div>
           )}
@@ -418,6 +610,8 @@ function ProjectDetailView({
   onBack,
   onCreateFlow,
   onSelectFlow,
+  onDeleteProject,
+  onEditProject,
   copyToClipboard,
   copiedId,
 }: {
@@ -425,13 +619,33 @@ function ProjectDetailView({
   onBack: () => void;
   onCreateFlow: () => void;
   onSelectFlow: (flow: Flow) => void;
+  onDeleteProject: (project: Project) => void;
+  onEditProject: () => void;
   copyToClipboard: (text: string, id: string) => void;
   copiedId: string | null;
 }) {
-  const { keys, loading: keysLoading, createKey } = useApiKeys(project.id);
+  const { keys, loading: keysLoading, createKey, revokeKey } = useApiKeys(project.id);
+  const [showActionsMenu, setShowActionsMenu] = useState(false);
   const [showSecret, setShowSecret] = useState<Record<string, boolean>>({});
   const [newKey, setNewKey] = useState<ApiKey | null>(null);
   const [isGeneratingKey, setIsGeneratingKey] = useState(false);
+  const [keyToRevoke, setKeyToRevoke] = useState<ApiKey | null>(null);
+  const [revokeDialogOpen, setRevokeDialogOpen] = useState(false);
+
+  const handleRevokeKey = async () => {
+    if (!keyToRevoke) return;
+    const { success, error } = await revokeKey(keyToRevoke.id);
+    if (success) {
+      toast.success("API key revoked", {
+        description: `The ${keyToRevoke.type} key has been revoked and can no longer be used.`,
+      });
+    } else {
+      toast.error("Failed to revoke key", {
+        description: error || "An unexpected error occurred.",
+      });
+    }
+    setKeyToRevoke(null);
+  };
 
   const handleGenerateKey = async (type: "publishable" | "secret") => {
     setIsGeneratingKey(true);
@@ -458,7 +672,45 @@ function ProjectDetailView({
         >
           <ArrowLeft className="w-3.5 h-3.5" />
         </button>
-        <h1 className="text-base font-normal text-foreground">{project.name}</h1>
+        <h1 className="text-base font-normal text-foreground flex-1">{project.name}</h1>
+        <div className="relative">
+          <button
+            onClick={() => setShowActionsMenu(!showActionsMenu)}
+            className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+          {showActionsMenu && (
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowActionsMenu(false)}
+              />
+              <div className="absolute right-0 top-full mt-1 z-50 min-w-[140px] bg-card border border-border rounded-lg shadow-lg overflow-hidden">
+                <button
+                  onClick={() => {
+                    setShowActionsMenu(false);
+                    onEditProject();
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-secondary transition-colors"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                  Edit Project
+                </button>
+                <button
+                  onClick={() => {
+                    setShowActionsMenu(false);
+                    onDeleteProject(project);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Delete Project
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </DashboardNavbar>
 
       <div className="p-6 flex justify-center">
@@ -522,6 +774,16 @@ function ProjectDetailView({
                   >
                     {copiedId === `${project.id}-client` ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
+                  <button
+                    onClick={() => {
+                      setKeyToRevoke(publishableKey);
+                      setRevokeDialogOpen(true);
+                    }}
+                    className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all"
+                    title="Revoke key"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               ) : (
                 <Button
@@ -569,6 +831,16 @@ function ProjectDetailView({
                   >
                     {copiedId === `${project.id}-secret` ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   </button>
+                  <button
+                    onClick={() => {
+                      setKeyToRevoke(secretKey);
+                      setRevokeDialogOpen(true);
+                    }}
+                    className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-all"
+                    title="Revoke key"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               ) : (
                 <Button
@@ -611,13 +883,16 @@ function ProjectDetailView({
 
             {project.flows.length > 0 ? (
               <div className="space-y-2">
-                {project.flows.map((flow) => (
-                  <div
+                {project.flows.map((flow, index) => (
+                  <motion.div
                     key={flow.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: index * 0.05 }}
                     onClick={() => onSelectFlow(flow)}
-                    className="group flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:border-primary/20 hover:bg-secondary/50 cursor-pointer transition-all"
+                    className="group flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:border-primary/20 hover:bg-secondary/50 hover:-translate-y-0.5 cursor-pointer transition-all duration-200"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <Layers className="w-4 h-4 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -635,8 +910,8 @@ function ProjectDetailView({
                       <p className="text-sm font-normal text-foreground tabular-nums">{flow.stats.totalVerifications.toLocaleString()}</p>
                       <p className="text-[10px] text-muted-foreground font-light">verifications</p>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-muted-foreground transition-colors flex-shrink-0" />
-                  </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                  </motion.div>
                 ))}
               </div>
             ) : (
@@ -673,6 +948,17 @@ untraced.verify({
           )}
         </div>
       </div>
+
+      {/* Revoke Key Confirmation */}
+      <ConfirmDialog
+        open={revokeDialogOpen}
+        onOpenChange={setRevokeDialogOpen}
+        title="Revoke API Key?"
+        description={`This will permanently revoke your ${keyToRevoke?.type} key. Any applications using this key will stop working immediately.`}
+        confirmLabel="Revoke Key"
+        variant="destructive"
+        onConfirm={handleRevokeKey}
+      />
     </>
   );
 }
@@ -688,26 +974,22 @@ const moduleIcons: Record<string, React.ComponentType<{ className?: string }>> =
   "zk-kyc": Shield,
 };
 
-const moduleGradients: Record<string, string> = {
-  "zk-email": "from-blue-500 to-cyan-500",
-  "zk-age": "from-purple-500 to-pink-500",
-  "zk-github": "from-gray-600 to-gray-800",
-  "zk-twitter": "from-sky-400 to-blue-600",
-  "zk-balance": "from-green-500 to-emerald-500",
-  "zk-country": "from-teal-500 to-cyan-500",
-  "zk-kyc": "from-rose-500 to-red-500",
-};
 
 // Flow Detail View with Analytics
 function FlowDetailView({
   flow,
   project,
   onBack,
+  onDeleteFlow,
+  onEditFlow,
 }: {
   flow: Flow;
   project: Project;
   onBack: () => void;
+  onDeleteFlow: (flow: Flow) => void;
+  onEditFlow: () => void;
 }) {
+  const [showActionsMenu, setShowActionsMenu] = useState(false);
   const stats = flow.stats || { totalVerifications: 0, successfulVerifications: 0, failedVerifications: 0 };
   const modules = flow.modules || [];
 
@@ -745,6 +1027,45 @@ function FlowDetailView({
         >
           {flow.status}
         </Badge>
+        <div className="flex-1" />
+        <div className="relative">
+          <button
+            onClick={() => setShowActionsMenu(!showActionsMenu)}
+            className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-all"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+          {showActionsMenu && (
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setShowActionsMenu(false)}
+              />
+              <div className="absolute right-0 top-full mt-1 z-50 min-w-[140px] bg-card border border-border rounded-lg shadow-lg overflow-hidden">
+                <button
+                  onClick={() => {
+                    setShowActionsMenu(false);
+                    onEditFlow();
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-secondary transition-colors"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                  Edit Flow
+                </button>
+                <button
+                  onClick={() => {
+                    setShowActionsMenu(false);
+                    onDeleteFlow(flow);
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-xs text-destructive hover:bg-destructive/10 transition-colors"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Delete Flow
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </DashboardNavbar>
 
       <div className="p-6 flex justify-center">
@@ -897,7 +1218,6 @@ function FlowDetailView({
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   {modules.map((module, index) => {
                     const Icon = moduleIcons[module.moduleId] || Shield;
-                    const gradient = moduleGradients[module.moduleId] || "from-gray-500 to-gray-600";
                     const configValue = module.config && Object.entries(module.config)[0];
 
                     return (
@@ -905,11 +1225,8 @@ function FlowDetailView({
                         key={module.instanceId}
                         className="flex items-center gap-3 p-3 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
                       >
-                        <div className={cn(
-                          "w-8 h-8 rounded-lg bg-gradient-to-br flex items-center justify-center flex-shrink-0",
-                          gradient
-                        )}>
-                          <Icon className="w-4 h-4 text-white" />
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-4 h-4 text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
