@@ -15,28 +15,25 @@ import {
 } from "@/components/verification";
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler";
 
-// Demo KYC modules - Using project color scheme
+// Demo KYC modules
 const demoModules: KYCModule[] = [
   {
     id: "email",
     name: "Email Verification",
     description: "Verify your email address ownership",
     icon: "Email",
-    gradient: "from-violet-500 to-purple-600",
   },
   {
     id: "github",
     name: "GitHub Account",
     description: "Verify your GitHub developer activity",
     icon: "Github",
-    gradient: "from-purple-500 to-violet-600",
   },
   {
     id: "age",
     name: "Age Verification",
     description: "Prove you meet age requirements",
     icon: "User",
-    gradient: "from-fuchsia-500 to-purple-600",
   },
 ];
 
@@ -273,8 +270,8 @@ function DemoContent() {
             <code className="text-muted-foreground">{`import { KYCFlowModal, type KYCFlowConfig } from "@/components/verification";
 
 const modules = [
-  { id: "email", name: "Email", icon: "Email", gradient: "from-violet-500 to-purple-600" },
-  { id: "github", name: "GitHub", icon: "Github", gradient: "from-purple-500 to-violet-600" },
+  { id: "email", name: "Email", icon: "Email" },
+  { id: "github", name: "GitHub", icon: "Github" },
 ];
 
 function App() {

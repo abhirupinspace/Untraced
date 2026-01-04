@@ -203,7 +203,7 @@ export function FlowBuilder() {
 
             {flowModules.length === 0 ? (
               <Card variant="bordered" className="border-dashed p-8 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-untraced-dark/5 to-untraced-dark/10 flex items-center justify-center mx-auto mb-4">
+                <div className="w-14 h-14 rounded-2xl bg-untraced-dark/5 flex items-center justify-center mx-auto mb-4">
                   <Plus className="w-7 h-7 text-untraced-dark/30" />
                 </div>
                 <p className="text-untraced-dark/60 text-sm font-medium mb-1">
@@ -267,7 +267,7 @@ export function FlowBuilder() {
               <CodePreview code={generatedCode} />
             ) : (
               <Card variant="bordered" className="border-dashed p-8 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-untraced-dark/5 to-untraced-dark/10 flex items-center justify-center mx-auto mb-4">
+                <div className="w-14 h-14 rounded-2xl bg-untraced-dark/5 flex items-center justify-center mx-auto mb-4">
                   <Sparkles className="w-7 h-7 text-untraced-dark/30" />
                 </div>
                 <p className="text-untraced-dark/60 text-sm font-medium mb-1">

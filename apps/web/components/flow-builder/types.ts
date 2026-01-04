@@ -4,7 +4,6 @@ export interface Module {
   description: string;
   icon: string;
   status: "active" | "coming";
-  gradient?: string;
   config?: ModuleConfig;
 }
 

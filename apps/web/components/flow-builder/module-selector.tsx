@@ -204,12 +204,11 @@ export function ModuleSelector({
                 {/* Icon */}
                 <div
                   className={cn(
-                    "w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br transition-transform group-hover:scale-105",
-                    module.gradient,
+                    "w-10 h-10 rounded-xl flex items-center justify-center bg-untraced-dark/10 transition-transform group-hover:scale-105",
                     isDisabled && "opacity-60"
                   )}
                 >
-                  <Icon className="w-5 h-5 text-foreground" />
+                  <Icon className="w-5 h-5 text-untraced-dark" />
                 </div>
 
                 {/* Content */}

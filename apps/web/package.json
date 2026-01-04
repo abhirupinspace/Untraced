@@ -26,6 +26,7 @@
     "lucide-react": "^0.468.0",
     "mongoose": "^9.0.1",
     "next": "^15.1.0",
+    "pinata": "^2.5.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sonner": "^1.7.1",

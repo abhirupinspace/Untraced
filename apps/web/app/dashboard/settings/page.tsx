@@ -25,7 +25,10 @@ import {
   Building2,
   ChevronRight,
   ExternalLink,
+  Camera,
+  X,
 } from "lucide-react";
+import Image from "next/image";
 import {
   useSettings,
   PLAN_FEATURES,
@@ -155,14 +158,18 @@ function GeneralSettings({
 }) {
   const [name, setName] = useState(userData.name || "");
   const [email, setEmail] = useState(userData.email || "");
+  const [avatar, setAvatar] = useState(userData.avatar || "");
   const [copied, setCopied] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     setHasChanges(
-      name !== (userData.name || "") || email !== (userData.email || "")
+      name !== (userData.name || "") ||
+      email !== (userData.email || "") ||
+      avatar !== (userData.avatar || "")
     );
-  }, [name, email, userData]);
+  }, [name, email, avatar, userData]);
 
   const copyAddress = () => {
     navigator.clipboard.writeText(userData.walletAddress);
@@ -170,8 +177,48 @@ function GeneralSettings({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/profile-photo", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Upload failed");
+      }
+
+      setAvatar(result.url);
+      toast.success("Photo uploaded", {
+        description: "Click Save Changes to update your profile.",
+      });
+    } catch (err) {
+      toast.error("Upload failed", {
+        description: err instanceof Error ? err.message : "Something went wrong",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setAvatar("");
+    toast.info("Photo removed", {
+      description: "Click Save Changes to update your profile.",
+    });
+  };
+
   const handleSave = async () => {
-    const { success, error } = await onUpdate({ name, email });
+    const { success, error } = await onUpdate({ name, email, avatar });
     if (success) {
       toast.success("Settings saved", {
         description: "Your profile has been updated.",
@@ -188,8 +235,54 @@ function GeneralSettings({
       <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
         <div className="relative p-6">
           <div className="flex flex-col items-center text-center">
-            <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl font-medium text-primary mb-4">
-              {userData.walletAddress?.slice(2, 4).toUpperCase() || "U"}
+            {/* Profile Photo with Upload */}
+            <div className="relative group mb-4">
+              {avatar ? (
+                <div className="relative w-20 h-20 rounded-2xl overflow-hidden">
+                  <Image
+                    src={avatar}
+                    alt="Profile"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl font-medium text-primary">
+                  {userData.walletAddress?.slice(2, 4).toUpperCase() || "U"}
+                </div>
+              )}
+
+              {/* Upload Overlay */}
+              <label
+                className={cn(
+                  "absolute inset-0 flex items-center justify-center rounded-2xl cursor-pointer transition-all",
+                  "bg-black/50 opacity-0 group-hover:opacity-100",
+                  isUploading && "opacity-100"
+                )}
+              >
+                {isUploading ? (
+                  <Loader2 className="w-6 h-6 text-white animate-spin" />
+                ) : (
+                  <Camera className="w-6 h-6 text-white" />
+                )}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                  disabled={isUploading}
+                />
+              </label>
+
+              {/* Remove Button */}
+              {avatar && !isUploading && (
+                <button
+                  onClick={handleRemovePhoto}
+                  className="absolute -top-2 -right-2 p-1 rounded-full bg-destructive text-white hover:bg-destructive/80 transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
             </div>
             <h3 className="text-lg font-medium text-foreground mb-1">
               {name || "Unnamed User"}

@@ -80,7 +80,7 @@ export function CodePreview({ code }: CodePreviewProps) {
           )}
         </button>
       </div>
-      <div className="p-4 bg-gradient-to-b from-untraced-dark/[0.02] to-untraced-dark/[0.04] max-h-[500px] overflow-auto">
+      <div className="p-4 bg-untraced-dark/[0.02] max-h-[500px] overflow-auto">
         <pre className="text-sm font-mono text-untraced-dark/80 whitespace-pre-wrap leading-relaxed">
           <code>{currentCode}</code>
         </pre>

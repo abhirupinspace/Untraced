@@ -15,6 +15,10 @@ export const metadata: Metadata = {
   description:
     "Build privacy-preserving verification flows with modular ZK modules. Prove attributes without revealing data.",
   keywords: ["zkTLS", "zero-knowledge", "verification", "privacy", "Web3", "KYC"],
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/icon.png",
+  },
 };
 
 const themeScript = `

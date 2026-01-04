@@ -857,7 +857,7 @@ function ProjectDetailView({
             </div>
           </div>
 
-          {/* Warning */}
+          {/* Warning
           <div className="bg-warning/5 border border-warning/20 rounded-lg p-2.5">
             <div className="flex gap-2">
               <AlertTriangle className="w-3.5 h-3.5 text-warning flex-shrink-0 mt-0.5" />
@@ -865,7 +865,7 @@ function ProjectDetailView({
                 Never expose your secret key in client-side code. Use it only on your server.
               </p>
             </div>
-          </div>
+          </div> */}
 
           {/* Flows Section */}
           <div>

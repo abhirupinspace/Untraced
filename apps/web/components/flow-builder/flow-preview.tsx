@@ -253,7 +253,7 @@ export function FlowPreview({ flowName, modules, className }: FlowPreviewProps) 
 
       {/* Preview Content */}
       {showPreview && (
-        <div className="flex-1 overflow-auto bg-gradient-to-br from-secondary/50 to-muted/50 dark:from-secondary/20 dark:to-background p-6">
+        <div className="flex-1 overflow-auto bg-secondary/30 p-6">
           <div className="flex justify-center">
             {/* Device Frame */}
             <div
@@ -383,11 +383,10 @@ export function FlowPreview({ flowName, modules, className }: FlowPreviewProps) 
                             <div className="text-center">
                               <div
                                 className={cn(
-                                  "w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-gradient-to-br",
-                                  currentModule?.gradient || "from-primary/80 to-primary"
+                                  "w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-primary/10"
                                 )}
                               >
-                                <Icon className="w-7 h-7 text-white" />
+                                <Icon className="w-7 h-7 text-primary" />
                               </div>
                               <h3 className="text-base font-medium text-foreground">
                                 {currentModule?.name || "Module"}
@@ -459,11 +458,8 @@ export function FlowPreview({ flowName, modules, className }: FlowPreviewProps) 
                                     className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-secondary/50"
                                   >
                                     <div className="flex items-center gap-3">
-                                      <div className={cn(
-                                        "w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br",
-                                        module.gradient || "from-primary/80 to-primary"
-                                      )}>
-                                        <ModuleIcon className="w-4 h-4 text-white" />
+                                      <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
+                                        <ModuleIcon className="w-4 h-4 text-primary" />
                                       </div>
                                       <span className="text-sm text-foreground">{module.name}</span>
                                     </div>

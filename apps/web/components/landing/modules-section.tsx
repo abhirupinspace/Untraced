@@ -22,7 +22,6 @@ const modules = [
     description: "Verify email ownership without revealing the address",
     icon: EmailIcon,
     status: "active",
-    gradient: "from-blue-500 to-cyan-500",
   },
   {
     id: "zk-age",
@@ -30,7 +29,6 @@ const modules = [
     description: "Prove age is above threshold without revealing DOB",
     icon: UserIcon,
     status: "active",
-    gradient: "from-purple-500 to-pink-500",
   },
   {
     id: "zk-github",
@@ -38,7 +36,6 @@ const modules = [
     description: "Verify GitHub account and commit history",
     icon: GithubIcon,
     status: "active",
-    gradient: "from-gray-700 to-gray-900",
   },
   {
     id: "zk-aadhar",
@@ -46,7 +43,6 @@ const modules = [
     description: "Verify Aadhaar identity without exposing number",
     icon: IdCardIcon,
     status: "coming",
-    gradient: "from-indigo-500 to-violet-500",
   },
   {
     id: "zk-bank-balance",
@@ -54,7 +50,6 @@ const modules = [
     description: "Prove balance exceeds threshold privately",
     icon: BankIcon,
     status: "coming",
-    gradient: "from-green-500 to-emerald-500",
   },
   {
     id: "zk-amazon",
@@ -62,7 +57,6 @@ const modules = [
     description: "Verify purchase history or Prime status",
     icon: AmazonIcon,
     status: "coming",
-    gradient: "from-orange-500 to-amber-500",
   },
   {
     id: "zk-country",
@@ -70,7 +64,6 @@ const modules = [
     description: "Prove residence in allowed regions",
     icon: GlobeIcon,
     status: "coming",
-    gradient: "from-teal-500 to-cyan-500",
   },
   {
     id: "zk-kyc",
@@ -78,7 +71,6 @@ const modules = [
     description: "Prove KYC passed without revealing details",
     icon: ShieldCheckIcon,
     status: "coming",
-    gradient: "from-rose-500 to-red-500",
   },
 ];
 
@@ -120,20 +112,11 @@ export function ModulesSection() {
                   module.status === "coming" && "opacity-70"
                 )}
               >
-                {/* Gradient overlay on hover */}
-                <div
-                  className={cn(
-                    "absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300 bg-gradient-to-br",
-                    module.gradient
-                  )}
-                />
-
                 <div className="relative">
                   <div className="flex items-start justify-between mb-4">
                     <div
                       className={cn(
-                        "w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br text-foreground transition-transform duration-300 group-hover:scale-110",
-                        module.gradient
+                        "w-12 h-12 rounded-xl flex items-center justify-center bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-110 group-hover:bg-primary/15"
                       )}
                     >
                       <module.icon className="w-6 h-6" />

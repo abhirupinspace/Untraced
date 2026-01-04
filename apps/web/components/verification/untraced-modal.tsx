@@ -131,8 +131,8 @@ export function UntracedModal({
               >
                 {/* Module Icon */}
                 <div className="flex justify-center">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                    <EmailIcon className="w-8 h-8 text-foreground" />
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                    <EmailIcon className="w-8 h-8 text-primary" />
                   </div>
                 </div>
 
@@ -183,11 +183,11 @@ export function UntracedModal({
                 className="text-center space-y-6 py-4"
               >
                 <div className="relative">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 mx-auto flex items-center justify-center">
-                    <LoaderIcon className="w-8 h-8 text-foreground" />
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 mx-auto flex items-center justify-center">
+                    <LoaderIcon className="w-8 h-8 text-primary" />
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full border-2 border-purple-500/30 animate-ping" />
+                    <div className="w-20 h-20 rounded-full border-2 border-primary/30 animate-ping" />
                   </div>
                 </div>
 
@@ -216,8 +216,8 @@ export function UntracedModal({
                 className="text-center space-y-6 py-4"
               >
                 <div className="relative">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 mx-auto flex items-center justify-center">
-                    <LoaderIcon className="w-8 h-8 text-foreground" />
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 mx-auto flex items-center justify-center">
+                    <LoaderIcon className="w-8 h-8 text-primary" />
                   </div>
                 </div>
 

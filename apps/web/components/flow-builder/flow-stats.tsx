@@ -29,28 +29,24 @@ export function FlowStats({ flowName, modules, className }: FlowStatsProps) {
       label: "Modules",
       value: modules.length,
       icon: Layers,
-      color: "from-blue-500 to-cyan-500",
       description: "verification steps",
     },
     {
       label: "Active",
       value: activeModules.length,
       icon: CheckCircle,
-      color: "from-green-500 to-emerald-500",
       description: "live modules",
     },
     {
       label: "Est. Time",
       value: `${modules.length * 15}s`,
       icon: Clock,
-      color: "from-purple-500 to-pink-500",
       description: "to complete",
     },
     {
       label: "Security",
       value: modules.length >= 3 ? "High" : modules.length >= 2 ? "Medium" : "Basic",
       icon: Shield,
-      color: "from-orange-500 to-red-500",
       description: "level",
     },
   ];
@@ -58,7 +54,7 @@ export function FlowStats({ flowName, modules, className }: FlowStatsProps) {
   return (
     <div className={cn("space-y-4", className)}>
       {/* Flow Name Card */}
-      <div className="bg-gradient-to-br from-untraced-dark to-untraced-dark-hover rounded-2xl p-5 text-foreground">
+      <div className="bg-untraced-dark rounded-2xl p-5 text-foreground">
         <div className="flex items-center gap-2 mb-3">
           <Hash className="w-4 h-4 opacity-60" />
           <span className="text-xs font-medium opacity-60">Flow Name</span>
@@ -93,13 +89,8 @@ export function FlowStats({ flowName, modules, className }: FlowStatsProps) {
             className="bg-white rounded-xl p-4 border border-untraced-dark/5 hover:border-untraced-dark/10 transition-all hover:shadow-sm"
           >
             <div className="flex items-center gap-2 mb-2">
-              <div
-                className={cn(
-                  "w-8 h-8 rounded-lg bg-gradient-to-br flex items-center justify-center",
-                  stat.color
-                )}
-              >
-                <stat.icon className="w-4 h-4 text-foreground" />
+              <div className="w-8 h-8 rounded-lg bg-untraced-dark/10 flex items-center justify-center">
+                <stat.icon className="w-4 h-4 text-untraced-dark" />
               </div>
             </div>
             <p className="text-2xl font-bold text-untraced-dark">{stat.value}</p>
@@ -126,12 +117,7 @@ export function FlowStats({ flowName, modules, className }: FlowStatsProps) {
                 className="flex items-center justify-between text-sm"
               >
                 <div className="flex items-center gap-2">
-                  <div
-                    className={cn(
-                      "w-2 h-2 rounded-full bg-gradient-to-br",
-                      module.gradient
-                    )}
-                  />
+                  <div className="w-2 h-2 rounded-full bg-untraced-dark/40" />
                   <span className="text-untraced-dark/80">{module.name}</span>
                 </div>
                 {module.configValue !== undefined && (

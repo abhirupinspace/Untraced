@@ -97,13 +97,8 @@ function FlowNode({
               <GripVertical className="w-4 h-4 text-untraced-dark/30" />
             </button>
 
-            <div
-              className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br shadow-sm",
-                module.gradient
-              )}
-            >
-              <Icon className="w-5 h-5 text-foreground" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-untraced-dark/10">
+              <Icon className="w-5 h-5 text-untraced-dark" />
             </div>
 
             <div className="flex-1 min-w-0">
@@ -207,11 +202,11 @@ function FlowNode({
       {/* Connector */}
       {index < total - 1 && (
         <div className="flex flex-col items-center py-2">
-          <div className="w-0.5 h-4 bg-gradient-to-b from-untraced-dark/20 to-untraced-dark/10" />
+          <div className="w-0.5 h-4 bg-untraced-dark/15" />
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-untraced-dark/5 border border-untraced-dark/10">
             <span className="text-[10px] font-bold text-untraced-dark/40">AND</span>
           </div>
-          <div className="w-0.5 h-4 bg-gradient-to-b from-untraced-dark/10 to-untraced-dark/20" />
+          <div className="w-0.5 h-4 bg-untraced-dark/15" />
         </div>
       )}
     </div>
@@ -237,7 +232,7 @@ export function FlowCanvas({
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-untraced-dark/5 to-untraced-dark/10 flex items-center justify-center mx-auto mb-6">
+          <div className="w-20 h-20 rounded-3xl bg-untraced-dark/5 flex items-center justify-center mx-auto mb-6">
             <Plus className="w-10 h-10 text-untraced-dark/20" />
           </div>
           <h3 className="text-lg font-semibold text-untraced-dark/60 mb-2">
@@ -258,10 +253,10 @@ export function FlowCanvas({
     <div className="py-6 px-4">
       {/* Start Node */}
       <div className="flex flex-col items-center mb-2">
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-500 flex items-center justify-center shadow-lg shadow-green-500/20">
-          <span className="text-foreground text-xs font-bold">START</span>
+        <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center shadow-lg shadow-green-500/20">
+          <span className="text-white text-xs font-bold">START</span>
         </div>
-        <div className="w-0.5 h-6 bg-gradient-to-b from-green-400 to-untraced-dark/20" />
+        <div className="w-0.5 h-6 bg-untraced-dark/20" />
       </div>
 
       {/* Flow Nodes */}
@@ -280,8 +275,8 @@ export function FlowCanvas({
 
       {/* End Node */}
       <div className="flex flex-col items-center mt-2">
-        <div className="w-0.5 h-6 bg-gradient-to-b from-untraced-dark/20 to-untraced-dark" />
-        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-untraced-dark to-untraced-dark-hover flex items-center justify-center shadow-lg shadow-untraced-dark/20">
+        <div className="w-0.5 h-6 bg-untraced-dark/20" />
+        <div className="w-12 h-12 rounded-full bg-untraced-dark flex items-center justify-center shadow-lg shadow-untraced-dark/20">
           <span className="text-foreground text-xs font-bold">END</span>
         </div>
       </div>

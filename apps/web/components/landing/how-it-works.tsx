@@ -14,7 +14,6 @@ const steps = [
     title: "Select Modules",
     description:
       "Choose verification modules for your app — email, age, KYC, or custom requirements.",
-    color: "from-blue-500 to-cyan-500",
   },
   {
     number: "02",
@@ -22,7 +21,6 @@ const steps = [
     title: "Build Your Flow",
     description:
       "Combine modules into a custom verification flow using our visual builder or SDK.",
-    color: "from-purple-500 to-pink-500",
   },
   {
     number: "03",
@@ -30,7 +28,6 @@ const steps = [
     title: "Generate Proofs",
     description:
       "Users connect Web2 accounts. zkTLS extracts data, ZK circuits generate proofs client-side.",
-    color: "from-orange-500 to-red-500",
   },
   {
     number: "04",
@@ -38,7 +35,6 @@ const steps = [
     title: "Verify On-Chain",
     description:
       "Proofs are verified on Mantle. Only boolean attestations stored — never raw data.",
-    color: "from-green-500 to-emerald-500",
   },
 ];
 
@@ -76,15 +72,13 @@ export function HowItWorks() {
               {/* Connector line */}
               {index < steps.length - 1 && (
                 <div className="hidden lg:block absolute top-12 left-full w-full h-px">
-                  <div className="h-full w-full bg-gradient-to-r from-white/20 to-transparent" />
+                  <div className="h-full w-full bg-border" />
                 </div>
               )}
 
               <Card variant="bordered" className="p-6 h-full">
-                <div
-                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-4`}
-                >
-                  <step.icon className="w-6 h-6 text-foreground" />
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                  <step.icon className="w-6 h-6 text-primary" />
                 </div>
                 <div className="text-xs font-medium text-muted-foreground mb-2">
                   STEP {step.number}
@@ -104,32 +98,21 @@ export function HowItWorks() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <Card className="relative overflow-hidden bg-gradient-to-br from-purple-600 to-pink-600 p-8 md:p-12">
-            {/* Background pattern */}
-            <div className="absolute inset-0 opacity-10">
-              <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <defs>
-                  <pattern id="grid-cta" width="10" height="10" patternUnits="userSpaceOnUse">
-                    <path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.5" />
-                  </pattern>
-                </defs>
-                <rect width="100" height="100" fill="url(#grid-cta)" />
-              </svg>
-            </div>
-
+          <Card className="relative overflow-hidden bg-primary p-8 md:p-12">
             <div className="relative flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="text-center md:text-left">
-                <h3 className="text-2xl md:text-3xl font-semibold text-foreground mb-2">
+                <h3 className="text-2xl md:text-3xl font-semibold text-primary-foreground mb-2">
                   Ready to build?
                 </h3>
-                <p className="text-foreground/70 font-light">
+                <p className="text-primary-foreground/70 font-light">
                   Start creating your custom verification flow in minutes.
                 </p>
               </div>
               <Link href="/dashboard">
                 <Button
                   size="lg"
-                  className="bg-primary text-primary-foreground hover:bg-accent group"
+                  variant="secondary"
+                  className="group"
                 >
                   Go to Dashboard
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />

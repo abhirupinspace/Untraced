@@ -56,7 +56,6 @@ interface Module {
   name: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
-  color: string;
   inputs: ModuleInput[];
   config?: {
     type: "threshold" | "selection";
@@ -66,7 +65,7 @@ interface Module {
     max?: number;
     default: string | number;
   };
-  requiresOAuth?: "github" | "twitter"; // Requires OAuth connection
+  requiresOAuth?: "github" | "twitter";
 }
 
 interface ConnectedAccount {
@@ -85,7 +84,6 @@ const modules: Module[] = [
     name: "Email Verification",
     description: "Prove email ownership without revealing the address",
     icon: Mail,
-    color: "bg-blue-500",
     inputs: [
       {
         id: "email",
@@ -108,7 +106,6 @@ const modules: Module[] = [
     name: "Age Verification",
     description: "Prove you meet age requirements using ZK proofs",
     icon: Calendar,
-    color: "bg-purple-500",
     inputs: [
       {
         id: "birthdate",
@@ -132,7 +129,6 @@ const modules: Module[] = [
     name: "GitHub Verification",
     description: "Verify GitHub account and contribution history",
     icon: Github,
-    color: "bg-gray-500",
     inputs: [],
     requiresOAuth: "github",
     config: {
@@ -148,7 +144,6 @@ const modules: Module[] = [
     name: "Twitter/X Verification",
     description: "Verify Twitter account ownership",
     icon: XIcon,
-    color: "bg-black",
     inputs: [],
     requiresOAuth: "twitter",
     config: {
@@ -163,7 +158,6 @@ const modules: Module[] = [
     name: "Balance Verification",
     description: "Prove balance threshold without revealing amount",
     icon: Wallet,
-    color: "bg-green-500",
     inputs: [
       {
         id: "address",
@@ -815,17 +809,16 @@ function PlaygroundContent() {
         </div>
       </DashboardNavbar>
 
-      <div className="p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="p-6 h-[calc(100vh-64px)]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
           {/* Left Panel - Module Selection & Inputs */}
-          <div className="space-y-4">
+          <div className="lg:col-span-3 flex flex-col gap-4 overflow-hidden">
             {/* Module List */}
-            <div className="rounded-2xl border border-border bg-card overflow-hidden">
-              <div className="p-4 border-b border-border">
-                <h3 className="text-sm font-normal text-foreground">Select Module</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">Choose a ZK module to test</p>
+            <div className="rounded-xl border border-border bg-card overflow-hidden flex-shrink-0">
+              <div className="px-4 py-3 border-b border-border bg-secondary/30">
+                <h3 className="text-xs font-medium text-foreground uppercase tracking-wider">Modules</h3>
               </div>
-              <div className="p-2">
+              <div className="p-2 space-y-1 max-h-[280px] overflow-auto">
                 {modules.map((module) => {
                   const Icon = module.icon;
                   const isSelected = selectedModule.id === module.id;
@@ -835,22 +828,31 @@ function PlaygroundContent() {
                       onClick={() => handleModuleSelect(module)}
                       className={cn(
                         "w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200",
-                        isSelected ? "bg-primary/10 dark:bg-white/10" : "hover:bg-secondary"
+                        isSelected ? "bg-primary/10 dark:bg-primary/10" : "hover:bg-secondary"
                       )}
                     >
-                      <div className={cn("p-2 rounded-lg", module.color)}>
-                        <Icon className="w-4 h-4 text-white" />
+                      <div className={cn(
+                        "p-2 rounded-lg transition-colors",
+                        isSelected ? "bg-primary/15" : "bg-secondary"
+                      )}>
+                        <Icon className={cn(
+                          "w-4 h-4",
+                          isSelected ? "text-primary" : "text-muted-foreground"
+                        )} />
                       </div>
                       <div className="flex-1 text-left min-w-0">
                         <p className={cn(
-                          "text-sm font-light truncate",
+                          "text-sm font-medium truncate",
                           isSelected ? "text-foreground" : "text-muted-foreground"
                         )}>
                           {module.name}
                         </p>
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">
+                          {module.description}
+                        </p>
                       </div>
                       {isSelected && (
-                        <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                        <ChevronRight className="w-4 h-4 text-primary flex-shrink-0" />
                       )}
                     </button>
                   );
@@ -859,18 +861,13 @@ function PlaygroundContent() {
             </div>
 
             {/* Input Fields / OAuth Connection */}
-            <div className="rounded-2xl border border-border bg-card overflow-hidden">
-              <div className="p-4 border-b border-border">
-                <h3 className="text-sm font-normal text-foreground">
-                  {selectedModule.requiresOAuth ? "Account Connection" : "Input Data"}
+            <div className="rounded-xl border border-border bg-card overflow-hidden flex-1 flex flex-col min-h-0">
+              <div className="px-4 py-3 border-b border-border bg-secondary/30 flex-shrink-0">
+                <h3 className="text-xs font-medium text-foreground uppercase tracking-wider">
+                  {selectedModule.requiresOAuth ? "Connection" : "Configuration"}
                 </h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {selectedModule.requiresOAuth
-                    ? `Connect your ${selectedModule.requiresOAuth === "github" ? "GitHub" : "Twitter"} account`
-                    : "Provide the required information"}
-                </p>
               </div>
-              <div className="p-4 space-y-4">
+              <div className="p-4 space-y-4 overflow-auto flex-1">
                 {/* OAuth Connection UI */}
                 {selectedModule.requiresOAuth === "github" && (
                   <OAuthConnectionCard
@@ -991,7 +988,7 @@ function PlaygroundContent() {
             <Button
               onClick={runVerification}
               disabled={status === "running" || !canRun}
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-11 gap-2 text-sm font-normal disabled:opacity-50"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-11 gap-2 text-sm font-medium disabled:opacity-50 flex-shrink-0"
             >
               {status === "running" ? (
                 <>
@@ -1008,23 +1005,23 @@ function PlaygroundContent() {
           </div>
 
           {/* Middle Panel - Terminal */}
-          <div className="rounded-2xl border border-border bg-card overflow-hidden flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b border-border">
+          <div className="lg:col-span-5 rounded-xl border border-border bg-card overflow-hidden flex flex-col h-full">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-secondary/30">
               <div className="flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-muted-foreground" />
-                <h3 className="text-sm font-normal text-foreground">Console</h3>
+                <Terminal className="w-3.5 h-3.5 text-muted-foreground" />
+                <h3 className="text-xs font-medium text-foreground uppercase tracking-wider">Console</h3>
               </div>
               {status === "running" && (
                 <div className="flex items-center gap-1.5">
-                  <span className="relative flex h-2 w-2">
+                  <span className="relative flex h-1.5 w-1.5">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
                   </span>
-                  <span className="text-xs text-muted-foreground">Running</span>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Running</span>
                 </div>
               )}
             </div>
-            <div className="flex-1 min-h-[400px] max-h-[500px] overflow-auto p-4 font-mono text-xs bg-muted/30 dark:bg-black/20">
+            <div className="flex-1 overflow-auto p-4 font-mono text-xs bg-black/5 dark:bg-black/30">
               {logs.length === 0 ? (
                 <div className="h-full flex items-center justify-center text-muted-foreground">
                   <div className="text-center">
@@ -1070,11 +1067,11 @@ function PlaygroundContent() {
           </div>
 
           {/* Right Panel - Results */}
-          <div className="space-y-4">
+          <div className="lg:col-span-4 flex flex-col gap-4 overflow-auto">
             {/* Status Card */}
-            <div className="rounded-2xl border border-border bg-card overflow-hidden">
-              <div className="p-4 border-b border-border">
-                <h3 className="text-sm font-normal text-foreground">Status</h3>
+            <div className="rounded-xl border border-border bg-card overflow-hidden">
+              <div className="px-4 py-3 border-b border-border bg-secondary/30">
+                <h3 className="text-xs font-medium text-foreground uppercase tracking-wider">Status</h3>
               </div>
               <div className="p-6">
                 <AnimatePresence mode="wait">
@@ -1084,14 +1081,14 @@ function PlaygroundContent() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="text-center"
+                      className="text-center py-4"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mx-auto mb-3">
-                        <Zap className="w-5 h-5 text-muted-foreground" />
+                      <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center mx-auto mb-4">
+                        <Zap className="w-6 h-6 text-muted-foreground" />
                       </div>
-                      <p className="text-sm text-muted-foreground">Ready to run</p>
-                      <p className="text-xs text-muted-foreground/70 mt-1">
-                        Fill in the inputs and click run
+                      <p className="text-sm font-medium text-foreground">Ready to run</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Configure a module and click Run Verification
                       </p>
                     </motion.div>
                   )}
@@ -1102,12 +1099,12 @@ function PlaygroundContent() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="text-center"
+                      className="text-center py-4"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center mx-auto mb-3">
-                        <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                        <Loader2 className="w-6 h-6 text-primary animate-spin" />
                       </div>
-                      <p className="text-sm text-foreground">Generating proof...</p>
+                      <p className="text-sm font-medium text-foreground">Generating proof...</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         This may take a few seconds
                       </p>
@@ -1120,12 +1117,12 @@ function PlaygroundContent() {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
-                      className="text-center"
+                      className="text-center py-4"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-success/20 flex items-center justify-center mx-auto mb-3">
-                        <CheckCircle2 className="w-5 h-5 text-success" />
+                      <div className="w-14 h-14 rounded-2xl bg-success/10 flex items-center justify-center mx-auto mb-4">
+                        <CheckCircle2 className="w-6 h-6 text-success" />
                       </div>
-                      <p className="text-sm text-foreground">Verification Successful</p>
+                      <p className="text-sm font-medium text-foreground">Verification Successful</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         Completed in {(executionTime / 1000).toFixed(2)}s
                       </p>
@@ -1138,14 +1135,14 @@ function PlaygroundContent() {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0 }}
-                      className="text-center"
+                      className="text-center py-4"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-destructive/20 flex items-center justify-center mx-auto mb-3">
-                        <XCircle className="w-5 h-5 text-destructive" />
+                      <div className="w-14 h-14 rounded-2xl bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+                        <XCircle className="w-6 h-6 text-destructive" />
                       </div>
-                      <p className="text-sm text-foreground">Verification Failed</p>
+                      <p className="text-sm font-medium text-foreground">Verification Failed</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Check the console for details
+                        Check console for details
                       </p>
                     </motion.div>
                   )}
@@ -1158,12 +1155,12 @@ function PlaygroundContent() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-2xl border border-border bg-card overflow-hidden"
+                className="rounded-xl border border-border bg-card overflow-hidden"
               >
-                <div className="flex items-center justify-between p-4 border-b border-border">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-secondary/30">
                   <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-muted-foreground" />
-                    <h3 className="text-sm font-normal text-foreground">Proof Output</h3>
+                    <Shield className="w-3.5 h-3.5 text-muted-foreground" />
+                    <h3 className="text-xs font-medium text-foreground uppercase tracking-wider">Proof Output</h3>
                   </div>
                   <button
                     onClick={copyProof}
@@ -1262,18 +1259,15 @@ function PlaygroundContent() {
             )}
 
             {/* Info Card */}
-            <div className="rounded-2xl border border-warning/20 bg-warning/5 p-4">
+            <div className="rounded-xl border border-border bg-secondary/30 p-4">
               <div className="flex gap-3">
-                <AlertTriangle className="w-4 h-4 text-warning flex-shrink-0 mt-0.5" />
-                <div className="text-xs text-warning space-y-1">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="w-4 h-4 text-primary" />
+                </div>
+                <div className="text-xs text-muted-foreground space-y-1.5">
+                  <p className="font-medium text-foreground">Testing Environment</p>
                   <p>
-                    GitHub and Twitter modules use real OAuth authentication.
-                    Other modules are simulated.
-                  </p>
-                  <p>
-                    {process.env.NEXT_PUBLIC_REGISTRY_ADDRESS
-                      ? "Click 'Submit to Chain' to record attestations on-chain."
-                      : "Configure REGISTRY_ADDRESS to enable on-chain submission."}
+                    GitHub and Twitter modules use real OAuth. Other modules are simulated for testing.
                   </p>
                 </div>
               </div>
@@ -1328,30 +1322,28 @@ function OAuthConnectionCard({
 }) {
   if (account) {
     return (
-      <div className="rounded-xl border border-border bg-secondary/50 p-4">
+      <div className="rounded-lg border border-success/20 bg-success/5 p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-secondary text-foreground">{icon}</div>
+            <div className="p-2 rounded-lg bg-success/10 text-success">{icon}</div>
             <div>
-              <p className="text-sm text-foreground font-light">@{account.username}</p>
+              <p className="text-sm text-foreground font-medium">@{account.username}</p>
               {account.name && (
                 <p className="text-xs text-muted-foreground">{account.name}</p>
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-success/10">
-              <CheckCircle2 className="w-3 h-3 text-success" />
-              <span className="text-xs text-success">Connected</span>
-            </div>
+          <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-success/10">
+            <CheckCircle2 className="w-3 h-3 text-success" />
+            <span className="text-[10px] text-success font-medium uppercase">Connected</span>
           </div>
         </div>
         {stats && stats.length > 0 && (
-          <div className="flex items-center gap-4 mb-3 pb-3 border-b border-border">
+          <div className="flex items-center gap-4 mb-3 pb-3 border-b border-success/10">
             {stats.map((stat, idx) => (
               <div key={idx} className="flex items-center gap-1.5">
                 <span className="text-xs text-muted-foreground">{stat.label}:</span>
-                <span className="text-xs text-foreground tabular-nums">{stat.value}</span>
+                <span className="text-xs text-foreground font-medium tabular-nums">{stat.value}</span>
               </div>
             ))}
           </div>
@@ -1370,14 +1362,14 @@ function OAuthConnectionCard({
   return (
     <button
       onClick={onConnect}
-      className="w-full flex items-center justify-center gap-3 p-4 rounded-xl border border-dashed border-border bg-secondary/30 hover:bg-secondary/50 hover:border-primary/30 transition-all"
+      className="w-full flex items-center gap-3 p-4 rounded-lg border border-dashed border-border bg-secondary/20 hover:bg-secondary/40 hover:border-primary/30 transition-all group"
     >
-      <div className="p-2 rounded-lg bg-secondary text-muted-foreground">{icon}</div>
-      <div className="text-left">
-        <p className="text-sm text-foreground font-light">Connect {label}</p>
+      <div className="p-2.5 rounded-lg bg-secondary text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">{icon}</div>
+      <div className="text-left flex-1">
+        <p className="text-sm text-foreground font-medium">Connect {label}</p>
         <p className="text-xs text-muted-foreground">Authenticate to verify your account</p>
       </div>
-      <LinkIcon className="w-4 h-4 text-muted-foreground ml-auto" />
+      <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
     </button>
   );
 }

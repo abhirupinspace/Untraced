@@ -101,7 +101,7 @@ export async function PATCH(request: NextRequest) {
     const { user } = await ensureUser(privyId, walletAddress);
 
     const body = await request.json();
-    const { name, email, settings } = body;
+    const { name, email, avatar, settings } = body;
 
     // Update allowed fields
     if (name !== undefined) {
@@ -109,6 +109,9 @@ export async function PATCH(request: NextRequest) {
     }
     if (email !== undefined) {
       user.email = email;
+    }
+    if (avatar !== undefined) {
+      user.avatar = avatar;
     }
     if (settings !== undefined) {
       if (settings.notifications !== undefined) {

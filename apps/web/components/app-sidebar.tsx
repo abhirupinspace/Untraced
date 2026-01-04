@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useWallet } from "@/lib/use-wallet";
 import { Button } from "@/components/ui/button";
+import { useSettings } from "@/lib/hooks";
 
 // Sidebar navigation items
 const sidebarLinks = [
@@ -288,6 +289,9 @@ function FooterLinkItem({
 function UserSection() {
   const { open, animate } = useSidebar();
   const { ready, authenticated, login, logout, user } = useWallet();
+  const { data: settingsData } = useSettings();
+
+  const avatar = settingsData?.user?.avatar;
 
   if (!ready) {
     return (
@@ -316,8 +320,8 @@ function UserSection() {
             onClick={login}
             className="w-full flex items-center justify-center p-2 rounded-lg bg-muted hover:bg-muted/80 dark:bg-white/10 dark:hover:bg-white/20 transition-all"
           >
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-              <span className="text-[10px] font-medium text-white">?</span>
+            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
+              <span className="text-[10px] font-medium text-primary">?</span>
             </div>
           </button>
         )}
@@ -327,9 +331,20 @@ function UserSection() {
 
   return (
     <div className="flex items-center gap-2 px-2 py-2">
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-medium text-white flex-shrink-0">
-        {user?.wallet?.address?.slice(2, 4).toUpperCase() || "U"}
-      </div>
+      {avatar ? (
+        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 relative">
+          <Image
+            src={avatar}
+            alt="Profile"
+            fill
+            className="object-cover"
+          />
+        </div>
+      ) : (
+        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary flex-shrink-0">
+          {user?.wallet?.address?.slice(2, 4).toUpperCase() || "U"}
+        </div>
+      )}
       <motion.div
         animate={{
           display: animate ? (open ? "flex" : "none") : "flex",

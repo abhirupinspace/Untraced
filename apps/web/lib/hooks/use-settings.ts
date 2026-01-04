@@ -91,6 +91,7 @@ export function useSettings() {
     async (updates: {
       name?: string;
       email?: string;
+      avatar?: string;
       settings?: Partial<UserSettings["settings"]>;
     }): Promise<{ success: boolean; error?: string }> => {
       if (!authenticated) {
@@ -139,6 +140,7 @@ export const PLAN_FEATURES = {
   free: {
     name: "Free",
     price: 0,
+    yearlyPrice: 0,
     description: "For developers getting started",
     features: [
       "3 projects",
@@ -155,10 +157,11 @@ export const PLAN_FEATURES = {
   },
   pro: {
     name: "Pro",
-    price: 49,
+    price: 20,
+    yearlyPrice: 18, // $18/month when billed yearly ($216/year)
     description: "For growing teams",
     features: [
-      "10 projects",
+      "Unlimited projects",
       "25 flows per project",
       "25,000 verifications/month",
       "Priority support",
@@ -167,7 +170,7 @@ export const PLAN_FEATURES = {
       "Webhooks",
     ],
     limits: {
-      maxProjects: 10,
+      maxProjects: -1,
       maxFlows: 25,
       maxVerificationsPerMonth: 25000,
     },
@@ -175,6 +178,7 @@ export const PLAN_FEATURES = {
   enterprise: {
     name: "Enterprise",
     price: -1, // Custom pricing
+    yearlyPrice: -1,
     description: "For large organizations",
     features: [
       "Unlimited projects",

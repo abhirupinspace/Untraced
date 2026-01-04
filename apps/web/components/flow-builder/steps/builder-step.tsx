@@ -127,13 +127,8 @@ export function BuilderStep({
                     : "hover:bg-secondary"
                 )}
               >
-                <div
-                  className={cn(
-                    "w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br flex-shrink-0",
-                    module.gradient
-                  )}
-                >
-                  <Icon className="w-4 h-4 text-foreground" />
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10 flex-shrink-0">
+                  <Icon className="w-4 h-4 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">
@@ -383,13 +378,8 @@ function FlowNodeCard({
             <GripVertical className="w-4 h-4 text-muted-foreground" />
           </button>
 
-          <div
-            className={cn(
-              "w-9 h-9 rounded-lg flex items-center justify-center bg-gradient-to-br flex-shrink-0",
-              module.gradient
-            )}
-          >
-            <Icon className="w-4 h-4 text-foreground" />
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-primary/10 flex-shrink-0">
+            <Icon className="w-4 h-4 text-primary" />
           </div>
 
           <div className="flex-1 min-w-0">
@@ -545,7 +535,7 @@ function PreviewView({
   const isDark = previewTheme === "dark";
 
   return (
-    <div className="h-full bg-gradient-to-br from-secondary/50 to-muted/50 dark:from-secondary/20 dark:to-background flex p-6 gap-6">
+    <div className="h-full bg-secondary/30 flex p-6 gap-6">
       {/* Customization Panel */}
       <div className="w-64 flex-shrink-0 space-y-4">
         <div>
@@ -767,13 +757,8 @@ function PreviewView({
                 >
                   {/* Module header */}
                   <div className="text-center">
-                    <div
-                      className={cn(
-                        "w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-gradient-to-br",
-                        currentModule?.gradient || "from-primary/80 to-primary"
-                      )}
-                    >
-                      <Icon className="w-7 h-7 text-white" />
+                    <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-primary/10">
+                      <Icon className="w-7 h-7 text-primary" />
                     </div>
                     <h4 className={cn(
                       "text-base font-medium",
@@ -853,11 +838,8 @@ function PreviewView({
                           )}
                         >
                           <div className="flex items-center gap-3">
-                            <div className={cn(
-                              "w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br",
-                              module.gradient || "from-primary/80 to-primary"
-                            )}>
-                              <ModuleIcon className="w-4 h-4 text-white" />
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
+                              <ModuleIcon className="w-4 h-4 text-primary" />
                             </div>
                             <span className={cn(
                               "text-sm",

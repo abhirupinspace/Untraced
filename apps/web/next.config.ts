@@ -8,6 +8,22 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.mypinata.cloud",
+      },
+      {
+        protocol: "https",
+        hostname: "gateway.pinata.cloud",
+      },
+      {
+        protocol: "https",
+        hostname: "*.pinata.cloud",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

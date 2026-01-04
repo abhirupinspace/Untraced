@@ -7,7 +7,6 @@ export const availableModules: Module[] = [
     description: "Verify email ownership",
     icon: "Email",
     status: "active",
-    gradient: "from-blue-500 to-cyan-500",
     config: {
       type: "selection",
       label: "Provider",
@@ -21,7 +20,6 @@ export const availableModules: Module[] = [
     description: "ZK proof of age (Noir circuit)",
     icon: "User",
     status: "active",
-    gradient: "from-purple-500 to-pink-500",
     config: {
       type: "threshold",
       label: "Minimum Age",
@@ -36,7 +34,6 @@ export const availableModules: Module[] = [
     description: "Verify GitHub account",
     icon: "Github",
     status: "active",
-    gradient: "from-gray-700 to-gray-900",
     config: {
       type: "threshold",
       label: "Min Commits",
@@ -51,7 +48,6 @@ export const availableModules: Module[] = [
     description: "Verify Twitter/X account",
     icon: "Twitter",
     status: "active",
-    gradient: "from-sky-400 to-blue-600",
     config: {
       type: "selection",
       label: "Verification",
@@ -65,7 +61,6 @@ export const availableModules: Module[] = [
     description: "ZK proof of balance threshold",
     icon: "Bank",
     status: "active",
-    gradient: "from-green-500 to-emerald-500",
     config: {
       type: "threshold",
       label: "Min Balance (ETH)",
@@ -80,7 +75,6 @@ export const availableModules: Module[] = [
     description: "Cross-chain balance via Flare",
     icon: "Chains",
     status: "coming",
-    gradient: "from-orange-500 to-red-500",
     config: {
       type: "selection",
       label: "Source Chain",
@@ -94,7 +88,6 @@ export const availableModules: Module[] = [
     description: "Verify Aadhaar identity",
     icon: "IdCard",
     status: "coming",
-    gradient: "from-indigo-500 to-violet-500",
   },
   {
     id: "zk-amazon",
@@ -102,7 +95,6 @@ export const availableModules: Module[] = [
     description: "Verify Amazon account",
     icon: "Amazon",
     status: "coming",
-    gradient: "from-orange-500 to-amber-500",
     config: {
       type: "selection",
       label: "Verification",
@@ -116,7 +108,6 @@ export const availableModules: Module[] = [
     description: "Verify country/region",
     icon: "Globe",
     status: "coming",
-    gradient: "from-teal-500 to-cyan-500",
     config: {
       type: "selection",
       label: "Region",
@@ -130,7 +121,6 @@ export const availableModules: Module[] = [
     description: "Verify KYC status",
     icon: "Shield",
     status: "coming",
-    gradient: "from-rose-500 to-red-500",
     config: {
       type: "selection",
       label: "Provider",

@@ -22,9 +22,9 @@ export const metadata: Metadata = {
   title: "UNTRACED - Zero-Knowledge Verification Protocol",
   description:
     "Modular zero-knowledge verification suite that allows users to prove specific facts about themselves without revealing identity or personal data",
-  generator: "v0.app",
   icons: {
-    icon: "/icon.svg",
+    icon: "/icon.png",
+    apple: "/icon.png",
   },
 }
 

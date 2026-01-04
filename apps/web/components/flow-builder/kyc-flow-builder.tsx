@@ -151,8 +151,8 @@ export function KYCFlowBuilder({ onBack, onFlowCreated, projectContext }: KYCFlo
               </button>
             )}
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                <Layers className="w-4 h-4 text-purple-400" />
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Layers className="w-4 h-4 text-primary" />
               </div>
               <div>
                 <h1 className="text-base font-normal text-foreground">Flow Builder</h1>

@@ -23,7 +23,6 @@ export interface KYCModule {
   name: string;
   description: string;
   icon: string;
-  gradient?: string;
   required?: boolean;
   configOptions?: ModuleConfigOption[];
 }
@@ -382,13 +381,8 @@ export function KYCFlowModal({
             >
               {/* Module header */}
               <div className="text-center">
-                <div
-                  className={cn(
-                    "w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-gradient-to-br",
-                    currentModule.gradient || "from-primary/80 to-primary"
-                  )}
-                >
-                  <Icon className="w-7 h-7 text-white" />
+                <div className="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-primary/10">
+                  <Icon className="w-7 h-7 text-primary" />
                 </div>
                 <h3 className="text-base font-medium text-foreground">
                   {currentModule.name}
@@ -554,14 +548,11 @@ export function KYCFlowModal({
                     className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-secondary/50"
                   >
                     <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br",
-                        module.gradient || "from-primary/80 to-primary"
-                      )}>
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
                         {iconMap[module.icon] ? (
-                          React.createElement(iconMap[module.icon], { className: "w-4 h-4 text-white" })
+                          React.createElement(iconMap[module.icon], { className: "w-4 h-4 text-primary" })
                         ) : (
-                          <ShieldCheckIcon className="w-4 h-4 text-white" />
+                          <ShieldCheckIcon className="w-4 h-4 text-primary" />
                         )}
                       </div>
                       <span className="text-sm text-foreground">{module.name}</span>

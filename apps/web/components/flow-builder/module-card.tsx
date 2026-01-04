@@ -57,17 +57,10 @@ export function ModuleCard({ module, onClick, disabled }: ModuleCardProps) {
           className={cn(
             "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300",
             "group-hover:scale-110 group-disabled:group-hover:scale-100",
-            module.gradient
-              ? `bg-gradient-to-br ${module.gradient}`
-              : "bg-untraced-dark/5"
+            "bg-untraced-dark/10"
           )}
         >
-          <Icon
-            className={cn(
-              "w-5 h-5",
-              module.gradient ? "text-foreground" : "text-untraced-dark"
-            )}
-          />
+          <Icon className="w-5 h-5 text-untraced-dark" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
@@ -136,12 +129,10 @@ export function FlowModuleCard({
         <div
           className={cn(
             "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
-            module.gradient
-              ? `bg-gradient-to-br ${module.gradient}`
-              : "bg-untraced-dark"
+            "bg-untraced-dark/10"
           )}
         >
-          <Icon className="w-5 h-5 text-foreground" />
+          <Icon className="w-5 h-5 text-untraced-dark" />
         </div>
 
         <div className="flex-1 min-w-0">
