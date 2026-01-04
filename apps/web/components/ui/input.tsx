@@ -27,12 +27,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             type={type}
             className={cn(
-              "w-full h-10 px-4 text-sm bg-secondary/50 border border-border rounded-xl",
+              "w-full h-10 px-4 text-sm bg-secondary border border-border/60 rounded-xl",
               "placeholder:text-muted-foreground text-foreground",
-              "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50",
-              "hover:border-border/80 hover:bg-secondary/70",
+              "focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary",
+              "hover:border-primary/40 hover:bg-secondary/80",
               "transition-all duration-200",
-              "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-secondary/50",
+              "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-secondary",
               error && "border-destructive/50 focus:ring-destructive/20 focus:border-destructive/50",
               leftIcon && "pl-10",
               rightIcon && "pr-10",
@@ -77,10 +77,10 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         <textarea
           className={cn(
-            "w-full min-h-[100px] px-4 py-3 text-sm bg-secondary/50 border border-border rounded-xl",
+            "w-full min-h-[100px] px-4 py-3 text-sm bg-secondary border border-border/60 rounded-xl",
             "placeholder:text-muted-foreground text-foreground resize-none",
-            "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50",
-            "hover:border-border/80 hover:bg-secondary/70",
+            "focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary",
+            "hover:border-primary/40 hover:bg-secondary/80",
             "transition-all duration-200",
             "disabled:opacity-50 disabled:cursor-not-allowed",
             error && "border-destructive/50 focus:ring-destructive/20 focus:border-destructive/50",
