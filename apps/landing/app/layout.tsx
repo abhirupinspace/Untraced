@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "UNTRACED - Zero-Knowledge Verification Protocol",
+  title: "UNTRACED v1",
   description:
     "Modular zero-knowledge verification suite that allows users to prove specific facts about themselves without revealing identity or personal data",
   icons: {
