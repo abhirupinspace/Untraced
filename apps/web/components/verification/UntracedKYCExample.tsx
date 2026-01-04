@@ -12,7 +12,7 @@ import {
   UntracedModal,
   UntracedButton,
   useUntracedModal,
-} from "@untraced/sdk";
+} from "@/lib/sdk";
 
 // ===========================================
 // OPTION 1: Quick Integration with UntracedButton

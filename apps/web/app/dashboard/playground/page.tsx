@@ -37,7 +37,7 @@ import { useWallet } from "@/lib/use-wallet";
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { createWalletClient, custom, type Hex } from "viem";
 import { mantleSepoliaTestnet } from "viem/chains";
-import { createClient, MANTLE_SEPOLIA } from "@untraced/sdk";
+import { createClient, MANTLE_SEPOLIA } from "@/lib/sdk";
 
 type ModuleStatus = "idle" | "running" | "success" | "error";
 

@@ -10,11 +10,6 @@ import {
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { mantleSepoliaTestnet } from "viem/chains";
-import {
-  ZKAgeProver,
-  addressToField,
-  generateRandomSecret,
-} from "@untraced/circuits";
 
 // Module type for age verification
 const ZK_AGE = keccak256(toHex("ZK_AGE"));
@@ -45,25 +40,12 @@ interface AgeAttestRequest {
   birthDate: string; // ISO date string (YYYY-MM-DD)
   minAge: number;
   nonce: number;
-  // Set to true to generate a real ZK proof (slower but fully private)
-  useZkProof?: boolean;
   // Optional: signature from identity provider
   identityProof?: {
     provider: string;
     signature: string;
     timestamp: number;
   };
-}
-
-// Singleton prover instance for reuse
-let zkProver: ZKAgeProver | null = null;
-
-async function getZkProver(): Promise<ZKAgeProver> {
-  if (!zkProver) {
-    zkProver = new ZKAgeProver();
-    await zkProver.initialize();
-  }
-  return zkProver;
 }
 
 /**
@@ -80,18 +62,6 @@ function calculateAge(birthDate: string): number {
   }
 
   return age;
-}
-
-/**
- * Parse birth date into components
- */
-function parseBirthDate(birthDate: string): {
-  year: number;
-  month: number;
-  day: number;
-} {
-  const [year, month, day] = birthDate.split("-").map(Number);
-  return { year, month, day };
 }
 
 /**
@@ -126,7 +96,6 @@ export async function POST(request: NextRequest) {
       minAge,
       nonce,
       identityProof,
-      useZkProof = false,
     } = body;
 
     // Validate inputs
@@ -203,43 +172,7 @@ export async function POST(request: NextRequest) {
       transport: http(),
     });
 
-    // If ZK proof requested, generate it
-    let zkProofData = null;
-    if (useZkProof) {
-      try {
-        const { year, month, day } = parseBirthDate(birthDate);
-        const prover = await getZkProver();
-
-        const zkProof = await prover.generateProof({
-          birthYear: year,
-          birthMonth: month,
-          birthDay: day,
-          userAddress: addressToField(userAddress),
-          minAge,
-          secret: generateRandomSecret(),
-        });
-
-        zkProofData = {
-          proof: Buffer.from(zkProof.proof).toString("hex"),
-          publicInputs: {
-            currentYear: zkProof.publicInputs.currentYear,
-            currentMonth: zkProof.publicInputs.currentMonth,
-            currentDay: zkProof.publicInputs.currentDay,
-            minAge: zkProof.publicInputs.minAge,
-            userAddress: zkProof.publicInputs.userAddress.toString(),
-            commitment: zkProof.publicInputs.commitment.toString(),
-          },
-        };
-      } catch (zkError) {
-        console.error("ZK proof generation failed:", zkError);
-        return NextResponse.json(
-          { error: "ZK proof generation failed" },
-          { status: 500 }
-        );
-      }
-    }
-
-    // Sign EIP-712 typed data (always generated for on-chain submission)
+    // Sign EIP-712 typed data
     const signature = await walletClient.signTypedData({
       domain: DOMAIN,
       types: ATTESTATION_TYPES,
@@ -276,15 +209,12 @@ export async function POST(request: NextRequest) {
         },
         proofData,
       },
-      // Include ZK proof data if generated
-      zkProof: zkProofData,
       meta: {
         ageRequirementMet: true,
         minAgeVerified: minAge,
         verificationSource: source,
         validityDays: 30,
         attestor: attestorAccount.address,
-        zkProofGenerated: useZkProof,
       },
     });
   } catch (error) {
@@ -301,10 +231,9 @@ export async function GET() {
   return NextResponse.json({
     status: "ok",
     module: "zk-age",
-    description: "Zero-knowledge age verification module",
+    description: "Age verification module",
     supportedProviders: ["self-attestation", "polygon-id", "worldcoin", "jumio"],
     ageRange: { min: 13, max: 100 },
-    zkProofSupported: true,
     registryConfigured: !!process.env.NEXT_PUBLIC_REGISTRY_ADDRESS,
     attestorConfigured: !!process.env.ATTESTOR_PRIVATE_KEY,
   });

@@ -7,7 +7,7 @@ import {
   UntracedModal,
   UntracedButton,
   useUntracedModal,
-} from "@untraced/sdk";
+} from "@/lib/sdk";
 import {
   KYCFlowModal,
   type KYCFlowConfig,
