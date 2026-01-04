@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import { Check, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const WEB_APP_URL = "http://localhost:3000"
+const WEB_APP_URL = "https://untraced-web.vercel.app"
 
 type Plan = {
   name: string

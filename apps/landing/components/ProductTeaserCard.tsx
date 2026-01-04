@@ -5,7 +5,7 @@ import { motion, useScroll, useTransform } from "framer-motion"
 import { ArrowRight, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-const WEB_APP_URL = "http://localhost:3000"
+const WEB_APP_URL = "https://untraced-web.vercel.app"
 
 export const ProductTeaserCard = () => {
   const sectionRef = useRef<HTMLElement>(null)

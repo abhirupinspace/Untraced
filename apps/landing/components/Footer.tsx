@@ -3,7 +3,7 @@
 import { ArrowUpRight } from "lucide-react"
 import Image from "next/image"
 
-const WEB_APP_URL = "http://localhost:3000"
+const WEB_APP_URL = "https://untraced-web.vercel.app"
 
 const links = {
   product: [

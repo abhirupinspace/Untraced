@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
 import Image from "next/image"
 import { AnimatedThemeToggler } from "@/components/ui/animated-theme-toggler"
 
-const WEB_APP_URL = "http://localhost:3000"
+const WEB_APP_URL = "https://untraced-web.vercel.app"
 
 const navigationLinks = [
   { name: "How It Works", href: "#how-it-works" },

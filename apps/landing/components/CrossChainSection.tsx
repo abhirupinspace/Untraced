@@ -4,7 +4,7 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 
-const WEB_APP_URL = "http://localhost:3000"
+const WEB_APP_URL = "https://untraced-web.vercel.app"
 
 const supportedChains = [
   { name: "Ethereum", symbol: "ETH", logo: "/images/Ethereum.svg" },

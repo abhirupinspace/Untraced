@@ -3,7 +3,7 @@
 import { motion } from "framer-motion"
 import { ArrowRight, ArrowUpRight } from "lucide-react"
 
-const WEB_APP_URL = "http://localhost:3000"
+const WEB_APP_URL = "https://untraced-web.vercel.app"
 
 const modules = [
   {
