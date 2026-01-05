@@ -1,6 +1,7 @@
 import { PortfolioNavbar } from "@/components/PortfolioNavbar"
 import { ProductTeaserCard } from "@/components/ProductTeaserCard"
 import { BankingScaleHero } from "@/components/BankingScaleHero"
+import { StickyFeatureSection } from "@/components/StickyFeatureSection"
 import { ModulesSection } from "@/components/ModulesSection"
 import { CrossChainSection } from "@/components/CrossChainSection"
 import { CaseStudiesCarousel } from "@/components/CaseStudiesCarousel"
@@ -15,6 +16,7 @@ export default function Page() {
       <PortfolioNavbar />
       <ProductTeaserCard />
       <BankingScaleHero />
+      <StickyFeatureSection />
       <ModulesSection />
       <CrossChainSection />
       <CaseStudiesCarousel />

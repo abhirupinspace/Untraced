@@ -52,7 +52,7 @@ const modules = [
 
 export const ModulesSection = () => {
   return (
-    <section className="relative w-full py-32 md:py-40 overflow-hidden bg-background" id="modules">
+    <section className="relative w-full pt-16 md:pt-20 pb-32 md:pb-40 overflow-hidden bg-background" id="modules">
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         {/* Header */}
         <motion.div

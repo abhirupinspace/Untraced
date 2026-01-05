@@ -40,7 +40,7 @@ export const BankingScaleHero = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-32 md:py-40 overflow-hidden bg-background"
+      className="relative w-full pt-32 md:pt-40 pb-16 md:pb-20 overflow-hidden bg-background"
       id="how-it-works"
     >
       <div className="relative z-10 max-w-6xl mx-auto px-6">
