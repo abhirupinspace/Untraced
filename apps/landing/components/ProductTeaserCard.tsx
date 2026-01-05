@@ -36,7 +36,7 @@ export const ProductTeaserCard = () => {
         >
           <source src="/bgvid.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/40 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/20 via-background/20 to-background" />
       </div>
 
       {/* Video Background - Light Mode */}
@@ -48,24 +48,24 @@ export const ProductTeaserCard = () => {
           playsInline
           className="h-full w-full object-cover opacity-30"
         >
-          <source src="/bgvidlight.mp4" type="video/mp4" />
+          <source src="/bgvidlight2.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background" />
+        {/* <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/30 to-background" /> */}
       </div>
 
       {/* Main Content */}
       <motion.div
         style={{ opacity, scale, y }}
-        className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pt-32 pb-24"
+        className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 sm:px-6 md:px-8 pt-24 md:pt-28 pb-32"
       >
         {/* Eyebrow */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-8"
+          className="mb-6 md:mb-8"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border/50 bg-secondary/50 backdrop-blur-sm text-sm text-muted-foreground">
+          <span className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-border/40 bg-secondary/40 backdrop-blur-sm text-sm font-medium tracking-wide text-muted-foreground uppercase">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             Now live on Mantle
           </span>
@@ -76,12 +76,12 @@ export const ProductTeaserCard = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="text-center max-w-5xl"
+          className="text-center max-w-5xl overflow-visible"
         >
-          <span className="block text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-medium tracking-tight text-foreground leading-[0.95]">
+          <span className="block text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem] font-medium tracking-[-0.04em] text-foreground leading-[1.1]">
             Verify everything.
           </span>
-          <span className="block text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-medium tracking-tight leading-[0.95] mt-2 text-primary">
+          <span className="block text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem] font-light italic tracking-[-0.02em] leading-[1.1] -mt-1 gradient-text pb-1">
             Reveal nothing.
           </span>
         </motion.h1>
@@ -91,7 +91,7 @@ export const ProductTeaserCard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.25 }}
-          className="mt-8 text-center text-xl sm:text-2xl text-muted-foreground max-w-xl leading-relaxed tracking-tight"
+          className="mt-6 md:mt-8 text-center text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-2xl leading-relaxed tracking-[-0.01em] font-light"
         >
           Verify users <span className="text-foreground font-medium">without</span> ever seeing their data.
         </motion.p>
@@ -101,7 +101,7 @@ export const ProductTeaserCard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-12 flex flex-col sm:flex-row items-center gap-4"
+          className="mt-8 md:mt-10 flex flex-col sm:flex-row items-center gap-4"
         >
           <Button
             asChild
@@ -130,18 +130,18 @@ export const ProductTeaserCard = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm text-muted-foreground/60"
+          className="mt-10 md:mt-12 flex flex-wrap items-center justify-center gap-x-8 md:gap-x-10 gap-y-3 text-xs tracking-widest uppercase text-muted-foreground/50 font-medium"
         >
-          <span className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
+          <span className="flex items-center gap-2.5">
+            <span className="w-1 h-1 rounded-full bg-primary/40" />
             Noir Circuits
           </span>
-          <span className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
+          <span className="flex items-center gap-2.5">
+            <span className="w-1 h-1 rounded-full bg-primary/40" />
             Client-side Proofs
           </span>
-          <span className="flex items-center gap-2">
-            <span className="w-1 h-1 rounded-full bg-muted-foreground/40" />
+          <span className="flex items-center gap-2.5">
+            <span className="w-1 h-1 rounded-full bg-primary/40" />
             On-chain Attestations
           </span>
         </motion.div>
@@ -151,7 +151,7 @@ export const ProductTeaserCard = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="mt-20 w-full max-w-4xl"
+          className="mt-12 md:mt-16 w-full max-w-4xl"
         >
           <div className="relative">
             {/* Code Preview */}
@@ -206,7 +206,7 @@ export const ProductTeaserCard = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2, duration: 0.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-10"
       >
         <a
           href="#how-it-works"

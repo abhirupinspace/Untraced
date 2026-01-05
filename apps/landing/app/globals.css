@@ -3,65 +3,65 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* UNTRACED Brand Colors - Soothing Light Mode */
+/* UNTRACED Brand Colors - Warm Brown Light Mode */
 :root {
-  /* Light theme - soft lavender/purple tinted whites */
-  --background: #faf8fc;
-  --foreground: #1a1225;
-  --card: #ffffff;
-  --card-foreground: #1a1225;
-  --popover: #ffffff;
-  --popover-foreground: #1a1225;
+  /* Light theme - warm cream/beige tones */
+  --background: #faf6f1;
+  --foreground: #2d2319;
+  --card: #fffbf7;
+  --card-foreground: #2d2319;
+  --popover: #fffbf7;
+  --popover-foreground: #2d2319;
 
-  /* Deep purple accent from logo */
-  --primary: #7c3aed;
+  /* Warm brown primary */
+  --primary: #8b5a2b;
   --primary-foreground: #ffffff;
-  --primary-hover: #6d28d9;
+  --primary-hover: #704821;
 
-  /* Secondary - soft lavender */
-  --secondary: #f3f0f7;
-  --secondary-foreground: #1a1225;
+  /* Secondary - soft tan */
+  --secondary: #f5ede4;
+  --secondary-foreground: #2d2319;
 
-  /* Muted - gentle purple tint */
-  --muted: #f5f3f7;
-  --muted-foreground: rgba(26, 18, 37, 0.6);
+  /* Muted - light beige */
+  --muted: #f7f1ea;
+  --muted-foreground: rgba(45, 35, 25, 0.6);
 
-  /* Accent - vibrant purple */
-  --accent: #8b5cf6;
+  /* Accent - copper/terracotta */
+  --accent: #b86f3e;
   --accent-foreground: #ffffff;
-  --accent-hover: #7c3aed;
+  --accent-hover: #a05d32;
 
   /* Destructive */
-  --destructive: #ef4444;
+  --destructive: #c53030;
   --destructive-foreground: #ffffff;
 
-  /* Borders and inputs - soft purple tint */
-  --border: rgba(124, 58, 237, 0.12);
-  --input: rgba(124, 58, 237, 0.12);
-  --ring: rgba(124, 58, 237, 0.25);
+  /* Borders and inputs - warm brown tint */
+  --border: rgba(139, 90, 43, 0.15);
+  --input: rgba(139, 90, 43, 0.15);
+  --ring: rgba(139, 90, 43, 0.25);
 
   /* Card border */
-  --card-border: rgba(124, 58, 237, 0.08);
+  --card-border: rgba(139, 90, 43, 0.1);
 
-  /* Chart colors - purple-centric palette */
-  --chart-1: #7c3aed;
-  --chart-2: #8b5cf6;
-  --chart-3: #a78bfa;
-  --chart-4: #c4b5fd;
-  --chart-5: #ddd6fe;
+  /* Chart colors - brown/amber palette */
+  --chart-1: #8b5a2b;
+  --chart-2: #b86f3e;
+  --chart-3: #c9915f;
+  --chart-4: #dab896;
+  --chart-5: #ecdcc8;
 
   /* Radius */
   --radius: 0.75rem;
 
   /* Sidebar */
-  --sidebar: #ffffff;
-  --sidebar-foreground: #1a1225;
-  --sidebar-primary: #7c3aed;
+  --sidebar: #fffbf7;
+  --sidebar-foreground: #2d2319;
+  --sidebar-primary: #8b5a2b;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f3f0f7;
-  --sidebar-accent-foreground: #1a1225;
-  --sidebar-border: rgba(124, 58, 237, 0.12);
-  --sidebar-ring: rgba(124, 58, 237, 0.25);
+  --sidebar-accent: #f5ede4;
+  --sidebar-accent-foreground: #2d2319;
+  --sidebar-border: rgba(139, 90, 43, 0.15);
+  --sidebar-ring: rgba(139, 90, 43, 0.25);
 }
 
 /* UNTRACED Brand Colors - Deep Purple Dark Theme */
@@ -219,7 +219,7 @@
 
 /* Gradient backgrounds - theme aware */
 .gradient-bg {
-  background: linear-gradient(160deg, #faf8fc 0%, #f3f0f7 50%, #faf8fc 100%);
+  background: linear-gradient(160deg, #faf6f1 0%, #f5ede4 50%, #faf6f1 100%);
 }
 
 .dark .gradient-bg {
@@ -227,7 +227,7 @@
 }
 
 .gradient-border {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(124, 58, 237, 0.05));
+  background: linear-gradient(135deg, rgba(139, 90, 43, 0.15), rgba(139, 90, 43, 0.05));
 }
 
 .dark .gradient-border {
@@ -236,7 +236,7 @@
 
 /* Animated gradient border */
 .animate-border {
-  background: linear-gradient(90deg, #7c3aed, #8b5cf6, #7c3aed);
+  background: linear-gradient(90deg, #8b5a2b, #b86f3e, #8b5a2b);
   background-size: 200% 100%;
   animation: border-gradient 4s ease infinite;
 }
@@ -256,7 +256,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(124, 58, 237, 0.08),
+    rgba(139, 90, 43, 0.08),
     transparent
   );
   background-size: 200% 100%;
@@ -280,7 +280,7 @@
 
 /* Glow effect - theme aware */
 .glow {
-  box-shadow: 0 0 30px rgba(124, 58, 237, 0.2);
+  box-shadow: 0 0 30px rgba(139, 90, 43, 0.2);
 }
 
 .dark .glow {
@@ -288,7 +288,7 @@
 }
 
 .glow-hover:hover {
-  box-shadow: 0 0 40px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 0 40px rgba(139, 90, 43, 0.3);
 }
 
 .dark .glow-hover:hover {
@@ -315,7 +315,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f3f0f7;
+  background: #f5ede4;
   border-radius: 3px;
 }
 
@@ -324,7 +324,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c4b5fd;
+  background: #dab896;
   border-radius: 3px;
 }
 
@@ -333,7 +333,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a78bfa;
+  background: #c9915f;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
@@ -342,7 +342,7 @@
 
 /* Selection */
 ::selection {
-  background: rgba(168, 85, 247, 0.3);
+  background: rgba(184, 111, 62, 0.3);
 }
 
 /* Magic UI Animations */
@@ -441,7 +441,7 @@
 
 /* Gradient text - theme aware */
 .gradient-text {
-  background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 50%, #7c3aed 100%);
+  background: linear-gradient(135deg, #8b5a2b 0%, #b86f3e 50%, #8b5a2b 100%);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -473,7 +473,7 @@
 
 .bento-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 24px 48px -12px rgba(124, 58, 237, 0.12);
+  box-shadow: 0 24px 48px -12px rgba(139, 90, 43, 0.12);
 }
 
 .dark .bento-card:hover {
@@ -482,10 +482,10 @@
 
 /* Glass morphism - theme aware */
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 251, 247, 0.7);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(124, 58, 237, 0.08);
+  border: 1px solid rgba(139, 90, 43, 0.1);
 }
 
 .dark .glass-card {
@@ -618,10 +618,10 @@
 /* Timeline dot pulse */
 @keyframes timeline-pulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4);
+    box-shadow: 0 0 0 0 rgba(139, 90, 43, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(124, 58, 237, 0);
+    box-shadow: 0 0 0 8px rgba(139, 90, 43, 0);
   }
 }
 
