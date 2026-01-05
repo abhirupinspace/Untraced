@@ -136,7 +136,7 @@ export const PortfolioNavbar = () => {
                   GitHub
                 </a>
                 <a
-                  href={`${WEB_APP_URL}/dashboard`}
+                  href={`https://untraced-web.vercel.app/dashboard`}
                   className="block w-full text-center bg-primary text-primary-foreground px-4 py-3 rounded-xl text-base font-medium"
                 >
                   Launch App
