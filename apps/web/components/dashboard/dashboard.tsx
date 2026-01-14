@@ -717,33 +717,50 @@ function ProjectDetailView({
         <div className="w-full max-w-3xl space-y-5">
           {/* New Key Alert */}
           {newKey?.key && (
-            <div className="bg-success/10 border border-success/20 rounded-lg p-3">
-              <div className="flex gap-2.5">
-                <Key className="w-4 h-4 text-success flex-shrink-0 mt-0.5" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-success font-medium mb-1.5">
-                    New {newKey.type} key created
-                  </p>
-                  <p className="text-xs text-success/70 mb-2">
-                    Copy this key now. You won&apos;t be able to see it again.
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <code className="flex-1 text-xs font-mono text-success bg-success/10 px-2.5 py-1.5 rounded truncate">
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              className="relative overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 via-primary/[0.02] to-transparent p-4"
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Key className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0 space-y-3">
+                  <div>
+                    <h4 className="text-sm font-medium text-foreground mb-0.5">
+                      {newKey.type === "publishable" ? "Client ID" : "Secret Key"} Created
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Save this key securely. It will only be shown once.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded-lg bg-secondary/50 border border-border/50">
+                    <code className="flex-1 text-xs font-mono text-foreground truncate select-all">
                       {newKey.key}
                     </code>
                     <button
                       onClick={() => copyToClipboard(newKey.key!, "new-key")}
-                      className="p-1.5 rounded hover:bg-success/20 text-success transition-all"
+                      className={cn(
+                        "p-2 rounded-md transition-all flex-shrink-0",
+                        copiedId === "new-key"
+                          ? "bg-success/10 text-success"
+                          : "hover:bg-secondary text-muted-foreground hover:text-foreground"
+                      )}
                     >
-                      {copiedId === "new-key" ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedId === "new-key" ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     </button>
                   </div>
-                  <button onClick={() => setNewKey(null)} className="text-xs text-success/50 hover:text-success mt-2">
-                    Dismiss
-                  </button>
                 </div>
+                <button
+                  onClick={() => setNewKey(null)}
+                  className="p-1.5 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-all flex-shrink-0"
+                >
+                  <XCircle className="w-4 h-4" />
+                </button>
               </div>
-            </div>
+            </motion.div>
           )}
 
           {/* API Keys Section */}

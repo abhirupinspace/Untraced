@@ -17,6 +17,8 @@ import type {
   VerificationResult,
   VerificationStatus,
 } from "./types";
+import { authenticate, type OAuthProvider } from "./oauth";
+import { AVAILABLE_MODULES } from "./types";
 
 const UntracedContext = createContext<UntracedContextValue | null>(null);
 
@@ -131,19 +133,47 @@ export function UntracedProvider({ children, config }: UntracedProviderProps) {
           address = await connectWallet();
         }
 
-        setStatus("verifying");
+        // Check if module requires OAuth
+        const moduleConfig = AVAILABLE_MODULES.find((m) => m.id === module);
+        let accessToken: string | undefined;
+
+        if (moduleConfig?.requiresOAuth && moduleConfig.oauthProvider) {
+          setStatus("verifying");
+          try {
+            // Start OAuth flow
+            accessToken = await authenticate(
+              moduleConfig.oauthProvider as OAuthProvider,
+              mergedConfig.apiUrl || "/api"
+            );
+          } catch (oauthError: any) {
+            throw new Error(
+              oauthError.message || `${moduleConfig.oauthProvider} authentication failed`
+            );
+          }
+        } else {
+          setStatus("verifying");
+        }
 
         // Build request based on module type
         const endpoint = `${mergedConfig.apiUrl}/attest/${module.replace("zk-", "")}`;
 
-        // Get nonce for signature
-        const nonce = Math.floor(Math.random() * 1000000);
+        // Use timestamp-based nonce for better security and uniqueness
+        const nonce = Date.now();
 
         const requestBody: Record<string, unknown> = {
           userAddress: address,
           nonce,
           ...options,
         };
+
+        // Add OAuth token if present
+        if (accessToken) {
+          if (moduleConfig?.oauthProvider === "github") {
+            requestBody.githubAccessToken = accessToken;
+          } else if (moduleConfig?.oauthProvider === "twitter") {
+            requestBody.twitterAccessToken = accessToken;
+          }
+        }
 
         // Make attestation request
         const response = await fetch(endpoint, {

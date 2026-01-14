@@ -4,6 +4,7 @@ import { useRef } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { ArrowRight, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { UntracedSDKDemo } from "./UntracedSDKDemo"
 
 const WEB_APP_URL = "https://untraced-web.vercel.app"
 
@@ -113,6 +114,7 @@ export const ProductTeaserCard = () => {
               <ArrowRight className="w-4 h-4" />
             </a>
           </Button>
+          <UntracedSDKDemo />
           <Button
             asChild
             variant="ghost"

@@ -52,4 +52,5 @@ yarn-error.log*
 
 # Misc
 *.pem
+docs
 untraced.md

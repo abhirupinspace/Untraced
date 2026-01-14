@@ -151,8 +151,9 @@ export async function GET(request: NextRequest) {
 
     const userData: GitHubUser = await userResponse.json();
 
-    // Redirect back to playground with token and user info
-    const returnUrl = new URL(stateData.returnUrl || "/dashboard/playground", request.url);
+    // Redirect back to return URL with token and user info
+    const returnPath = stateData.returnUrl || "/dashboard/playground";
+    const returnUrl = new URL(returnPath, request.url);
     returnUrl.searchParams.set("github_connected", "true");
     returnUrl.searchParams.set("github_username", userData.login);
 

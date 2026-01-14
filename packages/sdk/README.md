@@ -2,39 +2,195 @@
 
 Official SDK for integrating UNTRACED zero-knowledge verification into your dApp.
 
+> **Latest:** The SDK now includes a pre-built verification modal with support for 5 verification modules (Email, Age, GitHub, Twitter, Balance) with OAuth integration!
+
+## Features
+
+- **Zero-Knowledge Proofs** - Verify without revealing data
+- **Pre-built UI Modal** - Beautiful, customizable verification modal
+- **Easy Integration** - 3 lines of code to get started
+- **Multiple Verification Modules** - Email, age, GitHub, Twitter, wallet balance
+- **On-chain Attestations** - EIP-712 signed attestations on Mantle
+- **TypeScript First** - Full type safety and autocomplete
+- **OAuth Support** - Automatic handling of GitHub and Twitter OAuth flows
+
 ## Installation
 
 ```bash
 npm install @untraced/sdk
 # or
+yarn add @untraced/sdk
+# or
 bun add @untraced/sdk
 ```
 
-## Quick Start
+## Quick Start (Verification Modal)
+
+### 1. Wrap your app with UntracedProvider
 
 ```tsx
-import { useUntraced } from "@untraced/sdk";
+import { UntracedProvider, UntracedModal } from '@untraced/sdk';
 
-function VerifyButton() {
-  const { verified, loading, verify } = useUntraced();
-
+function App() {
   return (
-    <button onClick={verify} disabled={loading || verified}>
-      {verified ? "Verified" : "Verify Email"}
-    </button>
+    <UntracedProvider
+      config={{
+        clientId: "your-client-id", // Get from dashboard.untraced.io
+        apiUrl: "https://untraced-web.vercel.app/api",
+        theme: "dark", // "light" | "dark" | "auto"
+        onSuccess: (result) => {
+          console.log('Verification successful!', result);
+        },
+      }}
+    >
+      <YourApp />
+      {/* Add modal component at root level */}
+      <UntracedModal />
+    </UntracedProvider>
   );
 }
 ```
 
-## Configuration
+### 2. Trigger verification from anywhere
 
-Set environment variables in your Next.js app:
+```tsx
+import { useUntracedModal } from '@untraced/sdk';
 
-```env
-NEXT_PUBLIC_REGISTRY_ADDRESS=0x...  # UntracedRegistry contract address
+function MyComponent() {
+  const { open } = useUntracedModal();
+
+  return (
+    <div>
+      <button onClick={() => open('zk-email')}>Verify Email</button>
+      <button onClick={() => open('zk-github')}>Verify GitHub</button>
+      <button onClick={() => open('zk-twitter')}>Verify Twitter</button>
+    </div>
+  );
+}
 ```
 
-## API Reference
+### 3. Or use the pre-styled button
+
+```tsx
+import { UntracedButton } from '@untraced/sdk';
+
+function MyComponent() {
+  return (
+    <UntracedButton module="zk-email" variant="primary" size="lg">
+      Verify Your Email
+    </UntracedButton>
+  );
+}
+```
+
+## Available Verification Modules
+
+| Module ID | Description | OAuth Required | Config Options |
+|-----------|-------------|----------------|----------------|
+| `zk-email` | Verify email ownership | No | `provider` (any/gmail/outlook) |
+| `zk-age` | Prove age threshold | No | `minAge` (13-100) |
+| `zk-github` | Verify GitHub activity | Yes | `minCommits` (0-10000) |
+| `zk-twitter` | Verify Twitter/X account | Yes | `verificationType` (account/followers/verified) |
+| `zk-balance` | Prove wallet balance | No | `minBalance` (ETH) |
+
+## Modal Configuration
+
+### UntracedProvider Config
+
+```typescript
+interface UntracedConfig {
+  clientId: string;                    // Required: Your project client ID
+  apiUrl?: string;                     // Optional: API endpoint (default: "/api")
+  chainId?: number;                    // Optional: Chain ID (default: 5003 - Mantle Sepolia)
+  registryAddress?: Hex;               // Optional: Custom registry contract
+  theme?: "light" | "dark" | "auto";   // Optional: Theme mode (default: "dark")
+  accentColor?: string;                // Optional: Brand color (default: "#a855f7")
+  modules?: VerificationModule[];      // Optional: Limit available modules
+  onSuccess?: (result: VerificationResult) => void;  // Success callback
+  onError?: (error: Error) => void;                  // Error callback
+  onClose?: () => void;                              // Modal close callback
+}
+```
+
+### Advanced Modal Usage
+
+#### Programmatic Verification
+
+```tsx
+import { useUntracedModal } from '@untraced/sdk';
+
+function MyComponent() {
+  const { verify, status, verificationResult } = useUntracedModal();
+
+  const handleVerify = async () => {
+    try {
+      const result = await verify('zk-age', { minAge: 21 });
+      console.log('Verified!', result);
+    } catch (error) {
+      console.error('Verification failed:', error);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={handleVerify} disabled={status === 'verifying'}>
+        {status === 'verifying' ? 'Verifying...' : 'Verify Age 21+'}
+      </button>
+      {verificationResult && (
+        <div>✓ Verified! Transaction: {verificationResult.transactionHash}</div>
+      )}
+    </div>
+  );
+}
+```
+
+#### Custom Module Configuration
+
+```tsx
+const { open } = useUntracedModal();
+
+// Email with specific provider
+open('zk-email', { provider: 'gmail' });
+
+// Age with custom threshold
+open('zk-age', { minAge: 21 });
+
+// GitHub with commit requirement
+open('zk-github', { minCommits: 100 });
+
+// Twitter verification
+open('zk-twitter', { verificationType: 'followers', minFollowers: 1000 });
+
+// Wallet balance threshold
+open('zk-balance', { minBalance: 0.1 });
+```
+
+#### Limit Available Modules
+
+```tsx
+<UntracedProvider
+  config={{
+    clientId: "your-client-id",
+    modules: ['zk-email', 'zk-github'], // Only show these modules
+  }}
+>
+  <YourApp />
+  <UntracedModal />
+</UntracedProvider>
+```
+
+### OAuth Verification Flow
+
+For modules that require OAuth (GitHub, Twitter), the SDK automatically:
+
+1. Opens an OAuth popup window
+2. Handles the authentication flow
+3. Securely passes the access token to the attestation API
+4. Returns the verification result
+
+No additional configuration needed - OAuth is handled transparently!
+
+## Legacy API Reference
 
 ### Hooks
 

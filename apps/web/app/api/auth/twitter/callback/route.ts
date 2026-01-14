@@ -157,8 +157,9 @@ export async function GET(request: NextRequest) {
 
     const userData: TwitterUserResponse = await userResponse.json();
 
-    // Redirect back to playground with connection success
-    const returnUrl = new URL(stateData.returnUrl || "/dashboard/playground", request.url);
+    // Redirect back to return URL with connection success
+    const returnPath = stateData.returnUrl || "/dashboard/playground";
+    const returnUrl = new URL(returnPath, request.url);
     returnUrl.searchParams.set("twitter_connected", "true");
     returnUrl.searchParams.set("twitter_username", userData.data.username);
 

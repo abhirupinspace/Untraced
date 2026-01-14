@@ -46,7 +46,23 @@ export default function RootLayout({
         className={`${poppins.variable} font-sans antialiased bg-background text-foreground`}
       >
         <Providers>{children}</Providers>
-        <Toaster position="bottom-right" richColors />
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            unstyled: true,
+            classNames: {
+              toast: "group flex items-start gap-3 w-full p-4 rounded-xl border bg-card shadow-lg",
+              title: "text-sm font-medium text-foreground",
+              description: "text-xs text-muted-foreground mt-0.5",
+              actionButton: "bg-primary text-primary-foreground text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors",
+              cancelButton: "bg-secondary text-foreground text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-secondary/80 transition-colors",
+              success: "border-success/20 [&>svg]:text-success",
+              error: "border-destructive/20 [&>svg]:text-destructive",
+              warning: "border-warning/20 [&>svg]:text-warning",
+              info: "border-primary/20 [&>svg]:text-primary",
+            },
+          }}
+        />
       </body>
     </html>
   );
